@@ -1,0 +1,190 @@
+
+Ω:
+    𝓒:
+        tag: Ω
+        type: &APPROX ReproducingKernel{SNode,:Cubic2D,:□,:QuinticSpline,:Tri3}
+    𝓖:
+        type: TriRK6
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂x³,∂x²∂y,∂x∂y²,∂y³]
+    𝗠: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂x³,∂x²∂y,∂x∂y²,∂y³,∂x_,∂y_,∂x²_,∂x∂y_,∂y²_,∇̃²]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂x³,∂x²∂y,∂x∂y²,∂y³]
+
+
+Ωˢ:
+    𝓒:
+        tag: Ω
+        type: *APPROX
+    𝓖:
+        type: TriGI3
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²]
+    𝗠: [∇̃²]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²]
+
+Γ₁:
+    𝓒:
+        tag: Γ₁
+        type: &APPROX2 ReproducingKernel{SNode,:Cubic2D,:□,:QuinticSpline,:Seg2}
+    𝓖:
+        type: SegRK3
+        𝝭: [∂1,∂x,∂y,∂z]
+    𝗠: [∂1,∂x,∂y,∂z]
+    𝝭: [∂1,∂x,∂y,∂z]
+
+Γ₂:
+    𝓒:
+        tag: Γ₂
+        type: *APPROX2
+    𝓖:
+        type: SegRK3
+        𝝭: [∂1,∂x,∂y,∂z]
+    𝗠: [∂1,∂x,∂y,∂z]
+    𝝭: [∂1,∂x,∂y,∂z]
+
+Γ₃:
+    𝓒:
+        tag: Γ₃
+        type: *APPROX2
+    𝓖:
+        type: SegRK3
+        𝝭: [∂1,∂x,∂y,∂z]
+    𝗠: [∂1,∂x,∂y,∂z]
+    𝝭: [∂1,∂x,∂y,∂z]
+
+Γ₄:
+    𝓒:
+        tag: Γ₄
+        type: *APPROX2
+    𝓖:
+        type: SegRK3
+        𝝭: [∂1,∂x,∂y,∂z]
+    𝗠: [∂1,∂x,∂y,∂z]
+    𝝭: [∂1,∂x,∂y,∂z]
+
+Γ̃₁:
+    𝓒:
+        tag: Ω
+        type: *APPROX
+    𝓖:
+        tag: Γ₁
+        type: SegRK3
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x²∂x,∂x²∂y,∂x∂y∂x,∂x∂y∂y,∂y²∂x,∂y²∂y,∂̄x²,∂̄x∂̄y,∂̄y²,∂̄x²∂x,∂̄x²∂y,∂̄x∂̄y∂x,∂̄x∂̄y∂y,∂̄y²∂x,∂̄y²∂y,∂x∂z,∂y∂z,∂z²]
+    𝗠: [∂1,∂x,∂y,∂z,∇̃²,∂∇̃²∂ξ,∂∇̃²∂η]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x²∂x,∂x²∂y,∂x∂y∂x,∂x∂y∂y,∂y²∂x,∂y²∂y,∂̄x²,∂̄x∂̄y,∂̄y²,∂̄x²∂x,∂̄x²∂y,∂̄x∂̄y∂x,∂̄x∂̄y∂y,∂̄y²∂x,∂̄y²∂y,∂x∂z,∂y∂z,∂z²]
+
+Γ̃₂:
+    𝓒:
+        tag: Ω
+        type: *APPROX
+    𝓖:
+        tag: Γ₂
+        type: SegRK3
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x²∂x,∂x²∂y,∂x∂y∂x,∂x∂y∂y,∂y²∂x,∂y²∂y,∂̄x²,∂̄x∂̄y,∂̄y²,∂̄x²∂x,∂̄x²∂y,∂̄x∂̄y∂x,∂̄x∂̄y∂y,∂̄y²∂x,∂̄y²∂y,∂x∂z,∂y∂z,∂z²]
+    𝗠: [∂1,∂x,∂y,∂z,∇̃²,∂∇̃²∂ξ,∂∇̃²∂η]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x²∂x,∂x²∂y,∂x∂y∂x,∂x∂y∂y,∂y²∂x,∂y²∂y,∂̄x²,∂̄x∂̄y,∂̄y²,∂̄x²∂x,∂̄x²∂y,∂̄x∂̄y∂x,∂̄x∂̄y∂y,∂̄y²∂x,∂̄y²∂y,∂x∂z,∂y∂z,∂z²]
+
+Γ̃₃:
+    𝓒:
+        tag: Ω
+        type: *APPROX
+    𝓖:
+        tag: Γ₃
+        type: SegRK3
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x²∂x,∂x²∂y,∂x∂y∂x,∂x∂y∂y,∂y²∂x,∂y²∂y,∂̄x²,∂̄x∂̄y,∂̄y²,∂̄x²∂x,∂̄x²∂y,∂̄x∂̄y∂x,∂̄x∂̄y∂y,∂̄y²∂x,∂̄y²∂y,∂x∂z,∂y∂z,∂z²]
+    𝗠: [∂1,∂x,∂y,∂z,∇̃²,∂∇̃²∂ξ,∂∇̃²∂η]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x²∂x,∂x²∂y,∂x∂y∂x,∂x∂y∂y,∂y²∂x,∂y²∂y,∂̄x²,∂̄x∂̄y,∂̄y²,∂̄x²∂x,∂̄x²∂y,∂̄x∂̄y∂x,∂̄x∂̄y∂y,∂̄y²∂x,∂̄y²∂y,∂x∂z,∂y∂z,∂z²]
+
+Γ̃₄:
+    𝓒:
+        tag: Ω
+        type: *APPROX
+    𝓖:
+        tag: Γ₄
+        type: SegRK3
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x²∂x,∂x²∂y,∂x∂y∂x,∂x∂y∂y,∂y²∂x,∂y²∂y,∂̄x²,∂̄x∂̄y,∂̄y²,∂̄x²∂x,∂̄x²∂y,∂̄x∂̄y∂x,∂̄x∂̄y∂y,∂̄y²∂x,∂̄y²∂y,∂x∂z,∂y∂z,∂z²]
+    𝗠: [∂1,∂x,∂y,∂z,∇̃²,∂∇̃²∂ξ,∂∇̃²∂η]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x²∂x,∂x²∂y,∂x∂y∂x,∂x∂y∂y,∂y²∂x,∂y²∂y,∂̄x²,∂̄x∂̄y,∂̄y²,∂̄x²∂x,∂̄x²∂y,∂̄x∂̄y∂x,∂̄x∂̄y∂y,∂̄y²∂x,∂̄y²∂y,∂x∂z,∂y∂z,∂z²]
+
+Γₚ₁:
+    𝓒:
+        tag: Γₚ₁
+        type: &APPROX3 ReproducingKernel{SNode,:Cubic2D,:□,:QuinticSpline,:Poi1}
+    𝓖:
+        type: PoiGI1
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂z²,∂x∂z,∂y∂z]
+    𝗠: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂z²,∂x∂z,∂y∂z,∂x_,∂y_,∂z_]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂z²,∂x∂z,∂y∂z]
+
+Γₚ₂:
+    𝓒:
+        tag: Γₚ₂
+        type: *APPROX3
+    𝓖:
+        type: PoiGI1
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂z²,∂x∂z,∂y∂z]
+    𝗠: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂z²,∂x∂z,∂y∂z,∂x_,∂y_,∂z_]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂z²,∂x∂z,∂y∂z]
+
+Γₚ₃:
+    𝓒:
+        tag: Γₚ₃
+        type: *APPROX3
+    𝓖:
+        type: PoiGI1
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂z²,∂x∂z,∂y∂z]
+    𝗠: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂z²,∂x∂z,∂y∂z,∂x_,∂y_,∂z_]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂z²,∂x∂z,∂y∂z]
+
+Γₚ₄:
+    𝓒:
+        tag: Γₚ₄
+        type: *APPROX3
+    𝓖:
+        type: PoiGI1
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²]
+    𝗠: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂z²,∂x∂z,∂y∂z,∂x_,∂y_,∂z_]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂z²,∂x∂z,∂y∂z]
+
+Γ̃ₚ₁:
+    𝓒:
+        tag: Ω
+        # type: &APPROX ReproducingKernel{SNode,:Cubic2D,:□,:QuinticSpline,:Tri3}
+        type: *APPROX
+    𝓖:
+        tag: Γₚ₁
+        type: PoiGI1
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂̄x²,∂̄x∂̄y,∂̄y²]
+    𝗠: [∂1,∇̃²]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂̄x²,∂̄x∂̄y,∂̄y²]
+
+Γ̃ₚ₂:
+    𝓒:
+        tag: Ω
+        type: *APPROX
+    𝓖:
+        tag: Γₚ₂
+        type: PoiGI1
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂̄x²,∂̄x∂̄y,∂̄y²]
+    𝗠: [∂1,∇̃²]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂̄x²,∂̄x∂̄y,∂̄y²]
+
+Γ̃ₚ₃:
+    𝓒:
+        tag: Ω
+        type: *APPROX
+    𝓖:
+        tag: Γₚ₃
+        type: PoiGI1
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂̄x²,∂̄x∂̄y,∂̄y²]
+    𝗠: [∂1,∇̃²]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂̄x²,∂̄x∂̄y,∂̄y²]
+
+Γ̃ₚ₄:
+    𝓒:
+        tag: Ω
+        type: *APPROX
+    𝓖:
+        tag: Γₚ₄
+        type: PoiGI1
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂̄x²,∂̄x∂̄y,∂̄y²]
+    𝗠: [∂1,∇̃²]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂̄x²,∂̄x∂̄y,∂̄y²]

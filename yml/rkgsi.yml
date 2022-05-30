@@ -1,0 +1,100 @@
+
+Ω:
+    𝓒:
+        tag: Ω
+        type: &APPROX ReproducingKernel{SNode,:Cubic2D,:□,:QuinticSpline,:Tri3}
+    𝓖:
+        type: TriRK6
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂x³,∂x²∂y,∂x∂y²,∂y³]
+    𝗠: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂x³,∂x²∂y,∂x∂y²,∂y³,∂x_,∂y_,∂x²_,∂x∂y_,∂y²_,∇̃²]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂x³,∂x²∂y,∂x∂y²,∂y³]
+
+Ωˢ:
+    𝓒:
+        tag: Ω
+        type: *APPROX
+    𝓖:
+        type: TriGI3
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²]
+    𝗠: [∇̃²]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²]
+
+Γ₁:
+    𝓒:
+        tag: Γ₁
+        type: &APPROX2 ReproducingKernel{SNode,:Cubic2D,:□,:QuinticSpline,:Seg2}
+    𝓖:
+        type: SegRK3
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂x³,∂x²∂y,∂x∂y²,∂y³]
+    𝗠: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x³,∂x²∂y,∂x∂y²,∂y³,∂x_,∂y_,∂z_,∂x²_,∂x∂y_,∂y²_]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂x³,∂x²∂y,∂x∂y²,∂y³]
+
+Γ₂:
+    𝓒:
+        tag: Γ₂
+        type: *APPROX2
+    𝓖:
+        type: SegRK3
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂x³,∂x²∂y,∂x∂y²,∂y³]
+    𝗠: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x³,∂x²∂y,∂x∂y²,∂y³,∂x_,∂y_,∂z_,∂x²_,∂x∂y_,∂y²_]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂x³,∂x²∂y,∂x∂y²,∂y³]
+
+Γ₃:
+    𝓒:
+        tag: Γ₃
+        type: *APPROX2
+    𝓖:
+        type: SegRK3
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂x³,∂x²∂y,∂x∂y²,∂y³]
+    𝗠: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x³,∂x²∂y,∂x∂y²,∂y³,∂x_,∂y_,∂z_,∂x²_,∂x∂y_,∂y²_]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂x³,∂x²∂y,∂x∂y²,∂y³]
+
+Γ₄:
+    𝓒:
+        tag: Γ₄
+        type: *APPROX2
+    𝓖:
+        type: SegRK3
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂x³,∂x²∂y,∂x∂y²,∂y³]
+    𝗠: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x³,∂x²∂y,∂x∂y²,∂y³,∂x_,∂y_,∂z_,∂x²_,∂x∂y_,∂y²_]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂x³,∂x²∂y,∂x∂y²,∂y³]
+
+Γₚ₁:
+    𝓒:
+        tag: Γₚ₁
+        type: &APPROX3 ReproducingKernel{SNode,:Cubic2D,:□,:QuinticSpline,:Poi1}
+    𝓖:
+        type: PoiGI1
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²]
+    𝗠: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂z²,∂x∂z,∂y∂z,∂x_,∂y_,∂z_]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²]
+
+Γₚ₂:
+    𝓒:
+        tag: Γₚ₂
+        type: *APPROX3
+    𝓖:
+        type: PoiGI1
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²]
+    𝗠: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂z²,∂x∂z,∂y∂z,∂x_,∂y_,∂z_]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²]
+
+Γₚ₃:
+    𝓒:
+        tag: Γₚ₃
+        type: *APPROX3
+    𝓖:
+        type: PoiGI1
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²]
+    𝗠: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂z²,∂x∂z,∂y∂z,∂x_,∂y_,∂z_]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²]
+
+Γₚ₄:
+    𝓒:
+        tag: Γₚ₄
+        type: *APPROX3
+    𝓖:
+        type: PoiGI1
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²]
+    𝗠: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂z²,∂x∂z,∂y∂z,∂x_,∂y_,∂z_]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²]
