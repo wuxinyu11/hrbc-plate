@@ -1,0 +1,33 @@
+
+Ω:
+    𝓒:
+        tag: Ω
+        type: &APPROX ReproducingKernel{SNode,:Cubic2D,:□,:QuinticSpline,:Tri3}
+    𝓖:
+        type: TriRK6
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂x³,∂x²∂y,∂x∂y²,∂y³]
+    𝗠: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂x³,∂x²∂y,∂x∂y²,∂y³,∂x_,∂y_,∂x²_,∂x∂y_,∂y²_,∇̃²]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²,∂x³,∂x²∂y,∂x∂y²,∂y³]
+
+
+Ωˢ:
+    𝓒:
+        tag: Ω
+        type: *APPROX
+    𝓖:
+        type: TriGI3
+        𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²]
+    𝗠: [∇̃²]
+    𝝭: [∂1,∂x,∂y,∂z,∂x²,∂x∂y,∂y²,∂x∂z,∂y∂z,∂z²]
+
+
+Γ̃:
+    𝓒:
+        tag: Ω
+        type: *APPROX
+    𝓖:
+        tag: Γ
+        type: SegRK3
+        𝝭: [∂1,∂x²,∂x∂y,∂y²,∂x²∂x,∂x²∂y,∂x∂y∂x,∂x∂y∂y,∂y²∂x,∂y²∂y,∂̄x²,∂̄x∂̄y,∂̄y²,∂̄x²∂x,∂̄x²∂y,∂̄x∂̄y∂x,∂̄x∂̄y∂y,∂̄y²∂x,∂̄y²∂y]
+    𝗠: [∂1,∇̃²,∂∇̃²∂ξ,∂∇̃²∂η]
+    𝝭: [∂1,∂x²,∂x∂y,∂y²,∂x²∂x,∂x²∂y,∂x∂y∂x,∂x∂y∂y,∂y²∂x,∂y²∂y,∂̄x²,∂̄x∂̄y,∂̄y²,∂̄x²∂x,∂̄x²∂y,∂̄x∂̄y∂x,∂̄x∂̄y∂y,∂̄y²∂x,∂̄y²∂y]

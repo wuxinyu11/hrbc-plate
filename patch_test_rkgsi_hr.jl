@@ -1,7 +1,7 @@
 
 using Revise, YAML, ApproxOperator
 
-config = YAML.load_file("./yml/hrrk.yml")
+config = YAML.load_file("./yml/patch_test_hrrk.yml")
 
 elements, nodes = importmsh("./msh/patchtest.msh", config)
 
@@ -207,13 +207,3 @@ prescribe!(elements["Ω"],:∂³u∂x²∂y,(x,y,z)->w₁₁₂(x,y))
 prescribe!(elements["Ω"],:∂³u∂x∂y²,(x,y,z)->w₁₂₂(x,y))
 prescribe!(elements["Ω"],:∂³u∂y³,(x,y,z)->w₂₂₂(x,y))
 h3,h2,h1,l2 = ops[9](elements["Ω"])
-
-# f1 = checkConsistency(elements["Γ̃₁"],ApproxOperator.get∇∇̃²𝝭,ApproxOperator.get∇∇²𝒑)
-# f2 = checkConsistency(elements["Γ̃₂"],ApproxOperator.get∇∇̃²𝝭,ApproxOperator.get∇∇²𝒑)
-# f3 = checkConsistency(elements["Γ̃₃"],ApproxOperator.get∇∇̃²𝝭,ApproxOperator.get∇∇²𝒑)
-# f4 = checkConsistency(elements["Γ̃₄"],ApproxOperator.get∇∇̃²𝝭,ApproxOperator.get∇∇²𝒑)
-
-# f = checkConsistency(elements["Γ₁"],ApproxOperator.get∇𝝭,ApproxOperator.get∇𝒑)
-# f = checkConsistency(elements["Γ₁"],ApproxOperator.get∇²𝝭,ApproxOperator.get∇²𝒑)
-
-# f1 = checkConsistency(elements["Γ̃ₚ₁"],ApproxOperator.get∇²𝝭,ApproxOperator.get∇²𝒑)
