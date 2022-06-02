@@ -81,7 +81,7 @@ h3,h2,h1,l2 = ops[4](elements["Ω"])
 
 index = [10,20,40,80]
 row = "F"
-XLSX.openxlsx("rectangular.xlsx", mode="rw") do xf
+XLSX.openxlsx("./xlsx/rectangular.xlsx", mode="rw") do xf
     𝐿₂ = xf[1]
     𝐻₁ = xf[2]
     𝐻₂ = xf[3]
