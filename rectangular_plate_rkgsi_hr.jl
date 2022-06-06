@@ -3,13 +3,13 @@ using XLSX, YAML, ApproxOperator
 
 config = YAML.load_file("./yml/rectangular_hrrk.yml")
 
-ndiv = 20
+ndiv = 80
 elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh", config)
 
 nₚ = length(nodes[:x])
 nₑ = length(elements["Ω"])
 
-s = 3.5 / 20 * ones(nₚ)
+s = 3.5 / ndiv * ones(nₚ)
 push!(nodes, :s₁ => s, :s₂ => s, :s₃ => s)
 
 sp = RegularGrid(nodes[:x], nodes[:y], nodes[:z], n = 2, γ = 5)
@@ -80,12 +80,13 @@ prescribe!(elements["Ω"],:∂³u∂y³,(x,y,z)->w₂₂₂(x,y))
 h3,h2,h1,l2 = ops[4](elements["Ω"])
 
 index = [10,20,40,80]
-row = "F"
+
 XLSX.openxlsx("./xlsx/rectangular.xlsx", mode="rw") do xf
-    𝐿₂ = xf[1]
-    𝐻₁ = xf[2]
-    𝐻₂ = xf[3]
-    𝐻₃ = xf[4]
+    row = "F"
+    𝐿₂ = xf[2]
+    𝐻₁ = xf[3]
+    𝐻₂ = xf[4]
+    𝐻₃ = xf[5]
     ind = findfirst(n->n==ndiv,index)+1
     row = row*string(ind)
     𝐿₂[row] = log10(l2)
