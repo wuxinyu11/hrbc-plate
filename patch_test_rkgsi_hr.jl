@@ -3,12 +3,13 @@ using Revise, YAML, ApproxOperator
 
 config = YAML.load_file("./yml/patch_test_hrrk.yml")
 
-elements, nodes = importmsh("./msh/patchtest.msh", config)
+ndiv = 10
+elements, nodes = importmsh("./msh/patchtest_"*string(ndiv)*".msh", config)
 
 nₚ = length(nodes[:x])
 nₑ = length(elements["Ω"])
 
-s = 3.5 / 20 * ones(nₚ)
+s = 3.5 / ndiv * ones(nₚ)
 push!(nodes, :s₁ => s, :s₂ => s, :s₃ => s)
 
 sp = RegularGrid(nodes[:x], nodes[:y], nodes[:z], n = 2, γ = 5)
@@ -92,19 +93,33 @@ set∇̄²𝝭!(elements["Γ̃ₚ"],Γᵍ=elements["Γ̃∩Γ̃ₚ"],Γᴾ=eleme
 # set∇̄²𝝭!(elements["Γ̃ₚ"],Γᶿ=elements["Γ̃₁"])
 
 n = 2
-w(x,y) = (1+2x+3y)^n
-w₁(x,y) = 2n*(1+2x+3y)^abs(n-1)
-w₂(x,y) = 3n*(1+2x+3y)^abs(n-1)
-w₁₁(x,y) = 4n*(n-1)*(1+2x+3y)^abs(n-2)
-w₂₂(x,y) = 9n*(n-1)*(1+2x+3y)^abs(n-2)
-w₁₂(x,y) = 6n*(n-1)*(1+2x+3y)^abs(n-2)
-w₁₁₁(x,y) = 8n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
-w₁₁₂(x,y) = 12n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
-w₁₂₂(x,y) = 18n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
-w₂₂₂(x,y) = 27n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
-w₁₁₁₁(x,y) = 16n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
-w₁₁₂₂(x,y) = 36n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
-w₂₂₂₂(x,y) = 81n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
+# w(x,y) = (1+2x+3y)^n
+# w₁(x,y) = 2n*(1+2x+3y)^abs(n-1)
+# w₂(x,y) = 3n*(1+2x+3y)^abs(n-1)
+# w₁₁(x,y) = 4n*(n-1)*(1+2x+3y)^abs(n-2)
+# w₂₂(x,y) = 9n*(n-1)*(1+2x+3y)^abs(n-2)
+# w₁₂(x,y) = 6n*(n-1)*(1+2x+3y)^abs(n-2)
+# w₁₁₁(x,y) = 8n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
+# w₁₁₂(x,y) = 12n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
+# w₁₂₂(x,y) = 18n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
+# w₂₂₂(x,y) = 27n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
+# w₁₁₁₁(x,y) = 16n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
+# w₁₁₂₂(x,y) = 36n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
+# w₂₂₂₂(x,y) = 81n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
+w(x,y) = - sin(π*x)*sin(π*y)
+w₁(x,y) = - π*cos(π*x)*sin(π*y)
+w₂(x,y) = - π*sin(π*x)*cos(π*y)
+w₁₁(x,y) = π^2*sin(π*x)*sin(π*y)
+w₂₂(x,y) = π^2*sin(π*x)*sin(π*y)
+w₁₂(x,y) = - π^2*cos(π*x)*cos(π*y)
+w₁₁₁(x,y) = π^3*cos(π*x)*sin(π*y)
+w₁₁₂(x,y) = π^3*sin(π*x)*cos(π*y)
+w₁₂₂(x,y) = π^3*cos(π*x)*sin(π*y)
+w₂₂₂(x,y) = π^3*sin(π*x)*cos(π*y)
+w₁₁₁₁(x,y) = - π^4*sin(π*x)*sin(π*y)
+w₁₁₂₂(x,y) = - π^4*sin(π*x)*sin(π*y)
+w₂₂₂₂(x,y) = - π^4*sin(π*x)*sin(π*y)
+
 D = 1.0
 ν = 0.3
 M₁₁(x,y) = - D*(w₁₁(x,y)+ν*w₂₂(x,y))
@@ -158,15 +173,15 @@ f = zeros(nₚ)
 ops[1](elements["Ωˢ"],k)
 ops[2](elements["Ω"],f)
 
-ops[3](elements["Γ̃₁"],k,f)
-ops[3](elements["Γ̃₂"],k,f)
-ops[3](elements["Γ̃₃"],k,f)
-ops[3](elements["Γ̃₄"],k,f)
+# ops[3](elements["Γ̃₁"],k,f)
+# ops[3](elements["Γ̃₂"],k,f)
+# ops[3](elements["Γ̃₃"],k,f)
+# ops[3](elements["Γ̃₄"],k,f)
 # # ops[6](elements["Γ₁"],f)
 # # ops[6](elements["Γ₂"],f)
 # # ops[6](elements["Γ₃"],f)
 # # ops[6](elements["Γ₄"],f)
-#
+
 ops[4](elements["Γ̃₁"],k,f)
 ops[4](elements["Γ̃₂"],k,f)
 ops[4](elements["Γ̃₃"],k,f)

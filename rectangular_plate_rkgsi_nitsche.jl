@@ -1,9 +1,9 @@
 
 using XLSX, YAML, ApproxOperator
 
-config = YAML.load_file("./yml/rectangular_hrrk.yml")
+config = YAML.load_file("./yml/rectangular_rkgsi_nitsche.yml")
 
-ndiv = 20
+ndiv = 80
 elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh", config)
 
 nₚ = length(nodes[:x])
@@ -13,36 +13,17 @@ s = 3.5 / ndiv * ones(nₚ)
 push!(nodes, :s₁ => s, :s₂ => s, :s₃ => s)
 
 sp = RegularGrid(nodes[:x], nodes[:y], nodes[:z], n = 2, γ = 5)
-sp(elements["Ω"])
+sp(elements["Ω"],elements["Γ"],elements["Γₚ₁"],elements["Γₚ₂"],elements["Γₚ₃"],elements["Γₚ₄"])
 set_memory_𝝭!(elements["Ωˢ"])
-set_memory_𝝭!(elements["Γ̃"])
-set_memory_𝝭!(elements["Γ̃ₚ₁"])
-set_memory_𝝭!(elements["Γ̃ₚ₂"])
-set_memory_𝝭!(elements["Γ̃ₚ₃"])
-set_memory_𝝭!(elements["Γ̃ₚ₄"])
 
-elements["Ω∩Γ̃"] = elements["Ω"]∩elements["Γ̃"]
-elements["Ω∩Γ̃ₚ₁"] = elements["Ω"]∩elements["Γ̃ₚ₁"]
-elements["Ω∩Γ̃ₚ₂"] = elements["Ω"]∩elements["Γ̃ₚ₂"]
-elements["Ω∩Γ̃ₚ₃"] = elements["Ω"]∩elements["Γ̃ₚ₃"]
-elements["Ω∩Γ̃ₚ₄"] = elements["Ω"]∩elements["Γ̃ₚ₄"]
-elements["Γ̃ₚ"] = elements["Γ̃ₚ₁"]∪elements["Γ̃ₚ₂"]∪elements["Γ̃ₚ₃"]∪elements["Γ̃ₚ₄"]
-elements["Γ̃∩Γ̃ₚ"] = elements["Γ̃"]∩elements["Γ̃ₚ"]
 
 set∇𝝭!(elements["Ω"])
 set∇̃²𝝭!(elements["Ωˢ"],elements["Ω"])
-set∇∇̃²𝝭!(elements["Γ̃"],elements["Ω∩Γ̃"])
-set𝝭!(elements["Γ̃"])
-set∇̃²𝝭!(elements["Γ̃ₚ₁"],elements["Ω∩Γ̃ₚ₁"])
-set∇̃²𝝭!(elements["Γ̃ₚ₂"],elements["Ω∩Γ̃ₚ₂"])
-set∇̃²𝝭!(elements["Γ̃ₚ₃"],elements["Ω∩Γ̃ₚ₃"])
-set∇̃²𝝭!(elements["Γ̃ₚ₄"],elements["Ω∩Γ̃ₚ₄"])
-set𝝭!(elements["Γ̃ₚ₁"])
-set𝝭!(elements["Γ̃ₚ₂"])
-set𝝭!(elements["Γ̃ₚ₃"])
-set𝝭!(elements["Γ̃ₚ₄"])
-set∇∇̄²𝝭!(elements["Γ̃"],Γᵍ=elements["Γ̃"],Γᴾ=elements["Γ̃ₚ"])
-set∇̄²𝝭!(elements["Γ̃ₚ"],Γᵍ=elements["Γ̃∩Γ̃ₚ"],Γᴾ=elements["Γ̃ₚ"])
+set∇³𝝭!(elements["Γ"])
+set∇²𝝭!(elements["Γₚ₁"])
+set∇²𝝭!(elements["Γₚ₂"])
+set∇²𝝭!(elements["Γₚ₃"])
+set∇²𝝭!(elements["Γₚ₄"])
 
 w(x,y) = - sin(π*x)*sin(π*y)
 w₁(x,y) = - π*cos(π*x)*sin(π*y)
@@ -59,18 +40,21 @@ w₁₁₂₂(x,y) = - π^4*sin(π*x)*sin(π*y)
 w₂₂₂₂(x,y) = - π^4*sin(π*x)*sin(π*y)
 D = 1.0
 ν = 0.3
+M₁₁(x,y) = - D*(w₁₁(x,y)+ν*w₂₂(x,y))
+M₂₂(x,y) = - D*(ν*w₁₁(x,y)+w₂₂(x,y))
+M₁₂(x,y) = - D*(1-ν)*w₁₂(x,y)
 prescribe!(elements["Ω"],:q,(x,y,z)->w₁₁₁₁(x,y)+2*w₁₁₂₂(x,y)+w₂₂₂₂(x,y))
-# prescribe!(elements["Γ̃ₚ₁"],:Δn₁s₂n₂s₁,(x,y,z)->2.0)
-# prescribe!(elements["Γ̃ₚ₂"],:Δn₁s₂n₂s₁,(x,y,z)->-2.0)
-# prescribe!(elements["Γ̃ₚ₃"],:Δn₁s₂n₂s₁,(x,y,z)->2.0)
-# prescribe!(elements["Γ̃ₚ₄"],:Δn₁s₂n₂s₁,(x,y,z)->-2.0)
+prescribe!(elements["Γₚ₁"],:Δn₁s₂n₂s₁,(x,y,z)->2.0)
+prescribe!(elements["Γₚ₂"],:Δn₁s₂n₂s₁,(x,y,z)->-2.0)
+prescribe!(elements["Γₚ₃"],:Δn₁s₂n₂s₁,(x,y,z)->2.0)
+prescribe!(elements["Γₚ₄"],:Δn₁s₂n₂s₁,(x,y,z)->-2.0)
 
-coefficient = (:D=>1.0,:ν=>0.3)
+coefficient = (:D=>1.0,:α=>1e7,:ν=>0.3)
 
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫ṼgdΓ,coefficient...),
-       Operator(:ΔM̃ₙₛg,coefficient...),
+       Operator(:∫VgdΓ,coefficient...),
+       Operator(:ΔMₙₛg,coefficient...),
        Operator(:H₃)]
 
 k = zeros(nₚ,nₚ)
@@ -78,8 +62,11 @@ f = zeros(nₚ)
 
 ops[1](elements["Ωˢ"],k)
 ops[2](elements["Ω"],f)
-ops[3](elements["Γ̃"],k,f)
-ops[4](elements["Γ̃ₚ"],k,f)
+ops[3](elements["Γ"],k,f)
+ops[4](elements["Γₚ₁"],k,f)
+ops[4](elements["Γₚ₂"],k,f)
+ops[4](elements["Γₚ₃"],k,f)
+ops[4](elements["Γₚ₄"],k,f)
 
 d = k\f
 
@@ -103,7 +90,7 @@ h3,h2,h1,l2 = ops[5](elements["Ω"])
 index = [10,20,40,80]
 
 XLSX.openxlsx("./xlsx/rectangular.xlsx", mode="rw") do xf
-    row = "F"
+    row = "E"
     𝐿₂ = xf[2]
     𝐻₁ = xf[3]
     𝐻₂ = xf[4]
