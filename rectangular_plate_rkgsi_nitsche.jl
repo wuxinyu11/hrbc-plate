@@ -9,7 +9,7 @@ elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh", config)
 nₚ = length(nodes[:x])
 nₑ = length(elements["Ω"])
 
-s = 3.5 / ndiv * ones(nₚ)
+s = 3.1 / ndiv * ones(nₚ)
 push!(nodes, :s₁ => s, :s₂ => s, :s₃ => s)
 
 sp = RegularGrid(nodes[:x], nodes[:y], nodes[:z], n = 2, γ = 5)
@@ -74,7 +74,8 @@ push!(nodes,:d=>d)
 set𝓖!(elements["Ω"],:TriGI16)
 set_memory_𝝭!(elements["Ω"])
 
-set∇³𝝭!(elements["Ω"])
+# set∇³𝝭!(elements["Ω"])
+set∇̂³𝝭!(elements["Ω"])
 prescribe!(elements["Ω"],:u,(x,y,z)->w(x,y))
 prescribe!(elements["Ω"],:∂u∂x,(x,y,z)->w₁(x,y))
 prescribe!(elements["Ω"],:∂u∂y,(x,y,z)->w₂(x,y))
@@ -90,7 +91,7 @@ h3,h2,h1,l2 = ops[5](elements["Ω"])
 index = [10,20,40,80]
 
 XLSX.openxlsx("./xlsx/rectangular.xlsx", mode="rw") do xf
-    row = "E"
+    row = "D"
     𝐿₂ = xf[2]
     𝐻₁ = xf[3]
     𝐻₂ = xf[4]
