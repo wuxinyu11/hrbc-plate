@@ -2,25 +2,26 @@
 using Revise, YAML, ApproxOperator
 
 ndiv = 10
-config = YAML.load_file("./yml/patch_test_gauss_nitsche.yml")
-elements, nodes = importmsh("./msh/patchtest_"*string(ndiv)*".msh",config)
-nₚ = length(nodes)
+config = YAML.load_file("./yml/patch_test_rkgsi_nitsche.yml")
+elements,nodes = importmsh("./msh/patchtest_"*string(ndiv)*".msh", config)
+nₚ = getnₚ(elements["Ω"])
 
 s = 3.5/ndiv*ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
+set_memory_𝗠!(elements["Ω̃"],:∇̃²)
 
-set∇²₂𝝭!(elements["Ω"])
-set∇³𝝭!(elements["Γ₁"])
-set∇³𝝭!(elements["Γ₂"])
-set∇³𝝭!(elements["Γ₃"])
-set∇³𝝭!(elements["Γ₄"])
-set∇²₂𝝭!(elements["Γₚ₁"])
-set∇²₂𝝭!(elements["Γₚ₂"])
-set∇²₂𝝭!(elements["Γₚ₃"])
-set∇²₂𝝭!(elements["Γₚ₄"])
+set∇₂𝝭!(elements["Ω"])
+set∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
+set∇₂𝝭!(elements["Γ₁"])
+set∇₂𝝭!(elements["Γ₂"])
+set∇₂𝝭!(elements["Γ₃"])
+set∇₂𝝭!(elements["Γ₄"])
+set𝝭!(elements["Γₚ₁"])
+set𝝭!(elements["Γₚ₂"])
+set𝝭!(elements["Γₚ₃"])
+set𝝭!(elements["Γₚ₄"])
 
 n = 3
-
 w(x,y) = (1+2x+3y)^n
 w₁(x,y) = 2n*(1+2x+3y)^abs(n-1)
 w₂(x,y) = 3n*(1+2x+3y)^abs(n-1)
@@ -72,18 +73,17 @@ prescribe!(elements["Γₚ₄"],:ΔM=>(x,y,z)->-2*M₁₂(x,y))
 coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫VgdΓ,coefficient...,:α=>1e5),
+       Operator(:∫vgdΓ,coefficient...,:α=>1e7),
        Operator(:∫wVdΓ,coefficient...),
-       Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3),
+       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e7),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
-       Operator(:ΔMₙₛg,coefficient...,:α=>1e3),
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:H₃)]
 
 k = zeros(nₚ,nₚ)
 f = zeros(nₚ)
 
-ops[1](elements["Ω"],k)
+ops[1](elements["Ω̃"],k)
 ops[2](elements["Ω"],f)
 
 ops[3](elements["Γ₁"],k,f)
@@ -100,14 +100,14 @@ ops[5](elements["Γ₄"],k,f)
 # ops[6](elements["Γ₃"],f)
 # ops[6](elements["Γ₄"],f)
 
-ops[7](elements["Γₚ₁"],k,f)
-ops[7](elements["Γₚ₂"],k,f)
-ops[7](elements["Γₚ₃"],k,f)
-ops[7](elements["Γₚ₄"],k,f)
-# ops[8](elements["Γₚ₁"],f)
-# ops[8](elements["Γₚ₂"],f)
-# ops[8](elements["Γₚ₃"],f)
-# ops[8](elements["Γₚ₄"],f)
+ops[3](elements["Γₚ₁"],k,f)
+ops[3](elements["Γₚ₂"],k,f)
+ops[3](elements["Γₚ₃"],k,f)
+ops[3](elements["Γₚ₄"],k,f)
+# ops[7](elements["Γₚ₁"],f)
+# ops[7](elements["Γₚ₂"],f)
+# ops[7](elements["Γₚ₃"],f)
+# ops[7](elements["Γₚ₄"],f)
 
 d = k\f
 
@@ -124,4 +124,4 @@ prescribe!(elements["Ω"],:∂³u∂x³=>(x,y,z)->w₁₁₁(x,y))
 prescribe!(elements["Ω"],:∂³u∂x²∂y=>(x,y,z)->w₁₁₂(x,y))
 prescribe!(elements["Ω"],:∂³u∂x∂y²=>(x,y,z)->w₁₂₂(x,y))
 prescribe!(elements["Ω"],:∂³u∂y³=>(x,y,z)->w₂₂₂(x,y))
-h3,h2,h1,l2 = ops[9](elements["Ω"])
+h3,h2,h1,l2 = ops[8](elements["Ω"])
