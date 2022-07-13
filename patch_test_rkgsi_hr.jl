@@ -7,62 +7,75 @@ ndiv = 10
 config = YAML.load_file("./yml/patch_test_rkgsi_hr.yml")
 elements, nodes = importmsh("./msh/patchtest_"*string(ndiv)*".msh", config)
 
-nₚ = length(nodes[:x])
+nₚ = length(nodes)
 nₑ = length(elements["Ω"])
 
 s = 3.5 / ndiv * ones(nₚ)
 push!(nodes, :s₁ => s, :s₂ => s, :s₃ => s)
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
+set_memory_𝗠!(elements["Γ₁"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
+set_memory_𝗠!(elements["Γ₂"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
+set_memory_𝗠!(elements["Γ₃"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
+set_memory_𝗠!(elements["Γ₄"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
+set_memory_𝗠!(elements["Γₚ₁"],:𝝭,:∇̃²)
+set_memory_𝗠!(elements["Γₚ₂"],:𝝭,:∇̃²)
+set_memory_𝗠!(elements["Γₚ₃"],:𝝭,:∇̃²)
+set_memory_𝗠!(elements["Γₚ₄"],:𝝭,:∇̃²)
 
-elements["Ω∩Γ̃₁"] = elements["Ω"]∩elements["Γ̃₁"]
-elements["Ω∩Γ̃₂"] = elements["Ω"]∩elements["Γ̃₂"]
-elements["Ω∩Γ̃₃"] = elements["Ω"]∩elements["Γ̃₃"]
-elements["Ω∩Γ̃₄"] = elements["Ω"]∩elements["Γ̃₄"]
-elements["Ω∩Γ̃ₚ₁"] = elements["Ω"]∩elements["Γ̃ₚ₁"]
-elements["Ω∩Γ̃ₚ₂"] = elements["Ω"]∩elements["Γ̃ₚ₂"]
-elements["Ω∩Γ̃ₚ₃"] = elements["Ω"]∩elements["Γ̃ₚ₃"]
-elements["Ω∩Γ̃ₚ₄"] = elements["Ω"]∩elements["Γ̃ₚ₄"]
-elements["Γ̃ₚ"] = elements["Γ̃ₚ₁"]∪elements["Γ̃ₚ₂"]∪elements["Γ̃ₚ₃"]∪elements["Γ̃ₚ₄"]
-elements["Γ̃"] = elements["Γ̃₁"]∪elements["Γ̃₂"]∪elements["Γ̃₃"]∪elements["Γ̃₄"]
-elements["Γ̃∩Γ̃ₚ"] = elements["Γ̃"]∩elements["Γ̃ₚ"]
+elements["Ω∩Γ₁"] = elements["Ω"]∩elements["Γ₁"]
+elements["Ω∩Γ₂"] = elements["Ω"]∩elements["Γ₂"]
+elements["Ω∩Γ₃"] = elements["Ω"]∩elements["Γ₃"]
+elements["Ω∩Γ₄"] = elements["Ω"]∩elements["Γ₄"]
+elements["Ω∩Γₚ₁"] = elements["Ω"]∩elements["Γₚ₁"]
+elements["Ω∩Γₚ₂"] = elements["Ω"]∩elements["Γₚ₂"]
+elements["Ω∩Γₚ₃"] = elements["Ω"]∩elements["Γₚ₃"]
+elements["Ω∩Γₚ₄"] = elements["Ω"]∩elements["Γₚ₄"]
+elements["Γₚ"] = elements["Γₚ₁"]∪elements["Γₚ₂"]∪elements["Γₚ₃"]∪elements["Γₚ₄"]
+elements["Γ"] = elements["Γ₁"]∪elements["Γ₂"]∪elements["Γ₃"]∪elements["Γ₄"]
+elements["Γ∩Γₚ"] = elements["Γ"]∩elements["Γₚ"]
 
 set∇₂𝝭!(elements["Ω"])
 set∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
-set∇∇̃²𝝭!(elements["Γ̃₁"],elements["Ω∩Γ̃₁"])
-set∇∇̃²𝝭!(elements["Γ̃₂"],elements["Ω∩Γ̃₂"])
-set∇∇̃²𝝭!(elements["Γ̃₃"],elements["Ω∩Γ̃₃"])
-set∇∇̃²𝝭!(elements["Γ̃₄"],elements["Ω∩Γ̃₄"])
-set∇̃²𝝭!(elements["Γ̃ₚ₁"],elements["Ω∩Γ̃ₚ₁"])
-set∇̃²𝝭!(elements["Γ̃ₚ₂"],elements["Ω∩Γ̃ₚ₂"])
-set∇̃²𝝭!(elements["Γ̃ₚ₃"],elements["Ω∩Γ̃ₚ₃"])
-set∇̃²𝝭!(elements["Γ̃ₚ₄"],elements["Ω∩Γ̃ₚ₄"])
-set∇𝝭!(elements["Γ̃₁"])
-set∇𝝭!(elements["Γ̃₂"])
-set∇𝝭!(elements["Γ̃₃"])
-set∇𝝭!(elements["Γ̃₄"])
-set𝝭!(elements["Γ̃ₚ₁"])
-set𝝭!(elements["Γ̃ₚ₂"])
-set𝝭!(elements["Γ̃ₚ₃"])
-set𝝭!(elements["Γ̃ₚ₄"])
-# set∇∇̄²𝝭!(elements["Γ̃₁"],Γᵍ=elements["Γ̃₁"])
-# set∇∇̄²𝝭!(elements["Γ̃₁"],Γᵍ=elements["Γ̃₁"],Γᶿ=elements["Γ̃₁"],Γᴾ=elements["Γ̃ₚ"])
-# set∇∇̄²𝝭!(elements["Γ̃₂"],Γᵍ=elements["Γ̃₂"],Γᶿ=elements["Γ̃₂"],Γᴾ=elements["Γ̃ₚ"])
-# set∇∇̄²𝝭!(elements["Γ̃₃"],Γᵍ=elements["Γ̃₃"],Γᶿ=elements["Γ̃₃"],Γᴾ=elements["Γ̃ₚ"])
-# set∇∇̄²𝝭!(elements["Γ̃₄"],Γᵍ=elements["Γ̃₄"],Γᶿ=elements["Γ̃₄"],Γᴾ=elements["Γ̃ₚ"])
-# set∇̄²𝝭!(elements["Γ̃ₚ"],Γᵍ=elements["Γ̃∩Γ̃ₚ"],Γᶿ=elements["Γ̃∩Γ̃ₚ"],Γᴾ=elements["Γ̃ₚ"])
+set∇∇̃²𝝭!(elements["Γ₁"],elements["Ω∩Γ₁"])
+set∇∇̃²𝝭!(elements["Γ₂"],elements["Ω∩Γ₂"])
+set∇∇̃²𝝭!(elements["Γ₃"],elements["Ω∩Γ₃"])
+set∇∇̃²𝝭!(elements["Γ₄"],elements["Ω∩Γ₄"])
+set∇̃²𝝭!(elements["Γₚ₁"],elements["Ω∩Γₚ₁"])
+set∇̃²𝝭!(elements["Γₚ₂"],elements["Ω∩Γₚ₂"])
+set∇̃²𝝭!(elements["Γₚ₃"],elements["Ω∩Γₚ₃"])
+set∇̃²𝝭!(elements["Γₚ₄"],elements["Ω∩Γₚ₄"])
+set∇₂𝝭!(elements["Γ₁"])
+set∇₂𝝭!(elements["Γ₂"])
+set∇₂𝝭!(elements["Γ₃"])
+set∇₂𝝭!(elements["Γ₄"])
+set𝝭!(elements["Γₚ₁"])
+set𝝭!(elements["Γₚ₂"])
+set𝝭!(elements["Γₚ₃"])
+set𝝭!(elements["Γₚ₄"])
 
-# set∇∇̄²𝝭!(elements["Γ̃₁"],Γᵍ=elements["Γ̃₁"],Γᶿ=elements["Γ̃₁"])
-# set∇∇̄²𝝭!(elements["Γ̃₂"],Γᵍ=elements["Γ̃₂"],Γᶿ=elements["Γ̃₂"])
-# set∇∇̄²𝝭!(elements["Γ̃₃"],Γᵍ=elements["Γ̃₃"],Γᶿ=elements["Γ̃₃"])
-# set∇∇̄²𝝭!(elements["Γ̃₄"],Γᵍ=elements["Γ̃₄"],Γᶿ=elements["Γ̃₄"])
+set∇∇̄²𝝭!(elements["Γ₁"],Γᵍ=elements["Γ₁"],Γᶿ=elements["Γ₁"],Γᴾ=elements["Γₚ"])
+set∇∇̄²𝝭!(elements["Γ₂"],Γᵍ=elements["Γ₂"],Γᶿ=elements["Γ₂"],Γᴾ=elements["Γₚ"])
+set∇∇̄²𝝭!(elements["Γ₃"],Γᵍ=elements["Γ₃"],Γᶿ=elements["Γ₃"],Γᴾ=elements["Γₚ"])
+set∇∇̄²𝝭!(elements["Γ₄"],Γᵍ=elements["Γ₄"],Γᶿ=elements["Γ₄"],Γᴾ=elements["Γₚ"])
+set∇̄²𝝭!(elements["Γₚ"],Γᵍ=elements["Γ∩Γₚ"],Γᶿ=elements["Γ∩Γₚ"],Γᴾ=elements["Γₚ"])
+
+# set∇∇̄²𝝭!(elements["Γ₁"],Γᵍ=elements["Γ₁"],Γᶿ=elements["Γ₁"])
+# set∇∇̄²𝝭!(elements["Γ₂"],Γᵍ=elements["Γ₂"],Γᶿ=elements["Γ₂"])
+# set∇∇̄²𝝭!(elements["Γ₃"],Γᵍ=elements["Γ₃"],Γᶿ=elements["Γ₃"])
+# set∇∇̄²𝝭!(elements["Γ₄"],Γᵍ=elements["Γ₄"],Γᶿ=elements["Γ₄"])
+
+# set∇∇̄²𝝭!(elements["Γ₁"],Γᵍ=elements["Γ₁"])
+# set∇∇̄²𝝭!(elements["Γ₂"],Γᵍ=elements["Γ₂"])
+# set∇∇̄²𝝭!(elements["Γ₃"],Γᵍ=elements["Γ₃"])
+# set∇∇̄²𝝭!(elements["Γ₄"],Γᵍ=elements["Γ₄"])
 
 # set∇̄²𝝭!(elements["Γ̃ₚ"],Γᴾ=elements["Γ̃ₚ"])
 
-set∇∇̄²𝝭!(elements["Γ̃₁"],Γᵍ=elements["Γ̃₁"],Γᴾ=elements["Γ̃ₚ"])
-set∇∇̄²𝝭!(elements["Γ̃₂"],Γᵍ=elements["Γ̃₂"],Γᴾ=elements["Γ̃ₚ"])
-set∇∇̄²𝝭!(elements["Γ̃₃"],Γᵍ=elements["Γ̃₃"],Γᴾ=elements["Γ̃ₚ"])
-set∇∇̄²𝝭!(elements["Γ̃₄"],Γᵍ=elements["Γ̃₄"],Γᴾ=elements["Γ̃ₚ"])
-set∇̄²𝝭!(elements["Γ̃ₚ"],Γᵍ=elements["Γ̃∩Γ̃ₚ"],Γᴾ=elements["Γ̃ₚ"])
+# set∇∇̄²𝝭!(elements["Γ₁"],Γᵍ=elements["Γ₁"],Γᴾ=elements["Γₚ"])
+# set∇∇̄²𝝭!(elements["Γ₂"],Γᵍ=elements["Γ₂"],Γᴾ=elements["Γₚ"])
+# set∇∇̄²𝝭!(elements["Γ₃"],Γᵍ=elements["Γ₃"],Γᴾ=elements["Γₚ"])
+# set∇∇̄²𝝭!(elements["Γ₄"],Γᵍ=elements["Γ₄"],Γᴾ=elements["Γₚ"])
+# set∇̄²𝝭!(elements["Γₚ"],Γᵍ=elements["Γ∩Γₚ"],Γᴾ=elements["Γₚ"])
 # set∇̄²𝝭!(elements["Γ̃ₚ"],Γᵍ=elements["Γ̃₁"],Γᴾ=elements["Γ̃ₚ"])
 
 # set∇∇̄²𝝭!(elements["Γ̃₁"],Γᶿ=elements["Γ̃₁"],Γᴾ=elements["Γ̃ₚ"])
@@ -139,28 +152,28 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
 k = zeros(nₚ,nₚ)
 f = zeros(nₚ)
 
-ops[1](elements["Ωˢ"],k)
+ops[1](elements["Ω̃"],k)
 ops[2](elements["Ω"],f)
 
-# ops[3](elements["Γ̃₁"],k,f)
-# ops[3](elements["Γ̃₂"],k,f)
-# ops[3](elements["Γ̃₃"],k,f)
-# ops[3](elements["Γ̃₄"],k,f)
+ops[3](elements["Γ₁"],k,f)
+ops[3](elements["Γ₂"],k,f)
+ops[3](elements["Γ₃"],k,f)
+ops[3](elements["Γ₄"],k,f)
 # # ops[6](elements["Γ₁"],f)
 # # ops[6](elements["Γ₂"],f)
 # # ops[6](elements["Γ₃"],f)
 # # ops[6](elements["Γ₄"],f)
 
-# ops[4](elements["Γ̃₁"],k,f)
-# ops[4](elements["Γ̃₂"],k,f)
-# ops[4](elements["Γ̃₃"],k,f)
-# ops[4](elements["Γ̃₄"],k,f)
+ops[5](elements["Γ₁"],k,f)
+ops[5](elements["Γ₂"],k,f)
+ops[5](elements["Γ₃"],k,f)
+ops[5](elements["Γ₄"],k,f)
 # # ops[7](elements["Γ₁"],f)
 # # ops[7](elements["Γ₂"],f)
 # # ops[7](elements["Γ₃"],f)
 # # ops[7](elements["Γ₄"],f)
 
-# ops[5](elements["Γ̃ₚ"],k,f)
+ops[7](elements["Γₚ"],k,f)
 # ops[5](elements["Γ̃ₚ₁"],k,f)
 # ops[5](elements["Γ̃ₚ₂"],k,f)
 # ops[5](elements["Γ̃ₚ₃"],k,f)
@@ -173,7 +186,7 @@ ops[2](elements["Ω"],f)
 # # d = [w(nodes[:x][i],nodes[:y][i]) for i in 1:length(nodes[:x])]
 # # f .-= k*d
 
-# d = k\f
+d = k\f
 
 push!(nodes,:d=>d)
 set𝓖!(elements["Ω"],:TriGI16,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
