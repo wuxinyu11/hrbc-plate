@@ -76,7 +76,6 @@ set∇̄²𝝭!(elements["Γₚ"],Γᵍ=elements["Γ∩Γₚ"],Γᶿ=elements["�
 # set∇∇̄²𝝭!(elements["Γ₃"],Γᵍ=elements["Γ₃"],Γᴾ=elements["Γₚ"])
 # set∇∇̄²𝝭!(elements["Γ₄"],Γᵍ=elements["Γ₄"],Γᴾ=elements["Γₚ"])
 # set∇̄²𝝭!(elements["Γₚ"],Γᵍ=elements["Γ∩Γₚ"],Γᴾ=elements["Γₚ"])
-# set∇̄²𝝭!(elements["Γ̃ₚ"],Γᵍ=elements["Γ̃₁"],Γᴾ=elements["Γ̃ₚ"])
 
 # set∇∇̄²𝝭!(elements["Γ̃₁"],Γᶿ=elements["Γ̃₁"],Γᴾ=elements["Γ̃ₚ"])
 # set∇̄²𝝭!(elements["Γ̃₁"],Γᶿ=elements["Γ̃₁"],Γᴾ=elements["Γ̃ₚ"])
@@ -87,7 +86,7 @@ set∇̄²𝝭!(elements["Γₚ"],Γᵍ=elements["Γ∩Γₚ"],Γᶿ=elements["�
 # set∇̄²𝝭!(elements["Γ̃₁"],Γᴾ=elements["Γ̃ₚ"])
 # set∇̄²𝝭!(elements["Γ̃ₚ"],Γᶿ=elements["Γ̃₁"])
 
-n = 3
+n = 2
 w(x,y) = (1+2x+3y)^n
 w₁(x,y) = 2n*(1+2x+3y)^abs(n-1)
 w₂(x,y) = 3n*(1+2x+3y)^abs(n-1)
@@ -152,54 +151,50 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
 k = zeros(nₚ,nₚ)
 f = zeros(nₚ)
 
-ops[1](elements["Ω̃"],k)
-ops[2](elements["Ω"],f)
+# ops[1](elements["Ω̃"],k)
+# ops[2](elements["Ω"],f)
 
-ops[3](elements["Γ₁"],k,f)
-ops[3](elements["Γ₂"],k,f)
-ops[3](elements["Γ₃"],k,f)
-ops[3](elements["Γ₄"],k,f)
-# # ops[6](elements["Γ₁"],f)
-# # ops[6](elements["Γ₂"],f)
-# # ops[6](elements["Γ₃"],f)
-# # ops[6](elements["Γ₄"],f)
+# ops[3](elements["Γ₁"],k,f)
+# ops[3](elements["Γ₂"],k,f)
+# ops[3](elements["Γ₃"],k,f)
+# ops[3](elements["Γ₄"],k,f)
+# ops[4](elements["Γ₁"],f)
+# ops[4](elements["Γ₂"],f)
+# ops[4](elements["Γ₃"],f)
+# ops[4](elements["Γ₄"],f)
 
-ops[5](elements["Γ₁"],k,f)
-ops[5](elements["Γ₂"],k,f)
-ops[5](elements["Γ₃"],k,f)
-ops[5](elements["Γ₄"],k,f)
-# # ops[7](elements["Γ₁"],f)
-# # ops[7](elements["Γ₂"],f)
-# # ops[7](elements["Γ₃"],f)
-# # ops[7](elements["Γ₄"],f)
+# ops[5](elements["Γ₁"],k,f)
+# ops[5](elements["Γ₂"],k,f)
+# ops[5](elements["Γ₃"],k,f)
+# ops[5](elements["Γ₄"],k,f)
+ops[6](elements["Γ₁"],f)
+ops[6](elements["Γ₂"],f)
+ops[6](elements["Γ₃"],f)
+ops[6](elements["Γ₄"],f)
 
-ops[7](elements["Γₚ"],k,f)
-# ops[5](elements["Γ̃ₚ₁"],k,f)
-# ops[5](elements["Γ̃ₚ₂"],k,f)
-# ops[5](elements["Γ̃ₚ₃"],k,f)
-# ops[5](elements["Γ̃ₚ₄"],k,f)
-# ops[8](elements["Γₚ₁"],f)
-# ops[8](elements["Γₚ₂"],f)
-# ops[8](elements["Γₚ₃"],f)
-# ops[8](elements["Γₚ₄"],f)
-#
-# # d = [w(nodes[:x][i],nodes[:y][i]) for i in 1:length(nodes[:x])]
-# # f .-= k*d
+# ops[7](elements["Γₚ"],k,f)
+# ops[8](elements["Γₚ"][1],f)
+# ops[8](elements["Γₚ"][2],f)
+# ops[8](elements["Γₚ"][4],f)
+# ops[8](elements["Γₚ"][5],f)
 
-d = k\f
+d = [w(n.x,n.y) for n in nodes]
+f .-= k*d
 
-push!(nodes,:d=>d)
-set𝓖!(elements["Ω"],:TriGI16,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
-set∇̂³𝝭!(elements["Ω"])
-prescribe!(elements["Ω"],:u=>(x,y,z)->w(x,y))
-prescribe!(elements["Ω"],:∂u∂x=>(x,y,z)->w₁(x,y))
-prescribe!(elements["Ω"],:∂u∂y=>(x,y,z)->w₂(x,y))
-prescribe!(elements["Ω"],:∂²u∂x²=>(x,y,z)->w₁₁(x,y))
-prescribe!(elements["Ω"],:∂²u∂x∂y=>(x,y,z)->w₁₂(x,y))
-prescribe!(elements["Ω"],:∂²u∂y²=>(x,y,z)->w₂₂(x,y))
-prescribe!(elements["Ω"],:∂³u∂x³=>(x,y,z)->w₁₁₁(x,y))
-prescribe!(elements["Ω"],:∂³u∂x²∂y=>(x,y,z)->w₁₁₂(x,y))
-prescribe!(elements["Ω"],:∂³u∂x∂y²=>(x,y,z)->w₁₂₂(x,y))
-prescribe!(elements["Ω"],:∂³u∂y³=>(x,y,z)->w₂₂₂(x,y))
-h3,h2,h1,l2 = ops[9](elements["Ω"])
+# d = k\f
+
+# push!(nodes,:d=>d)
+# set𝓖!(elements["Ω"],:TriGI16,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
+# set∇̂³𝝭!(elements["Ω"])
+# prescribe!(elements["Ω"],:u=>(x,y,z)->w(x,y))
+# prescribe!(elements["Ω"],:∂u∂x=>(x,y,z)->w₁(x,y))
+# prescribe!(elements["Ω"],:∂u∂y=>(x,y,z)->w₂(x,y))
+# prescribe!(elements["Ω"],:∂²u∂x²=>(x,y,z)->w₁₁(x,y))
+# prescribe!(elements["Ω"],:∂²u∂x∂y=>(x,y,z)->w₁₂(x,y))
+# prescribe!(elements["Ω"],:∂²u∂y²=>(x,y,z)->w₂₂(x,y))
+# prescribe!(elements["Ω"],:∂³u∂x³=>(x,y,z)->w₁₁₁(x,y))
+# prescribe!(elements["Ω"],:∂³u∂x²∂y=>(x,y,z)->w₁₁₂(x,y))
+# prescribe!(elements["Ω"],:∂³u∂x∂y²=>(x,y,z)->w₁₂₂(x,y))
+# prescribe!(elements["Ω"],:∂³u∂y³=>(x,y,z)->w₂₂₂(x,y))
+# h3,h2,h1,l2 = ops[9](elements["Ω"])
 

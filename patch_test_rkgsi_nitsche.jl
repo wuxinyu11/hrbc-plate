@@ -20,7 +20,7 @@ set∇²₂𝝭!(elements["Γₚ₂"])
 set∇²₂𝝭!(elements["Γₚ₃"])
 set∇²₂𝝭!(elements["Γₚ₄"])
 
-n = 3
+n = 2
 w(x,y) = (1+2x+3y)^n
 w₁(x,y) = 2n*(1+2x+3y)^abs(n-1)
 w₂(x,y) = 3n*(1+2x+3y)^abs(n-1)
@@ -60,10 +60,10 @@ prescribe!(elements["Γₚ₁"],:g=>(x,y,z)->w(x,y))
 prescribe!(elements["Γₚ₂"],:g=>(x,y,z)->w(x,y))
 prescribe!(elements["Γₚ₃"],:g=>(x,y,z)->w(x,y))
 prescribe!(elements["Γₚ₄"],:g=>(x,y,z)->w(x,y))
-prescribe!(elements["Γₚ₁"],:Δn₁s₂n₂s₁=>(x,y,z)->2.0)
-prescribe!(elements["Γₚ₂"],:Δn₁s₂n₂s₁=>(x,y,z)->-2.0)
-prescribe!(elements["Γₚ₃"],:Δn₁s₂n₂s₁=>(x,y,z)->2.0)
-prescribe!(elements["Γₚ₄"],:Δn₁s₂n₂s₁=>(x,y,z)->-2.0)
+# prescribe!(elements["Γₚ₁"],:Δn₁s₂n₂s₁=>(x,y,z)->2.0)
+# prescribe!(elements["Γₚ₂"],:Δn₁s₂n₂s₁=>(x,y,z)->-2.0)
+# prescribe!(elements["Γₚ₃"],:Δn₁s₂n₂s₁=>(x,y,z)->2.0)
+# prescribe!(elements["Γₚ₄"],:Δn₁s₂n₂s₁=>(x,y,z)->-2.0)
 prescribe!(elements["Γₚ₁"],:ΔM=>(x,y,z)->2*M₁₂(x,y))
 prescribe!(elements["Γₚ₂"],:ΔM=>(x,y,z)->-2*M₁₂(x,y))
 prescribe!(elements["Γₚ₃"],:ΔM=>(x,y,z)->2*M₁₂(x,y))
@@ -72,11 +72,11 @@ prescribe!(elements["Γₚ₄"],:ΔM=>(x,y,z)->-2*M₁₂(x,y))
 coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫VgdΓ,coefficient...,:α=>1e5),
+       Operator(:∫VgdΓ,coefficient...,:α=>1e3*ndiv^2),
        Operator(:∫wVdΓ,coefficient...),
-       Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3),
+       Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3*ndiv),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
-       Operator(:ΔMₙₛg,coefficient...,:α=>1e3),
+       Operator(:ΔMₙₛg,coefficient...,:α=>1e3*ndiv^2),
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:H₃)]
 
@@ -90,6 +90,10 @@ ops[3](elements["Γ₁"],k,f)
 ops[3](elements["Γ₂"],k,f)
 ops[3](elements["Γ₃"],k,f)
 ops[3](elements["Γ₄"],k,f)
+# ops[4](elements["Γ₁"],f)
+# ops[4](elements["Γ₂"],f)
+# ops[4](elements["Γ₃"],f)
+# ops[4](elements["Γ₄"],f)
 
 ops[5](elements["Γ₁"],k,f)
 ops[5](elements["Γ₂"],k,f)
@@ -108,6 +112,9 @@ ops[7](elements["Γₚ₄"],k,f)
 # ops[8](elements["Γₚ₂"],f)
 # ops[8](elements["Γₚ₃"],f)
 # ops[8](elements["Γₚ₄"],f)
+
+# d = [w(n.x,n.y) for n in nodes]
+# f .-= k*d
 
 d = k\f
 
