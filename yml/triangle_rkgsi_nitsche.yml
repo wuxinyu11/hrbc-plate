@@ -43,13 +43,7 @@ RegularGrid:
         type: *GB
         𝝭: *𝝭
 
-Γ₄:
-    type: *A2
-    𝓒:
-        tag: Γ₄
-    𝓖:
-        type: *GB
-        𝝭: *𝝭
+
 
 Γₚ₁:
     type: &A3 ReproducingKernel{:Cubic2D,:□,:QuinticSpline,:Poi1}
@@ -71,14 +65,6 @@ RegularGrid:
     type: *A3
     𝓒:
         tag: Γₚ₃
-    𝓖:
-        type: *GP
-        𝝭: *𝝭ₚ
-
-Γₚ₄:
-    type: *A3
-    𝓒:
-        tag: Γₚ₄
     𝓖:
         type: *GP
         𝝭: *𝝭ₚ

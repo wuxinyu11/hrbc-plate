@@ -25,7 +25,7 @@ RegularGrid:
         tag: Γ₁
     𝓖:
         type: &GB SegRK3
-        𝝭: &𝝭 [𝝭,∂𝝭∂x,∂𝝭∂y,∂²𝝭∂x²,∂²𝝭∂x∂y,∂²𝝭∂y²,∂³𝝭∂x³,∂³𝝭∂x²∂y,∂³𝝭∂x∂y²,∂³𝝭∂y³]
+        𝝭: &𝝭 [𝝭,∂𝝭∂x,∂𝝭∂y]
 
 Γ₂:
     type: *A2
@@ -57,7 +57,7 @@ RegularGrid:
         tag: Γₚ₁
     𝓖:
         type: &GP PoiGI1
-        𝝭: &𝝭ₚ [𝝭,∂𝝭∂x,∂𝝭∂y,∂²𝝭∂x²,∂²𝝭∂x∂y,∂²𝝭∂y²]
+        𝝭: &𝝭ₚ [𝝭]
 
 Γₚ₂:
     type: *A3

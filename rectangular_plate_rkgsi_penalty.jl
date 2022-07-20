@@ -1,39 +1,41 @@
 
+
 using Revise, YAML, ApproxOperator
 
 ndiv = 10
-config = YAML.load_file("./yml/patch_test_rkgsi_nitsche.yml")
-elements,nodes = importmsh("./msh/patchtest_"*string(ndiv)*".msh", config)
-nₚ = length(nodes)
+config = YAML.load_file("./yml/rectangular_rkgsi_penalty.yml")
+elements,nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh", config)
+nₚ = getnₚ(elements["Ω"])
+
 s = 3.5/ndiv*ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
 
 set∇₂𝝭!(elements["Ω"])
 set∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
-set∇³𝝭!(elements["Γ₁"])
-set∇³𝝭!(elements["Γ₂"])
-set∇³𝝭!(elements["Γ₃"])
-set∇³𝝭!(elements["Γ₄"])
-set∇²₂𝝭!(elements["Γₚ₁"])
-set∇²₂𝝭!(elements["Γₚ₂"])
-set∇²₂𝝭!(elements["Γₚ₃"])
-set∇²₂𝝭!(elements["Γₚ₄"])
+set∇₂𝝭!(elements["Γ₁"])
+set∇₂𝝭!(elements["Γ₂"])
+set∇₂𝝭!(elements["Γ₃"])
+set∇₂𝝭!(elements["Γ₄"])
+set𝝭!(elements["Γₚ₁"])
+set𝝭!(elements["Γₚ₂"])
+set𝝭!(elements["Γₚ₃"])
+set𝝭!(elements["Γₚ₄"])
 
-n = 3
-w(x,y) = (1+2x+3y)^n
-w₁(x,y) = 2n*(1+2x+3y)^abs(n-1)
-w₂(x,y) = 3n*(1+2x+3y)^abs(n-1)
-w₁₁(x,y) = 4n*(n-1)*(1+2x+3y)^abs(n-2)
-w₂₂(x,y) = 9n*(n-1)*(1+2x+3y)^abs(n-2)
-w₁₂(x,y) = 6n*(n-1)*(1+2x+3y)^abs(n-2)
-w₁₁₁(x,y) = 8n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
-w₁₁₂(x,y) = 12n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
-w₁₂₂(x,y) = 18n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
-w₂₂₂(x,y) = 27n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
-w₁₁₁₁(x,y) = 16n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
-w₁₁₂₂(x,y) = 36n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
-w₂₂₂₂(x,y) = 81n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
+w(x,y) = - sin(π*x)*sin(π*y)
+w₁(x,y) = - π*cos(π*x)*sin(π*y)
+w₂(x,y) = - π*sin(π*x)*cos(π*y)
+w₁₁(x,y) = π^2*sin(π*x)*sin(π*y)
+w₂₂(x,y) = π^2*sin(π*x)*sin(π*y)
+w₁₂(x,y) = - π^2*cos(π*x)*cos(π*y)
+w₁₁₁(x,y) = π^3*cos(π*x)*sin(π*y)
+w₁₁₂(x,y) = π^3*sin(π*x)*cos(π*y)
+w₁₂₂(x,y) = π^3*cos(π*x)*sin(π*y)
+w₂₂₂(x,y) = π^3*sin(π*x)*cos(π*y)
+w₁₁₁₁(x,y) = - π^4*sin(π*x)*sin(π*y)
+w₁₁₂₂(x,y) = - π^4*sin(π*x)*sin(π*y)
+w₂₂₂₂(x,y) = - π^4*sin(π*x)*sin(π*y)
+
 D = 1.0
 ν = 0.3
 M₁₁(x,y) = - D*(w₁₁(x,y)+ν*w₂₂(x,y))
@@ -72,11 +74,10 @@ prescribe!(elements["Γₚ₄"],:ΔM=>(x,y,z)->-2*M₁₂(x,y))
 coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫VgdΓ,coefficient...,:α=>1e5),
+       Operator(:∫vgdΓ,coefficient...,:α=>1e7),
        Operator(:∫wVdΓ,coefficient...),
-       Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3),
+       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e7),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
-       Operator(:ΔMₙₛg,coefficient...,:α=>1e3),
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:H₃)]
 
@@ -100,14 +101,14 @@ ops[5](elements["Γ₄"],k,f)
 # ops[6](elements["Γ₃"],f)
 # ops[6](elements["Γ₄"],f)
 
-ops[7](elements["Γₚ₁"],k,f)
-ops[7](elements["Γₚ₂"],k,f)
-ops[7](elements["Γₚ₃"],k,f)
-ops[7](elements["Γₚ₄"],k,f)
-# ops[8](elements["Γₚ₁"],f)
-# ops[8](elements["Γₚ₂"],f)
-# ops[8](elements["Γₚ₃"],f)
-# ops[8](elements["Γₚ₄"],f)
+ops[3](elements["Γₚ₁"],k,f)
+ops[3](elements["Γₚ₂"],k,f)
+ops[3](elements["Γₚ₃"],k,f)
+ops[3](elements["Γₚ₄"],k,f)
+# ops[7](elements["Γₚ₁"],f)
+# ops[7](elements["Γₚ₂"],f)
+# ops[7](elements["Γₚ₃"],f)
+# ops[7](elements["Γₚ₄"],f)
 
 d = k\f
 
@@ -124,4 +125,9 @@ prescribe!(elements["Ω"],:∂³u∂x³=>(x,y,z)->w₁₁₁(x,y))
 prescribe!(elements["Ω"],:∂³u∂x²∂y=>(x,y,z)->w₁₁₂(x,y))
 prescribe!(elements["Ω"],:∂³u∂x∂y²=>(x,y,z)->w₁₂₂(x,y))
 prescribe!(elements["Ω"],:∂³u∂y³=>(x,y,z)->w₂₂₂(x,y))
-h3,h2,h1,l2 = ops[9](elements["Ω"])
+h3,h2,h1,l2 = ops[8](elements["Ω"])
+H1=log10(h1)
+H2=log10(h2)
+H3=log10(h3)
+L2=log10(l2)
+h=log10(1/ndiv)
