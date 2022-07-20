@@ -52,33 +52,37 @@ RegularGrid:
         𝝭: *𝝭
 
 Γₚ₁:
-    type: &A3 ReproducingKernel{:Cubic2D,:□,:QuinticSpline,:Poi1}
+    type: *A1
     𝓒:
-        tag: Γₚ₁
+        tag: Ω
     𝓖:
+        tag: Γₚ₁
         type: &GP PoiGI1
         𝝭: &𝝭ₚ [𝝭,∂𝝭∂x,∂𝝭∂y,∂²𝝭∂x²,∂²𝝭∂x∂y,∂²𝝭∂y²]
 
 Γₚ₂:
-    type: *A3
+    type: *A1
     𝓒:
-        tag: Γₚ₂
+        tag: Ω
     𝓖:
+        tag: Γₚ₂
         type: *GP
         𝝭: *𝝭ₚ
 
 Γₚ₃:
-    type: *A3
+    type: *A1
     𝓒:
-        tag: Γₚ₃
+        tag: Ω
     𝓖:
+        tag: Γₚ₃
         type: *GP
         𝝭: *𝝭ₚ
 
 Γₚ₄:
-    type: *A3
+    type: *A1
     𝓒:
-        tag: Γₚ₄
+        tag: Ω
     𝓖:
+        tag: Γₚ₄
         type: *GP
         𝝭: *𝝭ₚ
