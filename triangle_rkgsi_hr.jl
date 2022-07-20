@@ -1,8 +1,9 @@
 
 using Revise, YAML, ApproxOperator
 config = YAML.load_file("./yml/triangle_rkgsi_hr.yml")
-ndiv = 80
+ndiv = 10
 elements, nodes = importmsh("./msh/triangle_"*string(ndiv)*".msh", config)
+
 
 nₚ = length(nodes)
 nₑ = length(elements["Ω"])
