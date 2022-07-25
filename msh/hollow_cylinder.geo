@@ -34,7 +34,7 @@ Physical Curve("Γ₂") = {2};
 Physical Curve("Γ₃") = {3};
 Physical Curve("Γ₄") = {4};
 
-Physical Surface("Ω",1) = {1};
+Physical Surface("Ω") = {1};
 Transfinite Curve{1} = ndiv+1;
 Transfinite Curve{2} = 2*ndiv+1;
 Transfinite Curve{3} = ndiv+1;
