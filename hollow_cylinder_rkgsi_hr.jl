@@ -10,49 +10,54 @@ elements, nodes = importmsh("./msh/hollow_cylinder_"*string(ndiv)*".msh", config
 nₚ = length(nodes)
 nₑ = length(elements["Ω"])
 
-s = 3.5 / ndiv * ones(nₚ)
+s = 4*10 / ndiv * ones(nₚ)
 push!(nodes, :s₁ => s, :s₂ => s, :s₃ => s)
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
-set_memory_𝗠!(elements["Γ₁"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
-set_memory_𝗠!(elements["Γ₂"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
-set_memory_𝗠!(elements["Γ₃"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
-set_memory_𝗠!(elements["Γ₄"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
+set_memory_𝗠!(elements["Γ̃₁"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
+set_memory_𝗠!(elements["Γ̃₂"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
+set_memory_𝗠!(elements["Γ̃₃"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
+set_memory_𝗠!(elements["Γ̃₄"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
 set_memory_𝗠!(elements["Γₚ₁"],:𝝭,:∇̃²)
 set_memory_𝗠!(elements["Γₚ₂"],:𝝭,:∇̃²)
 set_memory_𝗠!(elements["Γₚ₃"],:𝝭,:∇̃²)
 set_memory_𝗠!(elements["Γₚ₄"],:𝝭,:∇̃²)
 
-elements["Ω∩Γ₁"] = elements["Ω"]∩elements["Γ₁"]
-elements["Ω∩Γ₂"] = elements["Ω"]∩elements["Γ₂"]
-elements["Ω∩Γ₃"] = elements["Ω"]∩elements["Γ₃"]
-elements["Ω∩Γ₄"] = elements["Ω"]∩elements["Γ₄"]
+elements["Ω∩Γ₁"] = elements["Ω"]∩elements["Γ̃₁"]
+elements["Ω∩Γ₂"] = elements["Ω"]∩elements["Γ̃₂"]
+elements["Ω∩Γ₃"] = elements["Ω"]∩elements["Γ̃₃"]
+elements["Ω∩Γ₄"] = elements["Ω"]∩elements["Γ̃₄"]
 elements["Ω∩Γₚ₁"] = elements["Ω"]∩elements["Γₚ₁"]
 elements["Ω∩Γₚ₂"] = elements["Ω"]∩elements["Γₚ₂"]
 elements["Ω∩Γₚ₃"] = elements["Ω"]∩elements["Γₚ₃"]
 elements["Ω∩Γₚ₄"] = elements["Ω"]∩elements["Γₚ₄"]
 elements["Γₚ"] = elements["Γₚ₁"]∪elements["Γₚ₂"]∪elements["Γₚ₃"]∪elements["Γₚ₄"]
-elements["Γ"] = elements["Γ₁"]∪elements["Γ₂"]∪elements["Γ₃"]∪elements["Γ₄"]
+elements["Γ"] = elements["Γ̃₁"]∪elements["Γ̃₂"]∪elements["Γ̃₃"]∪elements["Γ̃₄"]
 elements["Γ∩Γₚ"] = elements["Γ"]∩elements["Γₚ"]
+
 
 set∇₂𝝭!(elements["Ω"])
 set∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
-set∇∇̃²𝝭!(elements["Γ₁"],elements["Ω∩Γ₁"])
-set∇∇̃²𝝭!(elements["Γ₂"],elements["Ω∩Γ₂"])
-set∇∇̃²𝝭!(elements["Γ₃"],elements["Ω∩Γ₃"])
-set∇∇̃²𝝭!(elements["Γ₄"],elements["Ω∩Γ₄"])
-set∇̃²𝝭!(elements["Γₚ₁"],elements["Ω∩Γₚ₁"])
-set∇̃²𝝭!(elements["Γₚ₂"],elements["Ω∩Γₚ₂"])
-set∇̃²𝝭!(elements["Γₚ₃"],elements["Ω∩Γₚ₃"])
-set∇̃²𝝭!(elements["Γₚ₄"],elements["Ω∩Γₚ₄"])
+set∇∇̃²𝝭!(elements["Γ̃₁"],elements["Ω∩Γ₁"])
+set∇∇̃²𝝭!(elements["Γ̃₂"],elements["Ω∩Γ₂"])
+set∇∇̃²𝝭!(elements["Γ̃₃"],elements["Ω∩Γ₃"])
+set∇∇̃²𝝭!(elements["Γ̃₄"],elements["Ω∩Γ₄"])
 set∇₂𝝭!(elements["Γ₁"])
 set∇₂𝝭!(elements["Γ₂"])
 set∇₂𝝭!(elements["Γ₃"])
 set∇₂𝝭!(elements["Γ₄"])
+set∇̃²𝝭!(elements["Γₚ₁"],elements["Ω∩Γₚ₁"])
+set∇̃²𝝭!(elements["Γₚ₂"],elements["Ω∩Γₚ₂"])
+set∇̃²𝝭!(elements["Γₚ₃"],elements["Ω∩Γₚ₃"])
+set∇̃²𝝭!(elements["Γₚ₄"],elements["Ω∩Γₚ₄"])
+set∇₂𝝭!(elements["Γ̃₁"])
+set∇₂𝝭!(elements["Γ̃₂"])
+set∇₂𝝭!(elements["Γ̃₃"])
+set∇₂𝝭!(elements["Γ̃₄"])
+
 set𝝭!(elements["Γₚ₁"])
 set𝝭!(elements["Γₚ₂"])
 set𝝭!(elements["Γₚ₃"])
 set𝝭!(elements["Γₚ₄"])
-
 set∇∇̄²𝝭!(elements["Γ₁"],Γᵍ=elements["Γ₁"],Γᶿ=elements["Γ₁"],Γᴾ=elements["Γₚ"])
 set∇∇̄²𝝭!(elements["Γ₂"],Γᵍ=elements["Γ₂"],Γᶿ=elements["Γ₂"],Γᴾ=elements["Γₚ"])
 set∇∇̄²𝝭!(elements["Γ₃"],Γᵍ=elements["Γ₃"],Γᶿ=elements["Γ₃"],Γᴾ=elements["Γₚ"])
@@ -105,38 +110,40 @@ D = 1.0
 M₁₁(x,y) = - D*(w₁₁(x,y)+ν*w₂₂(x,y))
 M₂₂(x,y) = - D*(ν*w₁₁(x,y)+w₂₂(x,y))
 M₁₂(x,y) = - D*(1-ν)*w₁₂(x,y)
+mᵢ=2
+mₒ=1
 prescribe!(elements["Ω"],:q=>(x,y,z)->w₁₁₁₁(x,y)+2*w₁₁₂₂(x,y)+w₂₂₂₂(x,y))
 prescribe!(elements["Γ₁"],:g=>(x,y,z)->w(x,y))
 prescribe!(elements["Γ₂"],:g=>(x,y,z)->w(x,y))
 prescribe!(elements["Γ₃"],:g=>(x,y,z)->w(x,y))
 prescribe!(elements["Γ₄"],:g=>(x,y,z)->w(x,y))
 
-prescribe!(elements["Γ₁"],:V=>(x,y,z)-> 0)
-prescribe!(elements["Γ₃"],:V=>(x,y,z)->0)
+#prescribe!(elements["Γ₁"],:V=>(x,y,z)-> 0)
+#prescribe!(elements["Γ₃"],:V=>(x,y,z)->0)
 
-prescribe!(elements["Γ₁"],:θ=>(x,y,z)->0)
-prescribe!(elements["Γ₃"],:θ=>(x,y,z)-> 0)
+#prescribe!(elements["Γ₁"],:θ=>(x,y,z)->0)
+#prescribe!(elements["Γ₃"],:θ=>(x,y,z)-> 0)
 
-prescribe!(elements["Γ₂"],:M=>(x,y,z)->1)
-prescribe!(elements["Γ₄"],:M=>(x,y,z)->2)
+prescribe!(elements["Γ₂"],:M=>(x,y,z)->1/2*M₁₁(x,y)+1/2*M₂₂(x,y)+M₁₂(x,y))
+prescribe!(elements["Γ₄"],:M=>(x,y,z)->1/2*M₁₁(x,y)+1/2*M₂₂(x,y)+M₁₂(x,y))
 
 prescribe!(elements["Γₚ₁"],:g=>(x,y,z)->w(x,y))
 prescribe!(elements["Γₚ₂"],:g=>(x,y,z)->w(x,y))
 prescribe!(elements["Γₚ₃"],:g=>(x,y,z)->w(x,y))
 prescribe!(elements["Γₚ₄"],:g=>(x,y,z)->w(x,y))
 
-prescribe!(elements["Γₚ₁"],:Δn₁s₁=>(x,y,z)->1/2)
-prescribe!(elements["Γₚ₁"],:Δn₁s₂n₂s₁=>(x,y,z)->-1)
-prescribe!(elements["Γₚ₁"],:Δn₂s₂=>(x,y,z)->-1/2)
-prescribe!(elements["Γₚ₂"],:Δn₁s₁=>(x,y,z)->-1/2)
-prescribe!(elements["Γₚ₂"],:Δn₁s₂n₂s₁=>(x,y,z)->-1)
-prescribe!(elements["Γₚ₂"],:Δn₂s₂=>(x,y,z)->1/2)
-prescribe!(elements["Γₚ₃"],:Δn₁s₁=>(x,y,z)->1/2)
-prescribe!(elements["Γₚ₃"],:Δn₁s₂n₂s₁=>(x,y,z)->1)
-prescribe!(elements["Γₚ₃"],:Δn₂s₂=>(x,y,z)->-1/2)
-rescribe!(elements["Γₚ₄"],:Δn₁s₁=>(x,y,z)->-1/2)
-prescribe!(elements["Γₚ₄"],:Δn₁s₂n₂s₁=>(x,y,z)->1)
-prescribe!(elements["Γₚ₄"],:Δn₂s₂=>(x,y,z)->1/2)
+#prescribe!(elements["Γₚ₁"],:Δn₁s₁=>(x,y,z)->1/2)
+#prescribe!(elements["Γₚ₁"],:Δn₁s₂n₂s₁=>(x,y,z)->-1)
+#prescribe!(elements["Γₚ₁"],:Δn₂s₂=>(x,y,z)->-1/2)
+#prescribe!(elements["Γₚ₂"],:Δn₁s₁=>(x,y,z)->-1/2)
+#prescribe!(elements["Γₚ₂"],:Δn₁s₂n₂s₁=>(x,y,z)->-1)
+#prescribe!(elements["Γₚ₂"],:Δn₂s₂=>(x,y,z)->1/2)
+#prescribe!(elements["Γₚ₃"],:Δn₁s₁=>(x,y,z)->1/2)
+#prescribe!(elements["Γₚ₃"],:Δn₁s₂n₂s₁=>(x,y,z)->1)
+#prescribe!(elements["Γₚ₃"],:Δn₂s₂=>(x,y,z)->-1/2)
+#rescribe!(elements["Γₚ₄"],:Δn₁s₁=>(x,y,z)->-1/2)
+#prescribe!(elements["Γₚ₄"],:Δn₁s₂n₂s₁=>(x,y,z)->1)
+#prescribe!(elements["Γₚ₄"],:Δn₂s₂=>(x,y,z)->1/2)
 
 prescribe!(elements["Γₚ₁"],:ΔM=>(x,y,z)->-1*M₁₂(x,y))
 prescribe!(elements["Γₚ₂"],:ΔM=>(x,y,z)->-1*M₁₂(x,y))
@@ -177,9 +184,9 @@ ops[5](elements["Γ₃"],k,f)
 #ops[5](elements["Γ₄"],k,f)
 
 # ops[6](elements["Γ₁"],f)
- ops[6](elements["Γ₂"],f)
+ops[6](elements["Γ₂"],f)
 # ops[6](elements["Γ₃"],f)
- ops[6](elements["Γ₄"],f)
+ops[6](elements["Γ₄"],f)
 
 ops[7](elements["Γₚ"],k,f)
 # ops[5](elements["Γ̃ₚ₁"],k,f)

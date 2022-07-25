@@ -2,15 +2,16 @@
 
 using Revise, YAML, ApproxOperator
 
-ndiv =10
-config = YAML.load_file("./yml/hollow_cylinder_gauss_nitsche.yml")
-elements, nodes = importmsh("./msh/hollow_cylinder_"*string(ndiv)*".msh",config)
+ndiv = 10
+config = YAML.load_file("./yml/hollow_cylinder_rkgsi_nitsche.yml")
+elements,nodes = importmsh("./msh/hollow_cylinder_"*string(ndiv)*".msh", config)
 nₚ = length(nodes)
-
 s = 4*10/ndiv*ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
+set_memory_𝗠!(elements["Ω̃"],:∇̃²)
 
-set∇²₂𝝭!(elements["Ω"])
+set∇₂𝝭!(elements["Ω"])
+set∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
 set∇³𝝭!(elements["Γ₁"])
 set∇³𝝭!(elements["Γ₂"])
 set∇³𝝭!(elements["Γ₃"])
@@ -19,7 +20,6 @@ set∇²₂𝝭!(elements["Γₚ₁"])
 set∇²₂𝝭!(elements["Γₚ₂"])
 set∇²₂𝝭!(elements["Γₚ₃"])
 set∇²₂𝝭!(elements["Γₚ₄"])
-
 w(x,y) = 4/3/(1-ν)*log((x^2+y^2)/2)-1/3/*(1+ν)*(x^2+y^2-4)
 w₁(x,y) = 4/3/(1-ν)*(x^2+y^2)^(-1)*2*x-2*x/3/(1+ν)
 w₂(x,y) = 4/3/(1-ν)*(x^2+y^2)^(-1)*2*y-2*y/3/(1+ν)
@@ -44,11 +44,12 @@ prescribe!(elements["Γ₂"],:g=>(x,y,z)->w(x,y))
 prescribe!(elements["Γ₃"],:g=>(x,y,z)->w(x,y))
 prescribe!(elements["Γ₄"],:g=>(x,y,z)->w(x,y))
 
-#prescribe!(elements["Γ₁"],:V=>(x,y,z)->0)
+#prescribe!(elements["Γ₁"],:V=>(x,y,z)-> 0)
 #prescribe!(elements["Γ₃"],:V=>(x,y,z)->0)
 
 #prescribe!(elements["Γ₁"],:θ=>(x,y,z)->0)
 #prescribe!(elements["Γ₃"],:θ=>(x,y,z)-> 0)
+
 prescribe!(elements["Γ₂"],:M=>(x,y,z)->1/2*M₁₁(x,y)+1/2*M₂₂(x,y)+M₁₂(x,y))
 prescribe!(elements["Γ₄"],:M=>(x,y,z)->1/2*M₁₁(x,y)+1/2*M₂₂(x,y)+M₁₂(x,y))
 
@@ -57,16 +58,16 @@ prescribe!(elements["Γₚ₂"],:g=>(x,y,z)->w(x,y))
 prescribe!(elements["Γₚ₃"],:g=>(x,y,z)->w(x,y))
 prescribe!(elements["Γₚ₄"],:g=>(x,y,z)->w(x,y))
 
-#prescribe!(elements["Γₚ₁"],:Δn₁s₁=>(x,y,z)->-1/2)
-#prescribe!(elements["Γₚ₁"],:Δn₁s₂n₂s₁=>(x,y,z)->1)
-#prescribe!(elements["Γₚ₁"],:Δn₂s₂=>(x,y,z)->1/2)
+#prescribe!(elements["Γₚ₁"],:Δn₁s₁=>(x,y,z)->1/2)
+#prescribe!(elements["Γₚ₁"],:Δn₁s₂n₂s₁=>(x,y,z)->-1)
+#prescribe!(elements["Γₚ₁"],:Δn₂s₂=>(x,y,z)->-1/2)
 #prescribe!(elements["Γₚ₂"],:Δn₁s₁=>(x,y,z)->-1/2)
 #prescribe!(elements["Γₚ₂"],:Δn₁s₂n₂s₁=>(x,y,z)->-1)
 #prescribe!(elements["Γₚ₂"],:Δn₂s₂=>(x,y,z)->1/2)
 #prescribe!(elements["Γₚ₃"],:Δn₁s₁=>(x,y,z)->1/2)
 #prescribe!(elements["Γₚ₃"],:Δn₁s₂n₂s₁=>(x,y,z)->1)
 #prescribe!(elements["Γₚ₃"],:Δn₂s₂=>(x,y,z)->-1/2)
-#prescribe!(elements["Γₚ₄"],:Δn₁s₁=>(x,y,z)->-1/2)
+#rescribe!(elements["Γₚ₄"],:Δn₁s₁=>(x,y,z)->-1/2)
 #prescribe!(elements["Γₚ₄"],:Δn₁s₂n₂s₁=>(x,y,z)->1)
 #prescribe!(elements["Γₚ₄"],:Δn₂s₂=>(x,y,z)->1/2)
 
@@ -79,51 +80,42 @@ prescribe!(elements["Γₚ₄"],:ΔM=>(x,y,z)->1*M₁₂(x,y))
 coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫VgdΓ,coefficient...,:α=>1e5*ndiv^2),
+       Operator(:∫VgdΓ,coefficient...,:α=>1e3*ndiv^2),
        Operator(:∫wVdΓ,coefficient...),
-       Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e5*ndiv),
+       Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3*ndiv),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
-       Operator(:ΔMₙₛg,coefficient...,:α=>1e5*ndiv^2),
+       Operator(:ΔMₙₛg,coefficient...,:α=>1e3*ndiv^2),
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:H₃)]
 
 k = zeros(nₚ,nₚ)
 f = zeros(nₚ)
+
 ops[1](elements["Ω̃"],k)
 ops[2](elements["Ω"],f)
 
-#ops[3](elements["Γ₁"],k,f)
+ops[3](elements["Γ₁"],k,f)
 ops[3](elements["Γ₂"],k,f)
-#ops[3](elements["Γ₃"],k,f)
+ops[3](elements["Γ₃"],k,f)
 ops[3](elements["Γ₄"],k,f)
 
- ops[4](elements["Γ₁"],f)
-# ops[4](elements["Γ₂"],f)
- ops[4](elements["Γ₃"],f)
-# ops[4](elements["Γ₄"],f)
-
 ops[5](elements["Γ₁"],k,f)
-#ops[5](elements["Γ₂"],k,f)
+ops[5](elements["Γ₂"],k,f)
 ops[5](elements["Γ₃"],k,f)
-#ops[5](elements["Γ₄"],k,f)
-
+ops[5](elements["Γ₄"],k,f)
 # ops[6](elements["Γ₁"],f)
-ops[6](elements["Γ₂"],f)
+# ops[6](elements["Γ₂"],f)
 # ops[6](elements["Γ₃"],f)
-ops[6](elements["Γ₄"],f)
+# ops[6](elements["Γ₄"],f)
 
-ops[7](elements["Γₚ"],k,f)
-# ops[5](elements["Γ̃ₚ₁"],k,f)
-# ops[5](elements["Γ̃ₚ₂"],k,f)
-# ops[5](elements["Γ̃ₚ₃"],k,f)
-# ops[5](elements["Γ̃ₚ₄"],k,f)
+ops[7](elements["Γₚ₁"],k,f)
+ops[7](elements["Γₚ₂"],k,f)
+ops[7](elements["Γₚ₃"],k,f)
+ops[7](elements["Γₚ₄"],k,f)
 # ops[8](elements["Γₚ₁"],f)
 # ops[8](elements["Γₚ₂"],f)
 # ops[8](elements["Γₚ₃"],f)
 # ops[8](elements["Γₚ₄"],f)
-#
-# # d = [w(nodes[:x][i],nodes[:y][i]) for i in 1:length(nodes[:x])]
-# # f .-= k*d
 
 d = k\f
 
