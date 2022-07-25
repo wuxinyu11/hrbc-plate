@@ -24,9 +24,16 @@ Circle(4)  = {4,5,1};
 Line Loop(5) = { 1, 2, 3, 4};
 
 Plane Surface(1) = {5};
+Physical Point("Γₚ₁") = {1};
+Physical Point("Γₚ₂") = {2};
+Physical Point("Γₚ₃") = {3};
+Physical Point("Γₚ₄") = {4};
 
-Physical Curve("Γᵍ",2) = {1,3};
-Physical Curve("Γᴹ",3) = {2,4};
+Physical Curve("Γ₁") = {1};
+Physical Curve("Γ₂") = {2};
+Physical Curve("Γ₃") = {3};
+Physical Curve("Γ₄") = {4};
+
 Physical Surface("Ω",1) = {1};
 Transfinite Curve{1} = ndiv+1;
 Transfinite Curve{2} = 2*ndiv+1;
