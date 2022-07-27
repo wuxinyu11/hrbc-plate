@@ -12,15 +12,13 @@ set_memory_𝗠!(elements["Ω̃"],:∇̃²)
 
 set∇₂𝝭!(elements["Ω"])
 set∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
-set∇³𝝭!(elements["Γ₁"])
-set∇³𝝭!(elements["Γ₂"])
-set∇³𝝭!(elements["Γ₃"])
-set∇³𝝭!(elements["Γ₄"])
-set∇²₂𝝭!(elements["Γₚ₁"])
-set∇²₂𝝭!(elements["Γₚ₂"])
-set∇²₂𝝭!(elements["Γₚ₃"])
-set∇²₂𝝭!(elements["Γₚ₄"])
-n = 2
+set∇³𝝭!(elements["Γᵍ"])
+set∇²₂𝝭!(elements["Γᶿ"])
+set∇₂𝝭!(elements["Γᴹ"])
+set𝝭!(elements["Γⱽ"])
+set∇²₂𝝭!(elements["Γᴾ"])
+
+n = 3
 w(x,y) = (1+2x+3y)^n
 w₁(x,y) = 2n*(1+2x+3y)^abs(n-1)
 w₂(x,y) = 3n*(1+2x+3y)^abs(n-1)
@@ -41,39 +39,26 @@ M₂₂(x,y) = - D*(ν*w₁₁(x,y)+w₂₂(x,y))
 M₁₂(x,y) = - D*(1-ν)*w₁₂(x,y)
 
 prescribe!(elements["Ω"],:q=>(x,y,z)->w₁₁₁₁(x,y)+2*w₁₁₂₂(x,y)+w₂₂₂₂(x,y))
-prescribe!(elements["Γ₂"],:g=>(x,y,z)->w(x,y))
-prescribe!(elements["Γ₄"],:g=>(x,y,z)->w(x,y))
-
-# prescribe!(elements["Γ₁"],:V=>(x,y,z)->0.0)
- #prescribe!(elements["Γ₁"],:V=>(x,y,z)-> - D*(-(2-ν)*w₁₁₂(x,y)-w₂₂₂(x,y)))
-# prescribe!(elements["Γ₃"],:V=>(x,y,z)->0.0)
- #prescribe!(elements["Γ₃"],:V=>(x,y,z)-> - D*((2-ν)*w₁₁₂(x,y)+w₂₂₂(x,y)))
-
-
-prescribe!(elements["Γ₁"],:θ=>(x,y,z)->-w₂(x,y))
-prescribe!(elements["Γ₃"],:θ=>(x,y,z)->-w₁(x,y))
-
- #prescribe!(elements["Γ₂"],:M=>(x,y,z)->1/2*M₁₁(x,y)+1/2*M₂₂(x,y)+M₁₂(x,y))
-#prescribe!(elements["Γ₄"],:M=>(x,y,z)->1/2*M₁₁(x,y)+1/2*M₂₂(x,y)+M₁₂(x,y))
-prescribe!(elements["Γ₂"],:M=>(x,y,z,n₁,n₂,s₁,s₂)->M₁₁(x,y)*n₁*n₁+2*M₁₂(x,y)*n₁*n₂+M₂₂(x,y)*n₂*n₂)
-prescribe!(elements["Γ₄"],:M=>(x,y,z,n₁,n₂,s₁,s₂)->M₁₁(x,y)*n₁*n₁+2*M₁₂(x,y)*n₁*n₂+M₂₂(x,y)*n₂*n₂)
-
-
-prescribe!(elements["Γₚ₁"],:g=>(x,y,z)->w(x,y))
-prescribe!(elements["Γₚ₂"],:g=>(x,y,z)->w(x,y))
-prescribe!(elements["Γₚ₃"],:g=>(x,y,z)->w(x,y))
-prescribe!(elements["Γₚ₄"],:g=>(x,y,z)->w(x,y))
+set𝒏!(elements["Γᵍ"])
+prescribe!(elements["Γᵍ"],:g=>(x,y,z)->w(x,y))
+set𝒏!(elements["Γᶿ"])
+prescribe!(elements["Γᶿ"],:θ=>(x,y,z,n₁,n₂)->w₁(x,y)*n₁+w₂(x,y)*n₂)
+set𝒏!(elements["Γᴹ"])
+prescribe!(elements["Γᴹ"],:M=>(x,y,z,n₁,n₂)->M₁₁(x,y)*n₁*n₁+2*M₁₂(x,y)*n₁*n₂+M₂₂(x,y)*n₂*n₂)
+set𝒏!(elements["Γⱽ"])
+prescribe!(elements["Γⱽ"],:V=>(x,y,z,n₁,n₂)->Vₙ(x,y,n₁,n₂))
+prescribe!(elements["Γᴾ"],:g=>(x,y,z)->w(x,y))
 
 
 
 coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫VgdΓ,coefficient...,:α=>1e7*ndiv^2),
+       Operator(:∫VgdΓ,coefficient...,:α=>1e3),
        Operator(:∫wVdΓ,coefficient...),
-       Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e7*ndiv),
+       Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e1),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
-       Operator(:ΔMₙₛg,coefficient...,:α=>1e7*ndiv^2),
+       Operator(:ΔMₙₛg,coefficient...,:α=>1e3),
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:H₃)]
 
@@ -83,27 +68,11 @@ f = zeros(nₚ)
 ops[1](elements["Ω̃"],k)
 ops[2](elements["Ω"],f)
 
-ops[3](elements["Γ₂"],k,f)
-ops[3](elements["Γ₄"],k,f)
-
-ops[4](elements["Γ₁"],f)
-ops[4](elements["Γ₃"],f)
-
-ops[5](elements["Γ₁"],k,f)
-ops[5](elements["Γ₃"],k,f)
-
-
- ops[6](elements["Γ₂"],f)
- ops[6](elements["Γ₄"],f)
-
-ops[7](elements["Γₚ₁"],k,f)
-ops[7](elements["Γₚ₂"],k,f)
-ops[7](elements["Γₚ₃"],k,f)
-ops[7](elements["Γₚ₄"],k,f)
- #ops[8](elements["Γₚ₁"],f)
- #ops[8](elements["Γₚ₂"],f)
- #ops[8](elements["Γₚ₃"],f)
-#ops[8](elements["Γₚ₄"],f)
+ops[3](elements["Γᵍ"],k,f)
+ops[4](elements["Γⱽ"],f)
+ops[5](elements["Γᶿ"],k,f)
+ops[6](elements["Γᴹ"],f)
+ops[7](elements["Γᴾ"],k,f)
 
 d = k\f
 
