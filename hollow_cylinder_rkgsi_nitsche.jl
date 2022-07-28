@@ -2,11 +2,11 @@
 
 using Revise, YAML, ApproxOperator
 
-ndiv = 80
+ndiv = 40
 config = YAML.load_file("./yml/hollow_cylinder_rkgsi_nitsche.yml")
 elements,nodes = importmsh("./msh/hollow_cylinder_"*string(ndiv)*".msh", config)
 nₚ = length(nodes)
-s = 5/ndiv*ones(nₚ)
+s = 3.5*π/2/ndiv * ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
 

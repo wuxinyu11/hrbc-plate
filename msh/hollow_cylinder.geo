@@ -8,7 +8,7 @@ a = 1.0;
 b = 2.0;
 
 lc = 1;
-ndiv = 80;
+ndiv = 20;
 
 Point(5) = {0 , 0., 0.};
 Point(1) = {a , 0., 0.};
@@ -29,10 +29,9 @@ Physical Curve("Γᶿ") = {1,3};
 Physical Curve("Γʳ") = {2,4};
 Physical Surface("Ω") = {1};
 
-Transfinite Curve{1} = ndiv+1;
-Transfinite Curve{2} = 2*ndiv+1;
-Transfinite Curve{3} = ndiv+1;
-Transfinite Curve{4} = 2*ndiv+1;
+// 10 -> 1.07, 20 -> 1.035, 40 -> 1.01747, 80 -> 1.0087
+Transfinite Curve{1,-3} = ndiv+1 Using Progression 1.035;
+Transfinite Curve{2,4} = 2*ndiv+1;
 Transfinite Surface{1} = {1,2,3,4};
 Mesh.Algorithm = 1;
 Mesh.MshFileVersion = 2;
