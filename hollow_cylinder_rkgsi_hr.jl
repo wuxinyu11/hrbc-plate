@@ -1,17 +1,29 @@
 
 
-using Revise, YAML, ApproxOperator
+using Revise, YAML, ApproxOperator, LinearAlgebra
 
 config = YAML.load_file("./yml/hollow_cylinder_rkgsi_hr.yml")
 
 ndiv = 80
 elements, nodes = importmsh("./msh/hollow_cylinder_"*string(ndiv)*".msh", config)
+# elements, nodes = importmsh("./msh/hollow_cylinder_regular_"*string(ndiv)*".msh", config)
 
 nₚ = length(nodes)
 nₑ = length(elements["Ω"])
 
-s = 3.1*π/2/ndiv * ones(nₚ)
+# s = 3.1*π/2/ndiv * ones(nₚ)
+s = zeros(nₚ)
 push!(nodes, :s₁ => s, :s₂ => s, :s₃ => s)
+for node in nodes
+    x = node.x
+    y = node.y
+    r = (x^2+y^2)^0.5
+    sᵢ = 3.5*r*π/4/ndiv
+    node.s₁ = sᵢ
+    node.s₂ = sᵢ
+    node.s₃ = sᵢ
+end
+
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
 set_memory_𝗠!(elements["Γᵍ"],:𝝭,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
 set_memory_𝗠!(elements["Γᶿ"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²)
@@ -117,14 +129,17 @@ ops[5](elements["Γᶿ"],k,f)
 ops[6](elements["Γᴹ"],f)
 ops[7](elements["Γᴾ"],k,f)
 
+# F = eigen(k)
+# F.values[1]
 d = k\f
 
-# d = [w(n.x,n.y) for n in nodes]
-# f .-= k*d
+# # d = [w(n.x,n.y) for n in nodes]
+# # f .-= k*d
 
 push!(nodes,:d=>d)
 set𝓖!(elements["Ω"],:TriGI16,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
 set∇̂³𝝭!(elements["Ω"])
+# set_memory_𝗠!(elements["Ω"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
 # set∇³𝝭!(elements["Ω"])
 prescribe!(elements["Ω"],:u=>(x,y,z)->w(x,y))
 prescribe!(elements["Ω"],:∂u∂x=>(x,y,z)->w₁(x,y))
