@@ -1,18 +1,25 @@
 
 
-using Revise, YAML, ApproxOperator
-
-ndiv = 10
+using Revise, YAML, ApproxOperator,CPUTime,TimerOutputs
+# @CPUtime begin
+       to = TimerOutput()
+       @timeit to "Total Time" begin
+       @timeit to "searching" begin
+ndiv = 80
 config = YAML.load_file("./yml/rectangular_rkgsi_penalty.yml")
 elements,nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh", config)
 nₚ = getnₚ(elements["Ω"])
+       end
 
 s = 3.5/ndiv*ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
+# @timeit to "shape functions " begin
+# @CPUtime begin
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
-
 set∇₂𝝭!(elements["Ω"])
 set∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
+@timeit to "shape functions Γᵍ" begin
+
 set∇₂𝝭!(elements["Γ₁"])
 set∇₂𝝭!(elements["Γ₂"])
 set∇₂𝝭!(elements["Γ₃"])
@@ -21,7 +28,7 @@ set𝝭!(elements["Γₚ₁"])
 set𝝭!(elements["Γₚ₂"])
 set𝝭!(elements["Γₚ₃"])
 set𝝭!(elements["Γₚ₄"])
-
+ end
 w(x,y) = - sin(π*x)*sin(π*y)
 w₁(x,y) = - π*cos(π*x)*sin(π*y)
 w₂(x,y) = - π*sin(π*x)*cos(π*y)
@@ -83,9 +90,12 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
 
 k = zeros(nₚ,nₚ)
 f = zeros(nₚ)
+# @CPUtime begin
+#  @timeit to "assembly " begin
 
 ops[1](elements["Ω̃"],k)
 ops[2](elements["Ω"],f)
+@timeit to "assembly Γᵍ " begin
 
 ops[3](elements["Γ₁"],k,f)
 ops[3](elements["Γ₂"],k,f)
@@ -109,7 +119,8 @@ ops[3](elements["Γₚ₄"],k,f)
 # ops[7](elements["Γₚ₂"],f)
 # ops[7](elements["Γₚ₃"],f)
 # ops[7](elements["Γₚ₄"],f)
-
+end
+end
 d = k\f
 
 push!(nodes,:d=>d)
@@ -131,3 +142,5 @@ H2=log10(h2)
 H3=log10(h3)
 L2=log10(l2)
 h=log10(1/ndiv)
+show(to)
+show(to)

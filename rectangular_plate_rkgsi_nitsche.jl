@@ -1,17 +1,23 @@
 
 
-using Revise, YAML, ApproxOperator
-
+using Revise, YAML, ApproxOperator,CPUTime,TimerOutputs
+# @CPUtime begin
+# to = TimerOutput()
+# @timeit to "Total Time" begin
+# @timeit to "searching" begin
 ndiv = 80
 config = YAML.load_file("./yml/rectangular_rkgsi_nitsche.yml")
 elements,nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh", config)
 nₚ = length(nodes)
+# end
 s = 3.5/ndiv*ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
+# @timeit to "shape functions " begin
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
-
 set∇₂𝝭!(elements["Ω"])
 set∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
+
+# @timeit to "shape functions Γᵍ " begin      
 set∇³𝝭!(elements["Γ₁"])
 set∇³𝝭!(elements["Γ₂"])
 set∇³𝝭!(elements["Γ₃"])
@@ -20,7 +26,7 @@ set∇²₂𝝭!(elements["Γₚ₁"])
 set∇²₂𝝭!(elements["Γₚ₂"])
 set∇²₂𝝭!(elements["Γₚ₃"])
 set∇²₂𝝭!(elements["Γₚ₄"])
-
+# end
 w(x,y) = - sin(π*x)*sin(π*y)
 w₁(x,y) = - π*cos(π*x)*sin(π*y)
 w₂(x,y) = - π*sin(π*x)*cos(π*y)
@@ -72,19 +78,21 @@ prescribe!(elements["Γₚ₄"],:ΔM=>(x,y,z)->-2*M₁₂(x,y))
 coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫VgdΓ,coefficient...,:α=>1e3*ndiv^2),
+       Operator(:∫VgdΓ,coefficient...,:α=>1e7*ndiv^2),
        Operator(:∫wVdΓ,coefficient...),
-       Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3*ndiv),
+       Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e7*ndiv),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
-       Operator(:ΔMₙₛg,coefficient...,:α=>1e3*ndiv^2),
+       Operator(:ΔMₙₛg,coefficient...,:α=>1e7*ndiv^2),
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:H₃)]
 
 k = zeros(nₚ,nₚ)
 f = zeros(nₚ)
-
+# @timeit to "assembly " begin
+       
 ops[1](elements["Ω̃"],k)
 ops[2](elements["Ω"],f)
+# @timeit to "assembly Γᵍ" begin
 
 ops[3](elements["Γ₁"],k,f)
 ops[3](elements["Γ₂"],k,f)
@@ -108,9 +116,9 @@ ops[7](elements["Γₚ₄"],k,f)
 # ops[8](elements["Γₚ₂"],f)
 # ops[8](elements["Γₚ₃"],f)
 # ops[8](elements["Γₚ₄"],f)
-
-d = k\f
-
+# end
+# end
+ d = k\f
 push!(nodes,:d=>d)
 set𝓖!(elements["Ω"],:TriGI16,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
 set∇̂³𝝭!(elements["Ω"])
@@ -130,3 +138,4 @@ H2=log10(h2)
 H3=log10(h3)
 L2=log10(l2)
 h=log10(1/ndiv)
+# show(to)

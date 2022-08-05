@@ -1,18 +1,20 @@
 
-
-using Revise, YAML, ApproxOperator
-
-config = YAML.load_file("./yml/rectangular_rkgsi_hr.yml")
+using Revise, YAML, ApproxOperator,CPUTime,TimerOutputs
+# @CPUtime begin
+       to = TimerOutput()
+       @timeit to "Total Time" begin
+       @timeit to "searching" begin
 
 ndiv = 80
 config = YAML.load_file("./yml/rectangular_rkgsi_hr.yml")
 elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh", config)
-
+       end 
 nₚ = length(nodes)
 nₑ = length(elements["Ω"])
 
 s = 3.5 / ndiv * ones(nₚ)
 push!(nodes, :s₁ => s, :s₂ => s, :s₃ => s)
+       
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
 set_memory_𝗠!(elements["Γ₁"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
 set_memory_𝗠!(elements["Γ₂"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
@@ -35,8 +37,12 @@ elements["Γₚ"] = elements["Γₚ₁"]∪elements["Γₚ₂"]∪elements["Γ�
 elements["Γ"] = elements["Γ₁"]∪elements["Γ₂"]∪elements["Γ₃"]∪elements["Γ₄"]
 elements["Γ∩Γₚ"] = elements["Γ"]∩elements["Γₚ"]
 
+ 
+# @CPUtime begin
+# @timeit to "shape functions " begin      
 set∇₂𝝭!(elements["Ω"])
 set∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
+@timeit to "shape functions Γᵍ " begin      
 set∇∇̃²𝝭!(elements["Γ₁"],elements["Ω∩Γ₁"])
 set∇∇̃²𝝭!(elements["Γ₂"],elements["Ω∩Γ₂"])
 set∇∇̃²𝝭!(elements["Γ₃"],elements["Ω∩Γ₃"])
@@ -59,6 +65,8 @@ set∇∇̄²𝝭!(elements["Γ₂"],Γᵍ=elements["Γ₂"],Γᶿ=elements["Γ�
 set∇∇̄²𝝭!(elements["Γ₃"],Γᵍ=elements["Γ₃"],Γᶿ=elements["Γ₃"],Γᴾ=elements["Γₚ"])
 set∇∇̄²𝝭!(elements["Γ₄"],Γᵍ=elements["Γ₄"],Γᶿ=elements["Γ₄"],Γᴾ=elements["Γₚ"])
 set∇̄²𝝭!(elements["Γₚ"],Γᵍ=elements["Γ∩Γₚ"],Γᶿ=elements["Γ∩Γₚ"],Γᴾ=elements["Γₚ"])
+end
+
 
 # set∇∇̄²𝝭!(elements["Γ₁"],Γᵍ=elements["Γ₁"],Γᶿ=elements["Γ₁"])
 # set∇∇̄²𝝭!(elements["Γ₂"],Γᵍ=elements["Γ₂"],Γᶿ=elements["Γ₂"])
@@ -152,8 +160,11 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
 k = zeros(nₚ,nₚ)
 f = zeros(nₚ)
 
+# @CPUtime begin
+# @timeit to "assembly " begin       
 ops[1](elements["Ω̃"],k)
 ops[2](elements["Ω"],f)
+@timeit to "assembly  Γᵍ" begin       
 
 ops[3](elements["Γ₁"],k,f)
 ops[3](elements["Γ₂"],k,f)
@@ -185,7 +196,8 @@ ops[7](elements["Γₚ"],k,f)
 #
 # # d = [w(nodes[:x][i],nodes[:y][i]) for i in 1:length(nodes[:x])]
 # # f .-= k*d
-
+end
+end
 d = k\f
 
 push!(nodes,:d=>d)
@@ -207,3 +219,4 @@ H2=log10(h2)
 H3=log10(h3)
 L2=log10(l2)
 h=log10(1/ndiv)
+show(to)

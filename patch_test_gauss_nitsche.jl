@@ -1,25 +1,34 @@
 
-using Revise, YAML, ApproxOperator
+using Revise, YAML, ApproxOperator,TimerOutputs
+ to = TimerOutput()
 
-ndiv = 10
+
+ndiv = 80
+@timeit to "Total Time" begin
+@timeit to "searching" begin
 config = YAML.load_file("./yml/patch_test_gauss_nitsche.yml")
+
+end
 elements, nodes = importmsh("./msh/patchtest_"*string(ndiv)*".msh",config)
 nₚ = length(nodes)
+
 
 s = 3.5/ndiv*ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 
-set∇²₂𝝭!(elements["Ω"])
-set∇³𝝭!(elements["Γ₁"])
-set∇³𝝭!(elements["Γ₂"])
-set∇³𝝭!(elements["Γ₃"])
-set∇³𝝭!(elements["Γ₄"])
-set∇²₂𝝭!(elements["Γₚ₁"])
-set∇²₂𝝭!(elements["Γₚ₂"])
-set∇²₂𝝭!(elements["Γₚ₃"])
-set∇²₂𝝭!(elements["Γₚ₄"])
+
+@timeit to "shape functions Ω" set∇²₂𝝭!(elements["Ω"])
+@timeit to "shape functions Γ₁" set∇³𝝭!(elements["Γ₁"])
+@timeit to "shape functions Γ₂ " set∇³𝝭!(elements["Γ₂"])
+@timeit to "shape functions Γ₃" set∇³𝝭!(elements["Γ₃"])
+@timeit to "shape functions Γ₄" set∇³𝝭!(elements["Γ₄"])
+@timeit to "shape functions Γₚ₁" set∇²₂𝝭!(elements["Γₚ₁"])
+@timeit to "shape functions Γₚ₂" set∇²₂𝝭!(elements["Γₚ₂"])
+@timeit to "shape functions Γₚ₃" set∇²₂𝝭!(elements["Γₚ₃"])
+@timeit to "shape functions Γₚ₄" set∇²₂𝝭!(elements["Γₚ₄"])
 
 n = 3
+@timeit to "prescribling" begin
 
 w(x,y) = (1+2x+3y)^n
 w₁(x,y) = 2n*(1+2x+3y)^abs(n-1)
@@ -68,6 +77,7 @@ prescribe!(elements["Γₚ₁"],:ΔM=>(x,y,z)->2*M₁₂(x,y))
 prescribe!(elements["Γₚ₂"],:ΔM=>(x,y,z)->-2*M₁₂(x,y))
 prescribe!(elements["Γₚ₃"],:ΔM=>(x,y,z)->2*M₁₂(x,y))
 prescribe!(elements["Γₚ₄"],:ΔM=>(x,y,z)->-2*M₁₂(x,y))
+end
 
 coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
@@ -83,34 +93,33 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
 k = zeros(nₚ,nₚ)
 f = zeros(nₚ)
 
-ops[1](elements["Ω"],k)
-ops[2](elements["Ω"],f)
+@timeit to "assembly in Ω" ops[1](elements["Ω"],k)
+@timeit to "assembly in Ω" ops[2](elements["Ω"],f)
+@timeit to "assembly in Γ₁" ops[3](elements["Γ₁"],k,f)
+@timeit to "assembly in Γ₂" ops[3](elements["Γ₂"],k,f)
+@timeit to "assembly in Γ₃" ops[3](elements["Γ₃"],k,f)
+@timeit to "assembly in Γ₄" ops[3](elements["Γ₄"],k,f)
 
-ops[3](elements["Γ₁"],k,f)
-ops[3](elements["Γ₂"],k,f)
-ops[3](elements["Γ₃"],k,f)
-ops[3](elements["Γ₄"],k,f)
-
-ops[5](elements["Γ₁"],k,f)
-ops[5](elements["Γ₂"],k,f)
-ops[5](elements["Γ₃"],k,f)
-ops[5](elements["Γ₄"],k,f)
+@timeit to "assembly in Γ₁" ops[5](elements["Γ₁"],k,f)
+@timeit to "assembly in Γ₂" ops[5](elements["Γ₂"],k,f)
+@timeit to "assembly in Γ₃" ops[5](elements["Γ₃"],k,f)
+@timeit to "assembly in Γ₄" ops[5](elements["Γ₄"],k,f)
 # ops[6](elements["Γ₁"],f)
 # ops[6](elements["Γ₂"],f)
 # ops[6](elements["Γ₃"],f)
 # ops[6](elements["Γ₄"],f)
 
-ops[7](elements["Γₚ₁"],k,f)
-ops[7](elements["Γₚ₂"],k,f)
-ops[7](elements["Γₚ₃"],k,f)
-ops[7](elements["Γₚ₄"],k,f)
+@timeit to "assembly in Γₚ₁" ops[7](elements["Γₚ₁"],k,f)
+@timeit to "assembly in Γₚ₂" ops[7](elements["Γₚ₂"],k,f)
+@timeit to "assembly in Γₚ₃" ops[7](elements["Γₚ₃"],k,f)
+@timeit to "assembly in Γₚ₄ " ops[7](elements["Γₚ₄"],k,f)
 # ops[8](elements["Γₚ₁"],f)
 # ops[8](elements["Γₚ₂"],f)
 # ops[8](elements["Γₚ₃"],f)
 # ops[8](elements["Γₚ₄"],f)
 
-d = k\f
-
+@timeit to "solve" d = k\f
+end
 push!(nodes,:d=>d)
 set𝓖!(elements["Ω"],:TriGI16,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
 set∇̂³𝝭!(elements["Ω"])
@@ -125,3 +134,4 @@ prescribe!(elements["Ω"],:∂³u∂x²∂y=>(x,y,z)->w₁₁₂(x,y))
 prescribe!(elements["Ω"],:∂³u∂x∂y²=>(x,y,z)->w₁₂₂(x,y))
 prescribe!(elements["Ω"],:∂³u∂y³=>(x,y,z)->w₂₂₂(x,y))
 h3,h2,h1,l2 = ops[9](elements["Ω"])
+show(to)
