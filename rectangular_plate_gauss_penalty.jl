@@ -1,20 +1,20 @@
-using Revise, YAML, ApproxOperator,CPUTime,TimerOutputs
-# @CPUtime begin
-       to = TimerOutput()
-       @timeit to "Total Time" begin
-       @timeit to "searching" begin
+using YAML, ApproxOperator, XLSX, TimerOutputs
+to = TimerOutput()
+@timeit to "Total Time" begin
+@timeit to "searching" begin
 ndiv = 80
-config = YAML.load_file("./yml/rectangular_gauss_penalty.yml")
+𝒑 = "quartic"
+config = YAML.load_file("./yml/rectangular_gauss_penalty_"*𝒑*".yml")
 elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh",config)
 nₚ = length(nodes)
-       end
+end
 
-s = 3.5/ndiv*ones(nₚ)
+s = 4.5/ndiv*ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 
 # @CPUtime begin
-#  @timeit to "shape functions " begin
-       
+
+@timeit to "shape functions " begin
 set∇²₂𝝭!(elements["Ω"])
 @timeit to "shape functions Γᵍ " begin
 
@@ -26,7 +26,8 @@ set𝝭!(elements["Γₚ₁"])
 set𝝭!(elements["Γₚ₂"])
 set𝝭!(elements["Γₚ₃"])
 set𝝭!(elements["Γₚ₄"])
- end
+end
+end
 
 w(x,y) = - sin(π*x)*sin(π*y)
 w₁(x,y) = - π*cos(π*x)*sin(π*y)
@@ -76,10 +77,15 @@ prescribe!(elements["Γₚ₂"],:ΔM=>(x,y,z)->-2*M₁₂(x,y))
 prescribe!(elements["Γₚ₃"],:ΔM=>(x,y,z)->2*M₁₂(x,y))
 prescribe!(elements["Γₚ₄"],:ΔM=>(x,y,z)->-2*M₁₂(x,y))
 
+# cubic
+# ndiv = 10, 20, 40, 80, α = 1e7
+# quartic
+# ndiv = 10, 20, 40, 80, α = 1e9
+
 coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫vgdΓ,coefficient...,:α=>1e7),
+       Operator(:∫vgdΓ,coefficient...,:α=>1e9),
        Operator(:∫wVdΓ,coefficient...),
        Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e7),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
@@ -89,8 +95,7 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
 k = zeros(nₚ,nₚ)
 f = zeros(nₚ)
 
-# @CPUtime begin
-#  @timeit to "assembly " begin
+@timeit to "assembly " begin
 ops[1](elements["Ω"],k)
 ops[2](elements["Ω"],f)
 @timeit to "assembly Γᵍ " begin
@@ -100,10 +105,10 @@ ops[3](elements["Γ₂"],k,f)
 ops[3](elements["Γ₃"],k,f)
 ops[3](elements["Γ₄"],k,f)
 
-ops[5](elements["Γ₁"],k,f)
-ops[5](elements["Γ₂"],k,f)
-ops[5](elements["Γ₃"],k,f)
-ops[5](elements["Γ₄"],k,f)
+# ops[5](elements["Γ₁"],k,f)
+# ops[5](elements["Γ₂"],k,f)
+# ops[5](elements["Γ₃"],k,f)
+# ops[5](elements["Γ₄"],k,f)
 # ops[6](elements["Γ₁"],f)
 # ops[6](elements["Γ₂"],f)
 # ops[6](elements["Γ₃"],f)
@@ -120,6 +125,7 @@ ops[3](elements["Γₚ₄"],k,f)
 end
 end
 d = k\f
+end
 
 push!(nodes,:d=>d)
 set𝓖!(elements["Ω"],:TriGI16,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
@@ -135,9 +141,20 @@ prescribe!(elements["Ω"],:∂³u∂x²∂y=>(x,y,z)->w₁₁₂(x,y))
 prescribe!(elements["Ω"],:∂³u∂x∂y²=>(x,y,z)->w₁₂₂(x,y))
 prescribe!(elements["Ω"],:∂³u∂y³=>(x,y,z)->w₂₂₂(x,y))
 h3,h2,h1,l2 = ops[8](elements["Ω"])
-H1=log10(h1)
-H2=log10(h2)
-H3=log10(h3)
-L2=log10(l2)
-h=log10(1/ndiv)
 show(to)
+
+index = [10,20,40,80]
+XLSX.openxlsx("./xlsx/rectangular_"*𝒑*".xlsx", mode="rw") do xf
+    row = "A"
+#     row = "C"
+    𝐿₂ = xf[2]
+    𝐻₁ = xf[3]
+    𝐻₂ = xf[4]
+    𝐻₃ = xf[5]
+    ind = findfirst(n->n==ndiv,index)+1
+    row = row*string(ind)
+    𝐿₂[row] = log10(l2)
+    𝐻₁[row] = log10(h1)
+    𝐻₂[row] = log10(h2)
+    𝐻₃[row] = log10(h3)
+end

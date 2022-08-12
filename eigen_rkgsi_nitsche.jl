@@ -10,6 +10,7 @@ nₚ = length(nodes)
 nₑ = length(elements["Ω"])
 
 s = 3.1 / ndiv * ones(nₚ)
+push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
 
 elements["Γₚ"] = elements["Γₚ₁"]∪elements["Γₚ₂"]∪elements["Γₚ₃"]∪elements["Γₚ₄"]
@@ -32,8 +33,8 @@ D = 1.0
 coefficient = (:D=>1.0,:ν=>0.3)
 
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
-       Operator(:∫VgdΓ,:α=>0e9,coefficient...),
-       Operator(:∫MₙₙθdΓ,:α=>0e5,coefficient...),
+       Operator(:∫VgdΓ,:α=>1e0,coefficient...),
+       Operator(:∫MₙₙθdΓ,:α=>1e8,coefficient...),
        Operator(:ΔMₙₛg,:α=>0e5,coefficient...),
        Operator(:H₃)]
 
@@ -41,9 +42,9 @@ k = zeros(nₚ,nₚ)
 f = zeros(nₚ)
 
 ops[1](elements["Ω̃"],k)
-ops[2](elements["Γ₁"],k,f)
-ops[2](elements["Γ₂"],k,f)
-# ops[3](elements["Γ"],k,f)
+# ops[2](elements["Γ₁"],k,f)
+ops[2](elements["Γ"],k,f)
+ops[3](elements["Γ"],k,f)
 # ops[4](elements["Γₚ"],k,f)
 # ops[4](elements["Γₚ₂"],k,f)
 # ops[4](elements["Γₚ₃"],k,f)

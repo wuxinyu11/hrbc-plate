@@ -1,22 +1,18 @@
 
 using YAML, ApproxOperator, XLSX, TimerOutputs
-to = TimerOutput()
-@timeit to "Total Time" begin
-@timeit to "searching" begin
-ndiv = 80
+
+ndiv = 10
+# 𝒑 = "cubic"
 𝒑 = "quartic"
-config = YAML.load_file("./yml/rectangular_rkgsi_penalty_"*𝒑*".yml")
+config = YAML.load_file("./yml/rectangular_rkgsi_penalty_alpha_"*𝒑*".yml")
 elements,nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh", config)
 nₚ = getnₚ(elements["Ω"])
-end
 
 s = 4.5/ndiv*ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
-@timeit to "shape functions " begin
 set∇₂𝝭!(elements["Ω"])
 set∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
-@timeit to "shape functions Γᵍ" begin
 
 set∇₂𝝭!(elements["Γ₁"])
 set∇₂𝝭!(elements["Γ₂"])
@@ -26,8 +22,8 @@ set𝝭!(elements["Γₚ₁"])
 set𝝭!(elements["Γₚ₂"])
 set𝝭!(elements["Γₚ₃"])
 set𝝭!(elements["Γₚ₄"])
-end
-end
+set𝝭!(elements["Ω̄"])
+
 w(x,y) = - sin(π*x)*sin(π*y)
 w₁(x,y) = - π*cos(π*x)*sin(π*y)
 w₂(x,y) = - π*sin(π*x)*cos(π*y)
@@ -76,6 +72,7 @@ prescribe!(elements["Γₚ₁"],:ΔM=>(x,y,z)->2*M₁₂(x,y))
 prescribe!(elements["Γₚ₂"],:ΔM=>(x,y,z)->-2*M₁₂(x,y))
 prescribe!(elements["Γₚ₃"],:ΔM=>(x,y,z)->2*M₁₂(x,y))
 prescribe!(elements["Γₚ₄"],:ΔM=>(x,y,z)->-2*M₁₂(x,y))
+prescribe!(elements["Ω̄"],:u=>(x,y,z)->w(x,y))
 
 coefficient = (:D=>D,:ν=>ν)
 # cubic
@@ -95,71 +92,42 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e7),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
        Operator(:wΔMₙₛ,coefficient...),
-       Operator(:H₃)]
+       Operator(:L₂)]
 
 k = zeros(nₚ,nₚ)
 f = zeros(nₚ)
-# @CPUtime begin
-@timeit to "assembly " begin
-
-ops[1](elements["Ω̃"],k)
-ops[2](elements["Ω"],f)
-@timeit to "assembly Γᵍ " begin
-
-ops[3](elements["Γ₁"],k,f)
-ops[3](elements["Γ₂"],k,f)
-ops[3](elements["Γ₃"],k,f)
-ops[3](elements["Γ₄"],k,f)
-
-# ops[5](elements["Γ₁"],k,f)
-# ops[5](elements["Γ₂"],k,f)
-# ops[5](elements["Γ₃"],k,f)
-# ops[5](elements["Γ₄"],k,f)
-# ops[6](elements["Γ₁"],f)
-# ops[6](elements["Γ₂"],f)
-# ops[6](elements["Γ₃"],f)
-# ops[6](elements["Γ₄"],f)
-
-ops[3](elements["Γₚ₁"],k,f)
-ops[3](elements["Γₚ₂"],k,f)
-ops[3](elements["Γₚ₃"],k,f)
-ops[3](elements["Γₚ₄"],k,f)
-# ops[7](elements["Γₚ₁"],f)
-# ops[7](elements["Γₚ₂"],f)
-# ops[7](elements["Γₚ₃"],f)
-# ops[7](elements["Γₚ₄"],f)
-end
-end
-d = k\f
-end
-
+d = zeros(nₚ)
 push!(nodes,:d=>d)
-set𝓖!(elements["Ω"],:TriGI16,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
-set∇̂³𝝭!(elements["Ω"])
-prescribe!(elements["Ω"],:u=>(x,y,z)->w(x,y))
-prescribe!(elements["Ω"],:∂u∂x=>(x,y,z)->w₁(x,y))
-prescribe!(elements["Ω"],:∂u∂y=>(x,y,z)->w₂(x,y))
-prescribe!(elements["Ω"],:∂²u∂x²=>(x,y,z)->w₁₁(x,y))
-prescribe!(elements["Ω"],:∂²u∂x∂y=>(x,y,z)->w₁₂(x,y))
-prescribe!(elements["Ω"],:∂²u∂y²=>(x,y,z)->w₂₂(x,y))
-prescribe!(elements["Ω"],:∂³u∂x³=>(x,y,z)->w₁₁₁(x,y))
-prescribe!(elements["Ω"],:∂³u∂x²∂y=>(x,y,z)->w₁₁₂(x,y))
-prescribe!(elements["Ω"],:∂³u∂x∂y²=>(x,y,z)->w₁₂₂(x,y))
-prescribe!(elements["Ω"],:∂³u∂y³=>(x,y,z)->w₂₂₂(x,y))
-h3,h2,h1,l2 = ops[8](elements["Ω"])
-show(to)
 
-index = [10,20,40,80]
-XLSX.openxlsx("./xlsx/rectangular_"*𝒑*".xlsx", mode="rw") do xf
-    row = "E"
-    𝐿₂ = xf[2]
-    𝐻₁ = xf[3]
-    𝐻₂ = xf[4]
-    𝐻₃ = xf[5]
-    ind = findfirst(n->n==ndiv,index)+1
-    row = row*string(ind)
-    𝐿₂[row] = log10(l2)
-    𝐻₁[row] = log10(h1)
-    𝐻₂[row] = log10(h2)
-    𝐻₃[row] = log10(h3)
+αs = [1e0,1e1,1e2,1e3,1e4,1e5,4e5,7e5,1e6,4e6,7e6,1e7,4e7,7e7,1e8,1e9,1e10,1e11,1e12,1e13,1e14,1e15,1e16]
+for (i,α) in enumerate(αs)
+    println(i)
+
+    fill!(k,0.0)
+    fill!(f,0.0)
+
+    opv = Operator(:∫vgdΓ,coefficient...,:α=>α)
+
+    ops[1](elements["Ω̃"],k)
+    ops[2](elements["Ω"],f)
+
+    opv(elements["Γ₁"],k,f)
+    opv(elements["Γ₂"],k,f)
+    opv(elements["Γ₃"],k,f)
+    opv(elements["Γ₄"],k,f)
+
+    opv(elements["Γₚ₁"],k,f)
+    opv(elements["Γₚ₂"],k,f)
+    opv(elements["Γₚ₃"],k,f)
+    opv(elements["Γₚ₄"],k,f)
+
+    d .= k\f
+
+    l2 = ops[8](elements["Ω̄"])
+
+    XLSX.openxlsx("./xlsx/alpha.xlsx", mode="rw") do xf
+        𝐿₂_row = "B"*string(i+1)
+        xf_ = 𝒑 == "cubic" ? xf[1] : xf[2]
+        xf_[𝐿₂_row] = log10(l2)
+    end
 end

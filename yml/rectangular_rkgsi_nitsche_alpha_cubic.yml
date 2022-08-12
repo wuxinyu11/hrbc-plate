@@ -1,0 +1,92 @@
+RegularGrid:
+    n: 2
+    γ: 5
+
+Ω:
+    type: &A1 ReproducingKernel{:Cubic2D,:□,:QuinticSpline,:Tri3}
+    𝓒:
+        tag: Ω
+    𝓖:
+        type: TriRK6
+        𝝭: [𝝭,∂𝝭∂x,∂𝝭∂y]
+
+Ω̄:
+    type: *A1
+    𝓒:
+        tag: Ω
+    𝓖:
+        type: TriGI16
+        𝝭: [𝝭]
+
+Ω̃:
+    type: *A1
+    𝓒:
+        tag: Ω
+    𝓖:
+        type: TriGI3
+        𝝭: [∂²𝝭∂x²,∂²𝝭∂x∂y,∂²𝝭∂y²]
+
+
+Γ₁:
+    type: &A2 ReproducingKernel{:Cubic2D,:□,:QuinticSpline,:Seg2}
+    𝓒:
+        tag: Γ₁
+    𝓖:
+        type: &GB SegRK3
+        𝝭: &𝝭 [𝝭,∂𝝭∂x,∂𝝭∂y,∂²𝝭∂x²,∂²𝝭∂x∂y,∂²𝝭∂y²,∂³𝝭∂x³,∂³𝝭∂x²∂y,∂³𝝭∂x∂y²,∂³𝝭∂y³]
+
+Γ₂:
+    type: *A2
+    𝓒:
+        tag: Γ₂
+    𝓖:
+        type: *GB
+        𝝭: *𝝭
+
+Γ₃:
+    type: *A2
+    𝓒:
+        tag: Γ₃
+    𝓖:
+        type: *GB
+        𝝭: *𝝭
+
+Γ₄:
+    type: *A2
+    𝓒:
+        tag: Γ₄
+    𝓖:
+        type: *GB
+        𝝭: *𝝭
+
+Γₚ₁:
+    type: &A3 ReproducingKernel{:Cubic2D,:□,:QuinticSpline,:Poi1}
+    𝓒:
+        tag: Γₚ₁
+    𝓖:
+        type: &GP PoiGI1
+        𝝭: &𝝭ₚ [𝝭,∂𝝭∂x,∂𝝭∂y,∂²𝝭∂x²,∂²𝝭∂x∂y,∂²𝝭∂y²]
+
+Γₚ₂:
+    type: *A3
+    𝓒:
+        tag: Γₚ₂
+    𝓖:
+        type: *GP
+        𝝭: *𝝭ₚ
+
+Γₚ₃:
+    type: *A3
+    𝓒:
+        tag: Γₚ₃
+    𝓖:
+        type: *GP
+        𝝭: *𝝭ₚ
+
+Γₚ₄:
+    type: *A3
+    𝓒:
+        tag: Γₚ₄
+    𝓖:
+        type: *GP
+        𝝭: *𝝭ₚ

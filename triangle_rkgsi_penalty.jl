@@ -1,20 +1,26 @@
 
+using YAML, ApproxOperator, XLSX, TimerOutputs
 
-using Revise, YAML, ApproxOperator
+to = TimerOutput()
+@timeit to "Total Time" begin
+@timeit to "searching" begin
 
+# 𝒑 = "cubic"
+𝒑 = "quartic"
 ndiv = 80
-config = YAML.load_file("./yml/triangle_rkgsi_penalty.yml")
+config = YAML.load_file("./yml/triangle_rkgsi_penalty_"*𝒑*".yml")
 elements,nodes = importmsh("./msh/triangle_"*string(ndiv)*".msh", config)
+end
 nₚ = getnₚ(elements["Ω"])
 
-#s = 4.5*10/ndiv*ones(nₚ)
-s = 4*10/ndiv*ones(nₚ)
-#push!(nodes,:s₁=>3^(0.5)/2 .*s,:s₂=>s,:s₃=>s)
+s = 5*10/ndiv*ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
 
+@timeit to "shape functions " begin      
 set∇₂𝝭!(elements["Ω"])
 set∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
+@timeit to "shape functions Γᵍ " begin      
 set∇₂𝝭!(elements["Γ₁"])
 set∇₂𝝭!(elements["Γ₂"])
 set∇₂𝝭!(elements["Γ₃"])
@@ -22,6 +28,9 @@ set∇₂𝝭!(elements["Γ₃"])
 set𝝭!(elements["Γₚ₁"])
 set𝝭!(elements["Γₚ₂"])
 set𝝭!(elements["Γₚ₃"])
+
+end
+end
 
 w(x,y) = 1/640*(x^3-3y^2*x-10(x^2+y^2)+4000/27)*(400/9-x^2-y^2)
 w₁(x,y) = 1/640*(3*x^2-3*y^2-20x)*(4/9*100-x^2-y^2)+1/640*(x^3-3y^2*x-10(x^2+y^2)+4/27*1000)*(-2*x)
@@ -45,28 +54,8 @@ M₂₂(x,y) = - D*(ν*w₁₁(x,y)+w₂₂(x,y))
 M₁₂(x,y) = - D*(1-ν)*w₁₂(x,y)
 
 prescribe!(elements["Ω"],:q=>(x,y,z)->w₁₁₁₁(x,y)+2*w₁₁₂₂(x,y)+w₂₂₂₂(x,y))
-#prescribe!(elements["Γ₁"],:g=>(x,y,z)->w(x,y))
-#prescribe!(elements["Γ₂"],:g=>(x,y,z)->w(x,y))
-#prescribe!(elements["Γ₃"],:g=>(x,y,z)->w(x,y))
-
-#prescribe!(elements["Γ₁"],:V=>(x,y,z)-> - D*(-(2-ν)*w₁₁₂(x,y)-w₂₂₂(x,y)))
-#prescribe!(elements["Γ₂"],:V=>(x,y,z)-> - D*(w₁₁₁(x,y)+(2-ν)*w₁₂₂(x,y)))
-#prescribe!(elements["Γ₃"],:V=>(x,y,z)-> - D*((2-ν)*w₁₁₂(x,y)+w₂₂₂(x,y)))
-
-#prescribe!(elements["Γ₁"],:θ=>(x,y,z)->1/2*w₁(x,y)-3^(0.5)/2*w₂(x,y))
-#prescribe!(elements["Γ₂"],:θ=>(x,y,z)->-1*w₁(x,y))
-#prescribe!(elements["Γ₃"],:θ=>(x,y,z)->1/2*w₁(x,y)+3^(0.5)/2*w₂(x,y))
-
-#prescribe!(elements["Γ₁"],:M=>(x,y,z)->1/4*M₁₁(x,y)+3/4*M₂₂(x,y)-3^(0.5)/2*M₁₂(x,y))
-#prescribe!(elements["Γ₂"],:M=>(x,y,z)->M₁₁(x,y))
-#prescribe!(elements["Γ₃"],:M=>(x,y,z)->1/4*M₁₁(x,y)+3/4*M₂₂(x,y)+3^(0.5)/2*M₁₂(x,y))
-
-#prescribe!(elements["Γₚ₁"],:g=>(x,y,z)->w(x,y))
-#prescribe!(elements["Γₚ₂"],:g=>(x,y,z)->w(x,y))
-#prescribe!(elements["Γₚ₃"],:g=>(x,y,z)->w(x,y))
 
 prescribe!(elements["Γₚ₁"],:Δn₁s₁=>(x,y,z)->-3^(0.5)/2)
-#prescribe!(elements["Γₚ₁"],:Δn₁s₂n₂s₁=>(x,y,z)->0)
 prescribe!(elements["Γₚ₁"],:Δn₂s₂=>(x,y,z)->3^(0.5)/2)
 prescribe!(elements["Γₚ₂"],:Δn₁s₁=>(x,y,z)->3^(0.5)/4)
 prescribe!(elements["Γₚ₂"],:Δn₁s₂n₂s₁=>(x,y,z)->-3/2)
@@ -75,17 +64,26 @@ prescribe!(elements["Γₚ₃"],:Δn₁s₁=>(x,y,z)->3^(0.5)/4)
 prescribe!(elements["Γₚ₃"],:Δn₁s₂n₂s₁=>(x,y,z)->3/2)
 prescribe!(elements["Γₚ₃"],:Δn₂s₂=>(x,y,z)->-3^(0.5)/4)
 
-#prescribe!(elements["Γₚ₁"],:ΔM=>(x,y,z)->0*M₁₂(x,y))
-#prescribe!(elements["Γₚ₂"],:ΔM=>(x,y,z)->3/4*M₁₂(x,y))
-#prescribe!(elements["Γₚ₃"],:ΔM=>(x,y,z)->-3/4*M₁₂(x,y))
-
-
 coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫vgdΓ,coefficient...,:α=>1e5),
+    #    cubic
+       # ndiv = 10, α = 1e3
+       # ndiv = 20, α = 1e5
+       # ndiv = 40, α = 1e5
+       # ndiv = 80, α = 1e7
+    #    quartic
+       # ndiv = 10, α = 1e3
+       # ndiv = 20, α = 1e5
+       # ndiv = 40, α = 1e7
+       # ndiv = 80, α = 5e8
+       Operator(:∫vgdΓ,coefficient...,:α=>5e8),
        Operator(:∫wVdΓ,coefficient...),
-       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e5),
+       # ndiv = 10, α = 1e3
+       # ndiv = 20, α = 1e3
+       # ndiv = 40, α = 1e3
+       # ndiv = 80, α = 1e3
+       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e3),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:H₃)]
@@ -93,9 +91,11 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
 k = zeros(nₚ,nₚ)
 f = zeros(nₚ)
 
+@timeit to "assembly" begin       
 ops[1](elements["Ω̃"],k)
 ops[2](elements["Ω"],f)
 
+@timeit to "assembly Γᵍ" begin       
 ops[3](elements["Γ₁"],k,f)
 ops[3](elements["Γ₂"],k,f)
 ops[3](elements["Γ₃"],k,f)
@@ -118,8 +118,11 @@ ops[3](elements["Γ₃"],k,f)
  ops[7](elements["Γₚ₂"],f)
  ops[7](elements["Γₚ₃"],f)
 
+end
+end
 
 d = k\f
+end
 
 push!(nodes,:d=>d)
 set𝓖!(elements["Ω"],:TriGI16,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
@@ -135,8 +138,19 @@ prescribe!(elements["Ω"],:∂³u∂x²∂y=>(x,y,z)->w₁₁₂(x,y))
 prescribe!(elements["Ω"],:∂³u∂x∂y²=>(x,y,z)->w₁₂₂(x,y))
 prescribe!(elements["Ω"],:∂³u∂y³=>(x,y,z)->w₂₂₂(x,y))
 h3,h2,h1,l2 = ops[8](elements["Ω"])
-H1=log10(h1)
-H2=log10(h2)
-H3=log10(h3)
-L2=log10(l2)
-h=log10(1/ndiv)
+show(to)
+
+index = [10,20,40,80]
+XLSX.openxlsx("./xlsx/triangle_"*𝒑*".xlsx", mode="rw") do xf
+    row = "E"
+    𝐿₂ = xf[2]
+    𝐻₁ = xf[3]
+    𝐻₂ = xf[4]
+    𝐻₃ = xf[5]
+    ind = findfirst(n->n==ndiv,index)+1
+    row = row*string(ind)
+    𝐿₂[row] = log10(l2)
+    𝐻₁[row] = log10(h1)
+    𝐻₂[row] = log10(h2)
+    𝐻₃[row] = log10(h3)
+end

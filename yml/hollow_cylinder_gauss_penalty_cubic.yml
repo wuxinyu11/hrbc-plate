@@ -1,0 +1,55 @@
+RegularGrid:
+    n: 2
+    γ: 5
+
+IndependentDofs:
+    Γᴾ: Γʳ
+
+Ω:
+    type: &A1 ReproducingKernel{:Cubic2D,:□,:QuinticSpline,:Tri3}
+    𝓒:
+        tag: Ω
+    𝓖:
+        type: TriGI3
+        𝝭: [𝝭,∂𝝭∂x,∂𝝭∂y,∂²𝝭∂x²,∂²𝝭∂x∂y,∂²𝝭∂y²]
+
+Γᵍ:
+    type: &A2 ReproducingKernel{:Cubic2D,:□,:QuinticSpline,:Seg2}
+    𝓒:
+        tag: Γʳ
+    𝓖:
+        type: &GB SegGI3
+        𝝭: &𝝭 [𝝭,∂𝝭∂x,∂𝝭∂y]
+
+Γᶿ:
+    type: *A2
+    𝓒:
+        tag: Γᶿ
+    𝓖:
+        type: *GB
+        𝝭: *𝝭
+
+Γᴹ:
+    type: *A2
+    𝓒:
+        tag:  Γʳ
+    𝓖:
+        type: *GB
+        𝝭: *𝝭
+
+Γⱽ:
+    type: *A2
+    𝓒:
+        tag:  Γᶿ
+    𝓖:
+        type: *GB
+        𝝭: *𝝭
+
+Γᴾ:
+
+    type: &A3 ReproducingKernel{:Cubic2D,:□,:QuinticSpline,:Poi1}
+    𝓒:
+        tag: Γᴾ
+    𝓖:
+        type: &GP PoiGI1
+        𝝭: &𝝭ₚ [𝝭]

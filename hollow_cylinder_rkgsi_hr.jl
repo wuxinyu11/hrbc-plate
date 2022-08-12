@@ -1,12 +1,19 @@
 
 
-using Revise, YAML, ApproxOperator, LinearAlgebra
+using YAML, ApproxOperator, XLSX, TimerOutputs
 
-config = YAML.load_file("./yml/hollow_cylinder_rkgsi_hr.yml")
+to = TimerOutput()
+@timeit to "Total Time" begin
+@timeit to "searching" begin
 
-ndiv = 80
+𝒑 = "cubic"
+# 𝒑 = "quartic"
+config = YAML.load_file("./yml/hollow_cylinder_rkgsi_hr_"*𝒑*".yml")
+
+ndiv = 64
 elements, nodes = importmsh("./msh/hollow_cylinder_"*string(ndiv)*".msh", config)
 # elements, nodes = importmsh("./msh/hollow_cylinder_regular_"*string(ndiv)*".msh", config)
+end
 
 nₚ = length(nodes)
 nₑ = length(elements["Ω"])
@@ -18,7 +25,8 @@ for node in nodes
     x = node.x
     y = node.y
     r = (x^2+y^2)^0.5
-    sᵢ = 3.5*r*π/4/ndiv
+    # quartic, ndiv = 32, s = 4.05
+    sᵢ = 3.1*r*π/4/ndiv
     node.s₁ = sᵢ
     node.s₂ = sᵢ
     node.s₃ = sᵢ
@@ -36,14 +44,16 @@ elements["Γ"] = elements["Γᵍ"]∪elements["Γᶿ"]
 elements["Γ∩Γᴾ"] = elements["Γ"]∩elements["Γᴾ"]
 
 
+@timeit to "shape functions " begin      
 set∇₂𝝭!(elements["Ω"])
 set∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
+set∇₂𝝭!(elements["Γᴹ"])
+set𝝭!(elements["Γⱽ"])
+@timeit to "shape functions Γᵍ " begin      
 set∇∇̃²𝝭!(elements["Γᵍ"],elements["Ω∩Γᵍ"])
 set𝝭!(elements["Γᵍ"])
 set∇̃²𝝭!(elements["Γᶿ"],elements["Ω∩Γᶿ"])
 set∇₂𝝭!(elements["Γᶿ"])
-set∇₂𝝭!(elements["Γᴹ"])
-set𝝭!(elements["Γⱽ"])
 set∇̃²𝝭!(elements["Γᴾ"],elements["Ω∩Γᴾ"])
 set𝝭!(elements["Γᴾ"])
 
@@ -51,7 +61,10 @@ set∇∇̄²𝝭!(elements["Γᵍ"],Γᵍ=elements["Γᵍ"],Γᴾ=elements["Γ�
 set∇̄²𝝭!(elements["Γᶿ"],Γᶿ=elements["Γᶿ"],Γᴾ=elements["Γᴾ"])
 set∇̄²𝝭!(elements["Γᴾ"],Γᵍ=elements["Γᵍ"],Γᶿ=elements["Γᶿ"],Γᴾ=elements["Γᴾ"])
 
-# n = 4
+end
+end
+
+# n = 3
 # w(x,y) = (1+2x+3y)^n
 # w₁(x,y) = 2n*(1+2x+3y)^abs(n-1)
 # w₂(x,y) = 3n*(1+2x+3y)^abs(n-1)
@@ -120,18 +133,24 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
 
 k = zeros(nₚ,nₚ)
 f = zeros(nₚ)
+
+@timeit to "assembly" begin       
 ops[1](elements["Ω̃"],k)
 ops[2](elements["Ω"],f)
+ops[4](elements["Γⱽ"],f)
+ops[6](elements["Γᴹ"],f)
+@timeit to "assembly Γᵍ" begin       
 
 ops[3](elements["Γᵍ"],k,f)
-ops[4](elements["Γⱽ"],f)
 ops[5](elements["Γᶿ"],k,f)
-ops[6](elements["Γᴹ"],f)
 ops[7](elements["Γᴾ"],k,f)
+end
+end
 
 # F = eigen(k)
 # F.values[1]
 d = k\f
+end
 
 # # d = [w(n.x,n.y) for n in nodes]
 # # f .-= k*d
@@ -152,8 +171,20 @@ prescribe!(elements["Ω"],:∂³u∂x²∂y=>(x,y,z)->w₁₁₂(x,y))
 prescribe!(elements["Ω"],:∂³u∂x∂y²=>(x,y,z)->w₁₂₂(x,y))
 prescribe!(elements["Ω"],:∂³u∂y³=>(x,y,z)->w₂₂₂(x,y))
 h3,h2,h1,l2 = ops[9](elements["Ω"])
-# h=log10(π/2/ndiv)
-# H1=log10(h1)
-# H2=log10(h2)
-# H3=log10(h3)
-L2=log10(l2)
+show(to)
+
+# index = [10,20,40,80]
+index = [8,16,32,64]
+XLSX.openxlsx("./xlsx/hollow_cylinder_"*𝒑*".xlsx", mode="rw") do xf
+    row = "G"
+    𝐿₂ = xf[2]
+    𝐻₁ = xf[3]
+    𝐻₂ = xf[4]
+    𝐻₃ = xf[5]
+    ind = findfirst(n->n==ndiv,index)+1
+    row = row*string(ind)
+    𝐿₂[row] = log10(l2)
+    𝐻₁[row] = log10(h1)
+    𝐻₂[row] = log10(h2)
+    𝐻₃[row] = log10(h3)
+end

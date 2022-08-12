@@ -7,7 +7,7 @@
 a = 1.0;
 b = 2.0;
 
-ndiv = 80;
+ndiv = 32;
 
 Point(5) = {0 , 0., 0.};
 Point(1) = {a , 0., 0.};
@@ -29,7 +29,8 @@ Physical Curve("Γʳ") = {2,4};
 Physical Surface("Ω") = {1};
 
 // 10 -> 1.07177, 20 -> 1.035, 40 -> 1.01747, 80 -> 1.0087
-Transfinite Curve{1,-3} = ndiv+1 Using Progression 1.0087;
+// 8 -> 1.0905, 16 -> 1.04427378, 32 -> 1.021897149, 64 -> 1.010889286
+Transfinite Curve{1,-3} = ndiv+1 Using Progression 1.021897149;
 // Transfinite Curve{1,-3} = ndiv+1;
 Transfinite Curve{2,4} = 2*ndiv+1;
 Transfinite Surface{1} = {1,2,3,4};
