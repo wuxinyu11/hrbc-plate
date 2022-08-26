@@ -6,6 +6,7 @@ to = TimerOutput()
 @timeit to "searching" begin
 
 ndiv = 80
+# 𝒑 = "cubic"
 𝒑 = "quartic"
 config = YAML.load_file("./yml/rectangular_rkgsi_hr_"*𝒑*".yml")
 elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh", config)

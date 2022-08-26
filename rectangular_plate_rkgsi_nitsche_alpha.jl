@@ -2,7 +2,7 @@
 
 using YAML, ApproxOperator, XLSX
 
-ndiv = 10
+ndiv = 80
 # 𝒑 = "cubic"
 𝒑 = "quartic"
 config = YAML.load_file("./yml/rectangular_rkgsi_nitsche_alpha_"*𝒑*".yml")
@@ -44,6 +44,10 @@ D = 1.0
 M₁₁(x,y) = - D*(w₁₁(x,y)+ν*w₂₂(x,y))
 M₂₂(x,y) = - D*(ν*w₁₁(x,y)+w₂₂(x,y))
 M₁₂(x,y) = - D*(1-ν)*w₁₂(x,y)
+set𝒏!(elements["Γ₁"])
+set𝒏!(elements["Γ₂"])
+set𝒏!(elements["Γ₃"])
+set𝒏!(elements["Γ₄"])
 prescribe!(elements["Ω"],:q=>(x,y,z)->w₁₁₁₁(x,y)+2*w₁₁₂₂(x,y)+w₂₂₂₂(x,y))
 prescribe!(elements["Γ₁"],:g=>(x,y,z)->w(x,y))
 prescribe!(elements["Γ₂"],:g=>(x,y,z)->w(x,y))
@@ -92,7 +96,7 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wVdΓ,coefficient...),
        Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3*ndiv),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
-       Operator(:ΔMₙₛg,coefficient...,:α=>1e3*ndiv^2),
+       Operator(:ΔMₙₛg,coefficient...,:α=>1e0*ndiv^2),
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:L₂)]
 
@@ -102,8 +106,9 @@ f = zeros(nₚ)
 d = zeros(nₚ)
 push!(nodes,:d=>d)
 
-# αs = [1e0,1e1,1e2,1e3,1e4,1e5,1e6,1e7,1e8,1e9,1e10,1e11,1e12,1e13,1e14,1e15,1e16]
-αs = [1e0,1e1,1e2,1e3,1e4,1e5,4e5,7e5,1e6,4e6,7e6,1e7,4e7,7e7,1e8,1e9,1e10,1e11,1e12,1e13,1e14,1e15,1e16]
+αs = [1e0,1e1,1e2,1e3,1e4,1e5,1e6,1e7,1e8,1e9,1e10,1e11,1e12,1e13,1e14,1e15,1e16]
+# αs = [1e0,1e1,1e2,1e3,1e4,1e5,4e5,7e5,1e6,4e6,7e6,1e7,4e7,7e7,1e8,1e9,1e10,1e11,1e12,1e13,1e14,1e15,1e16]
+# αs = [1e-16,1e-14,1e-12,1e-10,1e-8,1e-6,1e-4,1e-2,1e0,1e2,1e4,1e6,1e8,1e10,1e12,1e14,1e16]
 for (i,α) in enumerate(αs)
     println(i)
 
@@ -129,6 +134,7 @@ for (i,α) in enumerate(αs)
 
     l2 = ops[8](elements["Ω̄"])
 
+    println(log10(l2))
     XLSX.openxlsx("./xlsx/alpha.xlsx", mode="rw") do xf
         α_row = "A"*string(i+1)
         𝐿₂_row = "C"*string(i+1)

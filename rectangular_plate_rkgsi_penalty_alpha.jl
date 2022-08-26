@@ -1,7 +1,7 @@
 
 using YAML, ApproxOperator, XLSX, TimerOutputs
 
-ndiv = 10
+ndiv = 80
 # 𝒑 = "cubic"
 𝒑 = "quartic"
 config = YAML.load_file("./yml/rectangular_rkgsi_penalty_alpha_"*𝒑*".yml")
@@ -99,7 +99,7 @@ f = zeros(nₚ)
 d = zeros(nₚ)
 push!(nodes,:d=>d)
 
-αs = [1e0,1e1,1e2,1e3,1e4,1e5,4e5,7e5,1e6,4e6,7e6,1e7,4e7,7e7,1e8,1e9,1e10,1e11,1e12,1e13,1e14,1e15,1e16]
+αs = [1e0,1e1,1e2,1e3,1e4,1e5,1e6,1e7,1e8,1e9,1e10,1e11,1e12,1e13,1e14,1e15,1e16]
 for (i,α) in enumerate(αs)
     println(i)
 

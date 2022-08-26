@@ -3,14 +3,15 @@ using YAML, ApproxOperator, XLSX, TimerOutputs
 to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
-ndiv = 80
-𝒑 = "quartic"
+ndiv = 10
+𝒑 = "cubic"
+# 𝒑 = "quartic"
 config = YAML.load_file("./yml/rectangular_gauss_nitsche_"*𝒑*".yml")
 elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh",config)
 nₚ = length(nodes)
 end
 
-s = 4.5/ndiv*ones(nₚ)
+s = 3.5/ndiv*ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 
 @timeit to "shape functions " begin        
@@ -80,11 +81,11 @@ coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
        # ndiv = 10, α = 1e3*ndiv^3
-       Operator(:∫VgdΓ,coefficient...,:α=>1e3*ndiv^3),
+       Operator(:∫VgdΓ,coefficient...,:α=>1e5),
        Operator(:∫wVdΓ,coefficient...),
        Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3*ndiv),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
-       Operator(:ΔMₙₛg,coefficient...,:α=>1e3*ndiv^2),
+       Operator(:ΔMₙₛg,coefficient...,:α=>1e1),
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:H₃)]
 
@@ -142,8 +143,8 @@ show(to)
 
 index = [10,20,40,80]
 XLSX.openxlsx("./xlsx/rectangular_"*𝒑*".xlsx", mode="rw") do xf
-    row = "B"
-#     row = "D"
+    # row = "B"
+    row = "D"
     𝐿₂ = xf[2]
     𝐻₁ = xf[3]
     𝐻₂ = xf[4]

@@ -4,13 +4,14 @@ to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
 ndiv = 80
-𝒑 = "quartic"
+𝒑 = "cubic"
+# 𝒑 = "quartic"
 config = YAML.load_file("./yml/rectangular_rkgsi_penalty_"*𝒑*".yml")
 elements,nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh", config)
 nₚ = getnₚ(elements["Ω"])
 end
 
-s = 4.5/ndiv*ones(nₚ)
+s = 3.5/ndiv*ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
 @timeit to "shape functions " begin
@@ -90,7 +91,7 @@ coefficient = (:D=>D,:ν=>ν)
 # ndiv = 10, α = 1e14
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫vgdΓ,coefficient...,:α=>1e14),
+       Operator(:∫vgdΓ,coefficient...,:α=>1e11),
        Operator(:∫wVdΓ,coefficient...),
        Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e7),
        Operator(:∫θₙMₙₙdΓ,coefficient...),

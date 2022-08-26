@@ -1,17 +1,18 @@
 
 
-using YAML, ApproxOperator, TimerOutputs
+using YAML, ApproxOperator, TimerOutputs, XLSX
 # @CPUtime begin
 to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
 ndiv = 80
-𝒑 = "quartic"
+𝒑 = "cubic"
+# 𝒑 = "quartic"
 config = YAML.load_file("./yml/rectangular_rkgsi_nitsche_"*𝒑*".yml")
 elements,nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh", config)
 nₚ = length(nodes)
 end
-s = 4.5/ndiv*ones(nₚ)
+s = 3.5/ndiv*ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
 
@@ -48,6 +49,10 @@ D = 1.0
 M₁₁(x,y) = - D*(w₁₁(x,y)+ν*w₂₂(x,y))
 M₂₂(x,y) = - D*(ν*w₁₁(x,y)+w₂₂(x,y))
 M₁₂(x,y) = - D*(1-ν)*w₁₂(x,y)
+set𝒏!(elements["Γ₁"])
+set𝒏!(elements["Γ₂"])
+set𝒏!(elements["Γ₃"])
+set𝒏!(elements["Γ₄"])
 prescribe!(elements["Ω"],:q=>(x,y,z)->w₁₁₁₁(x,y)+2*w₁₁₂₂(x,y)+w₂₂₂₂(x,y))
 prescribe!(elements["Γ₁"],:g=>(x,y,z)->w(x,y))
 prescribe!(elements["Γ₂"],:g=>(x,y,z)->w(x,y))
@@ -91,11 +96,11 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
         # α = 1e5*ndiv^3 for ndiv = 20
         # α = 1e7*ndiv^3 for ndiv = 40
         # α = 1e7*ndiv^3 for ndiv = 80
-       Operator(:∫VgdΓ,coefficient...,:α=>1e7*ndiv^3),
+       Operator(:∫VgdΓ,coefficient...,:α=>1e8),
        Operator(:∫wVdΓ,coefficient...),
        Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3*ndiv),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
-       Operator(:ΔMₙₛg,coefficient...,:α=>1e3*ndiv^2),
+       Operator(:ΔMₙₛg,coefficient...,:α=>1e1),
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:H₃)]
 
