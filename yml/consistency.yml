@@ -3,11 +3,11 @@ RegularGrid:
     γ: 5
 
 Ω:
-    type: &A ReproducingKernel{:Cubic2D,:□,:QuinticSpline,:Tri3}
+    type: &A ReproducingKernel{:Quartic2D,:□,:QuinticSpline,:Tri3}
     𝓒:
         tag: Ω
     𝓖:
-        type: TriRK6
+        type: TriRK13
         𝝭: [𝝭,∂𝝭∂x,∂𝝭∂y]
 
 Ω̃:
@@ -15,6 +15,6 @@ RegularGrid:
     𝓒:
         tag: Ω
     𝓖:
-        type: TriGI3
+        type: TriGI6
         𝝭: [𝝭,∂𝝭∂x,∂𝝭∂y,∂𝝭∂z,∂²𝝭∂x²,∂²𝝭∂x∂y,∂²𝝭∂y²,∂²𝝭∂x∂z,∂²𝝭∂y∂z,∂²𝝭∂z²,∂∂²𝝭∂x²∂x,∂∂²𝝭∂x²∂y,∂∂²𝝭∂x∂y∂x,∂∂²𝝭∂x∂y∂y,∂∂²𝝭∂y²∂x,∂∂²𝝭∂y²∂y]
 

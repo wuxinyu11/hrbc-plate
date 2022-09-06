@@ -77,7 +77,7 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        # ndiv = 20, α = 1e5
        # ndiv = 40, α = 1e7
        # ndiv = 80, α = 5e8
-       Operator(:∫vgdΓ,coefficient...,:α=>5e8),
+       Operator(:∫vgdΓ,coefficient...,:α=>1e8),
        Operator(:∫wVdΓ,coefficient...),
        # ndiv = 10, α = 1e3
        # ndiv = 20, α = 1e3

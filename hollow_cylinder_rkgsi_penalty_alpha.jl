@@ -1,9 +1,9 @@
 
 using YAML, ApproxOperator, XLSX
 
-# 𝒑 = "cubic"
-𝒑 = "quartic"
-ndiv = 32
+𝒑 = "cubic"
+# 𝒑 = "quartic"
+ndiv = 64
 config = YAML.load_file("./yml/hollow_cylinder_rkgsi_penalty_alpha_"*𝒑*".yml")
 elements,nodes = importmsh("./msh/hollow_cylinder_"*string(ndiv)*".msh", config)
 nₚ = length(nodes)
@@ -14,7 +14,7 @@ for node in nodes
     x = node.x
     y = node.y
     r = (x^2+y^2)^0.5
-    sᵢ = 4.1*r*π/4/ndiv
+    sᵢ = 3.1*r*π/4/ndiv
     node.s₁ = sᵢ
     node.s₂ = sᵢ
     node.s₃ = sᵢ
@@ -88,8 +88,10 @@ d = zeros(nₚ)
 push!(nodes,:d=>d)
        
 αs = [1e0,1e1,1e2,1e3,1e4,1e5,1e6,1e7,1e8,1e9,1e10,1e11,1e12,1e13,1e14,1e15,1e16]
-for (i,α) in enumerate(αs)
-    for (j,β) in enumerate(αs)
+# for (i,α) in enumerate(αs)
+#     for (j,β) in enumerate(αs)
+for (i,α) in enumerate([1e8,1e9,1e10,1e11,1e12,1e13,1e14])
+    for (j,β) in enumerate([1e0,1e1,1e2,1e3,1e4,1e5,1e6,1e7,1e8])
         println(i,j)
 
         fill!(k,0.0)

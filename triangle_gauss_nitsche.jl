@@ -5,15 +5,15 @@ to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
 
-# 𝒑 = "cubic"
-𝒑 = "quartic"
-ndiv = 80
+𝒑 = "cubic"
+# 𝒑 = "quartic"
+ndiv = 10
 config = YAML.load_file("./yml/triangle_gauss_nitsche_"*𝒑*".yml")
 elements, nodes = importmsh("./msh/triangle_"*string(ndiv)*".msh",config)
 end
 nₚ = length(nodes)
 
-s = 5*10/ndiv*ones(nₚ)
+s = 4*10/ndiv*ones(nₚ)
 #s = 4.5*10/ndiv*ones(nₚ)
 #push!(nodes,:s₁=>3^(0.5)/2 .*s,:s₂=>s,:s₃=>s)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
@@ -53,6 +53,9 @@ M₁₂(x,y) = - D*(1-ν)*w₁₂(x,y)
 prescribe!(elements["Ω"],:q=>(x,y,z)->w₁₁₁₁(x,y)+2*w₁₁₂₂(x,y)+w₂₂₂₂(x,y))
 
 
+set𝒏!(elements["Γ₁"])
+set𝒏!(elements["Γ₂"])
+set𝒏!(elements["Γ₃"])
 prescribe!(elements["Γₚ₁"],:Δn₁s₁=>(x,y,z)->-3^(0.5)/2)
 prescribe!(elements["Γₚ₁"],:Δn₂s₂=>(x,y,z)->3^(0.5)/2)
 prescribe!(elements["Γₚ₂"],:Δn₁s₁=>(x,y,z)->3^(0.5)/4)
@@ -77,11 +80,11 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        # ndiv = 20, α = 1e7
        # ndiv = 40, α = 1e9
        # ndiv = 80, α = 1e11
-       Operator(:∫VgdΓ,coefficient...,:α=>1e11*ndiv^3),
+       Operator(:∫VgdΓ,coefficient...,:α=>1e4),
        Operator(:∫wVdΓ,coefficient...),
        Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3*ndiv),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
-       Operator(:ΔMₙₛg,coefficient...,:α=>1e1*ndiv^2),
+       Operator(:ΔMₙₛg,coefficient...,:α=>1e1),
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:H₃)]
 
@@ -137,8 +140,8 @@ show(to)
 
 index = [10,20,40,80]
 XLSX.openxlsx("./xlsx/triangle_"*𝒑*".xlsx", mode="rw") do xf
-    row = "B"
-#     row = "D"
+    # row = "B"
+    row = "D"
     𝐿₂ = xf[2]
     𝐻₁ = xf[3]
     𝐻₂ = xf[4]

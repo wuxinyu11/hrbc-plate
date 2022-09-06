@@ -6,7 +6,7 @@ to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
 
-ndiv = 40
+ndiv = 80
 # 𝒑 = "cubic"
 𝒑 = "quartic"
 config = YAML.load_file("./yml/triangle_rkgsi_nitsche_"*𝒑*".yml")
@@ -15,7 +15,7 @@ end
 
 nₚ = length(nodes)
 s = 5*10/ndiv*ones(nₚ)
-#s = 4.5*10/ndiv*ones(nₚ)
+# s = 4.5*10/ndiv*ones(nₚ)
 #push!(nodes,:s₁=>3^(0.5)/2 .*s,:s₂=>s,:s₃=>s)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 
@@ -55,6 +55,9 @@ M₁₁(x,y) = - D*(w₁₁(x,y)+ν*w₂₂(x,y))
 M₂₂(x,y) = - D*(ν*w₁₁(x,y)+w₂₂(x,y))
 M₁₂(x,y) = - D*(1-ν)*w₁₂(x,y)
 
+set𝒏!(elements["Γ₁"])
+set𝒏!(elements["Γ₂"])
+set𝒏!(elements["Γ₃"])
 prescribe!(elements["Ω"],:q=>(x,y,z)->w₁₁₁₁(x,y)+2*w₁₁₂₂(x,y)+w₂₂₂₂(x,y))
 
 prescribe!(elements["Γₚ₁"],:Δn₁s₁=>(x,y,z)->-3^(0.5)/2)
@@ -75,11 +78,11 @@ prescribe!(elements["Γₚ₃"],:Δn₂s₂=>(x,y,z)->-3^(0.5)/4)
 coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫VgdΓ,coefficient...,:α=>1e3*ndiv^2),
+       Operator(:∫VgdΓ,coefficient...,:α=>1e8),
        Operator(:∫wVdΓ,coefficient...),
        Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3*ndiv),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
-       Operator(:ΔMₙₛg,coefficient...,:α=>1e3*ndiv^2),
+       Operator(:ΔMₙₛg,coefficient...,:α=>1e1),
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:H₃)]
 

@@ -1,16 +1,17 @@
 
 using Revise, YAML, ApproxOperator
 
-config = YAML.load_file("./yml/patch_test_rkgsi_hr.yml")
-
-ndiv = 10
-config = YAML.load_file("./yml/patch_test_rkgsi_hr.yml")
-elements, nodes = importmsh("./msh/patchtest_"*string(ndiv)*".msh", config)
+ndiv = 15
+# 𝒑 = "cubic"
+𝒑 = "quartic"
+config = YAML.load_file("./yml/patch_test_rkgsi_hr_"*𝒑*".yml")
+# elements, nodes = importmsh("./msh/patchtest_"*string(ndiv)*".msh", config)
+elements, nodes = importmsh("./msh/patchtest.msh", config)
 
 nₚ = length(nodes)
 nₑ = length(elements["Ω"])
 
-s = 3.5 / ndiv * ones(nₚ)
+s = 4.5 / ndiv * ones(nₚ)
 push!(nodes, :s₁ => s, :s₂ => s, :s₃ => s)
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
 set_memory_𝗠!(elements["Γ₁"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
@@ -86,7 +87,7 @@ set∇̄²𝝭!(elements["Γₚ"],Γᵍ=elements["Γ∩Γₚ"],Γᶿ=elements["�
 # set∇̄²𝝭!(elements["Γ̃₁"],Γᴾ=elements["Γ̃ₚ"])
 # set∇̄²𝝭!(elements["Γ̃ₚ"],Γᶿ=elements["Γ̃₁"])
 
-n = 2
+n = 4
 w(x,y) = (1+2x+3y)^n
 w₁(x,y) = 2n*(1+2x+3y)^abs(n-1)
 w₂(x,y) = 3n*(1+2x+3y)^abs(n-1)
@@ -178,8 +179,6 @@ ops[7](elements["Γₚ"],k,f)
 # ops[8](elements["Γₚ"][4],f)
 # ops[8](elements["Γₚ"][5],f)
 
-# d = [w(n.x,n.y) for n in nodes]
-# f .-= k*d
 
 d = k\f
 

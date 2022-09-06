@@ -1,17 +1,17 @@
 
-using Revise, ApproxOperator, BenchmarkTools, YAML
+using ApproxOperator, BenchmarkTools, YAML
 
 config = YAML.load_file("./yml/consistency.yml")
 elements,nodes = importmsh("./msh/patchtest_10.msh",config)
 
-# nₚ = getnₚ(elements["Ω"])
+nₚ = getnₚ(elements["Ω"])
 
-s = 3.5/10 .* ones(nₚ)
+s = 4.5/10 .* ones(nₚ)
 push!(nodes, :s₁ => s, :s₂ => s, :s₃ => s)
 set_memory_𝗠!(elements["Ω̃"],:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
 set∇₂𝝭!(elements["Ω"])
-# set∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
-set∇∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
+set∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
+# set∇∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
 # @btime set∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
 # @btime set𝝭!($elements["Ω"])
 # @btime set∇𝝭!(elements["Ω"])
@@ -28,6 +28,6 @@ set∇∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
 # set∇̃²𝝭!(elements["Ω"])
 # f = check∇𝝭(elements["Ω̃"])
 # f = check∇²𝝭(elements["Ω"])
-# f = check∇²𝝭(elements["Ω̃"])
+f = check∇²𝝭(elements["Ω̃"])
 # f = check∇³𝝭(elements["Ω"])
-f = check∇∇²𝝭(elements["Ω̃"])
+# f = check∇∇²𝝭(elements["Ω̃"])

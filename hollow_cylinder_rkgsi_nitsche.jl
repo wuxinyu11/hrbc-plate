@@ -8,7 +8,7 @@ to = TimerOutput()
 
 𝒑 = "cubic"
 # 𝒑 = "quartic"
-ndiv = 32
+ndiv = 64
 config = YAML.load_file("./yml/hollow_cylinder_rkgsi_nitsche_"*𝒑*".yml")
 elements,nodes = importmsh("./msh/hollow_cylinder_"*string(ndiv)*".msh", config)
 nₚ = length(nodes)
@@ -101,32 +101,20 @@ prescribe!(elements["Γᴾ"],:g=>(x,y,z)->w(x,y))
 coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       # ndiv = 8, α = 1e4*ndiv^3
-       # ndiv = 16, α = 1e4*ndiv^3
-       # ndiv = 32, α = 1e3*ndiv^3
-       # ndiv = 64, α = 1e3*ndiv^4
-       # ndiv = 10, α = 1e4*ndiv^3
-       # ndiv = 20, α = 1e3*ndiv^3
-       # ndiv = 40, α = 1e3*ndiv^3
-       # ndiv = 80, α = 1e3*ndiv^4
+       # ndiv = 8, α = 1e6, β = 1e0
+       # ndiv = 16, α = 1e8, β = 1e1
+       # ndiv = 32, α = 1e8, β = 1e0
+       # ndiv = 64, α = 1e11, β = 1e5
     #    quartic
-       # ndiv = 8, α = 1e4*ndiv^3
-       # ndiv = 16, α = 1e4*ndiv^3
-       # ndiv = 32, α = 1e4*ndiv^3
-       # ndiv = 64, α = 1e3*ndiv^3
-       Operator(:∫VgdΓ,coefficient...,:α=>1e3*ndiv^3),
+       # ndiv = 8, α = 1e7, β = 1e2
+       # ndiv = 16, α = 1e8, β = 1e3
+       # ndiv = 32, α = 1e8, β = 1e3
+       # ndiv = 64, α = 1e8, β = 1e3
+       Operator(:∫VgdΓ,coefficient...,:α=>1e8),
        Operator(:∫wVdΓ,coefficient...),
-       # ndiv = 10, α = 1e3*ndiv
-       # ndiv = 80, α = 1e2*ndiv
-       Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e2*ndiv),
+       Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
-    #    cubic
-       # ndiv = 10, α = 1e1*ndiv^2
-       # ndiv = 80, α = 1e0*ndiv^2
-       # ndiv = 8, α = 1e1*ndiv^2
-       # ndiv = 16, α = 1e1*ndiv^2
-       # ndiv = 64, α = 1e0*ndiv^2
-       Operator(:ΔMₙₛg,coefficient...,:α=>1e1*ndiv^2),
+       Operator(:ΔMₙₛg,coefficient...,:α=>1e3),
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:H₃)]
 
