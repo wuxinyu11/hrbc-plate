@@ -2,7 +2,7 @@
 
 using YAML, ApproxOperator, XLSX
 
-ndiv = 10
+ndiv = 80
 # 𝒑 = "cubic"
 𝒑 = "quartic"
 config = YAML.load_file("./yml/triangle_rkgsi_nitsche_alpha_"*𝒑*".yml")

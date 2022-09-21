@@ -2,15 +2,15 @@ using YAML, ApproxOperator, XLSX, TimerOutputs
 to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
-ndiv = 80
-# 𝒑 = "cubic"
-𝒑 = "quartic"
+ndiv = 10
+𝒑 = "cubic"
+# 𝒑 = "quartic"
 config = YAML.load_file("./yml/rectangular_gauss_penalty_"*𝒑*".yml")
 elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh",config)
 nₚ = length(nodes)
 end
-
-s = 4.5/ndiv*ones(nₚ)
+s = 3.5/ndiv*ones(nₚ)
+# s = 4.5/ndiv*ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 
 # @CPUtime begin
@@ -83,10 +83,23 @@ prescribe!(elements["Γₚ₄"],:ΔM=>(x,y,z)->-2*M₁₂(x,y))
 # quartic
 # ndiv = 10, 20, 40, 80, α = 1e9
 
+
+# cubic-wxy
+# ndiv = 10, α = 1e6
+# ndiv = 20, α = 1e8
+# ndiv = 40, α = 1e9
+# ndiv = 80, α = 1e11
+
+# quartic-wxy
+# ndiv = 10, α = 1e8
+# ndiv = 20, α = 1e10
+# ndiv = 40, α = 1e12
+# ndiv = 80, α = 1e13
+
 coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫vgdΓ,coefficient...,:α=>1e9),
+       Operator(:∫vgdΓ,coefficient...,:α=>1e6),
        Operator(:∫wVdΓ,coefficient...),
        Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e7),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
@@ -129,33 +142,33 @@ d = k\f
 end
 show(to)
 
-# push!(nodes,:d=>d)
-# set𝓖!(elements["Ω"],:TriGI16,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
-# set∇̂³𝝭!(elements["Ω"])
-# prescribe!(elements["Ω"],:u=>(x,y,z)->w(x,y))
-# prescribe!(elements["Ω"],:∂u∂x=>(x,y,z)->w₁(x,y))
-# prescribe!(elements["Ω"],:∂u∂y=>(x,y,z)->w₂(x,y))
-# prescribe!(elements["Ω"],:∂²u∂x²=>(x,y,z)->w₁₁(x,y))
-# prescribe!(elements["Ω"],:∂²u∂x∂y=>(x,y,z)->w₁₂(x,y))
-# prescribe!(elements["Ω"],:∂²u∂y²=>(x,y,z)->w₂₂(x,y))
-# prescribe!(elements["Ω"],:∂³u∂x³=>(x,y,z)->w₁₁₁(x,y))
-# prescribe!(elements["Ω"],:∂³u∂x²∂y=>(x,y,z)->w₁₁₂(x,y))
-# prescribe!(elements["Ω"],:∂³u∂x∂y²=>(x,y,z)->w₁₂₂(x,y))
-# prescribe!(elements["Ω"],:∂³u∂y³=>(x,y,z)->w₂₂₂(x,y))
-# h3,h2,h1,l2 = ops[8](elements["Ω"])
+push!(nodes,:d=>d)
+set𝓖!(elements["Ω"],:TriGI16,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
+set∇̂³𝝭!(elements["Ω"])
+prescribe!(elements["Ω"],:u=>(x,y,z)->w(x,y))
+prescribe!(elements["Ω"],:∂u∂x=>(x,y,z)->w₁(x,y))
+prescribe!(elements["Ω"],:∂u∂y=>(x,y,z)->w₂(x,y))
+prescribe!(elements["Ω"],:∂²u∂x²=>(x,y,z)->w₁₁(x,y))
+prescribe!(elements["Ω"],:∂²u∂x∂y=>(x,y,z)->w₁₂(x,y))
+prescribe!(elements["Ω"],:∂²u∂y²=>(x,y,z)->w₂₂(x,y))
+prescribe!(elements["Ω"],:∂³u∂x³=>(x,y,z)->w₁₁₁(x,y))
+prescribe!(elements["Ω"],:∂³u∂x²∂y=>(x,y,z)->w₁₁₂(x,y))
+prescribe!(elements["Ω"],:∂³u∂x∂y²=>(x,y,z)->w₁₂₂(x,y))
+prescribe!(elements["Ω"],:∂³u∂y³=>(x,y,z)->w₂₂₂(x,y))
+h3,h2,h1,l2 = ops[8](elements["Ω"])
 
-# index = [10,20,40,80]
-# XLSX.openxlsx("./xlsx/rectangular_"*𝒑*".xlsx", mode="rw") do xf
-#     row = "A"
-# #     row = "C"
-#     𝐿₂ = xf[2]
-#     𝐻₁ = xf[3]
-#     𝐻₂ = xf[4]
-#     𝐻₃ = xf[5]
-#     ind = findfirst(n->n==ndiv,index)+1
-#     row = row*string(ind)
-#     𝐿₂[row] = log10(l2)
-#     𝐻₁[row] = log10(h1)
-#     𝐻₂[row] = log10(h2)
-#     𝐻₃[row] = log10(h3)
-# end
+index = [10,20,40,80]
+XLSX.openxlsx("./xlsx/rectangular_"*𝒑*".xlsx", mode="rw") do xf
+    row = "A"
+#     row = "C"
+    𝐿₂ = xf[2]
+    𝐻₁ = xf[3]
+    𝐻₂ = xf[4]
+    𝐻₃ = xf[5]
+    ind = findfirst(n->n==ndiv,index)+1
+    row = row*string(ind)
+    𝐿₂[row] = log10(l2)
+    𝐻₁[row] = log10(h1)
+    𝐻₂[row] = log10(h2)
+    𝐻₃[row] = log10(h3)
+end

@@ -1,5 +1,5 @@
 RegularGrid:
-    n: 2
+    n: 3
     γ: 5
 
 IndependentDofs:
@@ -10,7 +10,7 @@ IndependentDofs:
     𝓒:
         tag: Ω
     𝓖:
-        type: TriGI6
+        type: TriGI16
         𝝭: [𝝭,∂𝝭∂x,∂𝝭∂y,∂²𝝭∂x²,∂²𝝭∂x∂y,∂²𝝭∂y²]
 
 Γᵍ:

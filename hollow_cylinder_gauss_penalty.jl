@@ -5,8 +5,8 @@ to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
 
-𝒑 = "cubic"
-# 𝒑 = "quartic"
+# 𝒑 = "cubic"
+𝒑 = "quartic"
 ndiv = 64
 config = YAML.load_file("./yml/hollow_cylinder_gauss_penalty_"*𝒑*".yml")
 elements,nodes = importmsh("./msh/hollow_cylinder_"*string(ndiv)*".msh", config)
@@ -19,7 +19,7 @@ for node in nodes
     x = node.x
     y = node.y
     r = (x^2+y^2)^0.5
-    sᵢ = 3.1*r*π/4/ndiv
+    sᵢ = 4.1*r*π/4/ndiv
     node.s₁ = sᵢ
     node.s₂ = sᵢ
     node.s₃ = sᵢ

@@ -6,9 +6,9 @@ to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
 
-ndiv = 80
-# 𝒑 = "cubic"
-𝒑 = "quartic"
+ndiv = 10
+𝒑 = "cubic"
+# 𝒑 = "quartic"
 config = YAML.load_file("./yml/triangle_rkgsi_nitsche_"*𝒑*".yml")
 elements,nodes = importmsh("./msh/triangle_"*string(ndiv)*".msh", config)
 end
@@ -75,10 +75,23 @@ prescribe!(elements["Γₚ₃"],:Δn₂s₂=>(x,y,z)->-3^(0.5)/4)
 # quartic
 # ndiv = 10, 20, 40, 80, α = 1e3*ndiv^2
 # ndiv = 80, α = 1e2*ndiv^3
+
+    #    quartic-0909
+       # ndiv = 10, α = 1e4
+       # ndiv = 20, α = 1e6
+       # ndiv = 40, α = 1e6
+       # ndiv = 80, α = 5e8
+
+       #    cubic-0909
+       # ndiv = 10, α = 1e4
+       # ndiv = 20, α = 1e5
+       # ndiv = 40, α = 1e6
+       # ndiv = 80, α = 1e7
+
 coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫VgdΓ,coefficient...,:α=>1e8),
+       Operator(:∫VgdΓ,coefficient...,:α=>1e4),
        Operator(:∫wVdΓ,coefficient...),
        Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3*ndiv),
        Operator(:∫θₙMₙₙdΓ,coefficient...),

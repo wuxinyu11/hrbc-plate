@@ -2,18 +2,21 @@
 using Revise, YAML, ApproxOperator,TimerOutputs
  to = TimerOutput()
 
-
-ndiv = 80
+ ndiv = 15
+ 𝒑 = "quartic"
+#  𝒑 = "cubic"
+# ndiv = 80
 @timeit to "Total Time" begin
 @timeit to "searching" begin
-config = YAML.load_file("./yml/patch_test_gauss_nitsche.yml")
-
+# config = YAML.load_file("./yml/patch_test_gauss_nitsche.yml")
+config = YAML.load_file("./yml/patch_test_gauss_nitsche_"*𝒑*".yml")
 end
-elements, nodes = importmsh("./msh/patchtest_"*string(ndiv)*".msh",config)
+# elements, nodes = importmsh("./msh/patchtest_"*string(ndiv)*".msh",config)
+elements,nodes = importmsh("./msh/patchtest.msh", config)
 nₚ = length(nodes)
 
 
-s = 3.5/ndiv*ones(nₚ)
+s = 4.5/ndiv*ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 
 
@@ -27,7 +30,7 @@ push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 @timeit to "shape functions Γₚ₃" set∇²₂𝝭!(elements["Γₚ₃"])
 @timeit to "shape functions Γₚ₄" set∇²₂𝝭!(elements["Γₚ₄"])
 
-n = 3
+n = 4
 @timeit to "prescribling" begin
 
 w(x,y) = (1+2x+3y)^n
@@ -134,4 +137,4 @@ prescribe!(elements["Ω"],:∂³u∂x²∂y=>(x,y,z)->w₁₁₂(x,y))
 prescribe!(elements["Ω"],:∂³u∂x∂y²=>(x,y,z)->w₁₂₂(x,y))
 prescribe!(elements["Ω"],:∂³u∂y³=>(x,y,z)->w₂₂₂(x,y))
 h3,h2,h1,l2 = ops[9](elements["Ω"])
-show(to)
+# show(to)

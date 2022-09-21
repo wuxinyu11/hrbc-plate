@@ -5,7 +5,7 @@ to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
 
-ndiv = 10
+ndiv = 80
 # 𝒑 = "cubic"
 𝒑 = "quartic"
 config = YAML.load_file("./yml/rectangular_rkgsi_hr_"*𝒑*".yml")
@@ -13,8 +13,8 @@ elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh", config)
 end 
 nₚ = length(nodes)
 nₑ = length(elements["Ω"])
-
-s = 4.1 / ndiv * ones(nₚ)
+# s = 3.5 / ndiv * ones(nₚ)
+s = 4.5 / ndiv * ones(nₚ)
 push!(nodes, :s₁ => s, :s₂ => s, :s₃ => s)
        
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
@@ -105,34 +105,34 @@ end
 # set∇̄²𝝭!(elements["Γ̃₁"],Γᴾ=elements["Γ̃ₚ"])
 # set∇̄²𝝭!(elements["Γ̃ₚ"],Γᶿ=elements["Γ̃₁"])
 
-n = 2
-w(x,y) = (1+2x+3y)^n
-w₁(x,y) = 2n*(1+2x+3y)^abs(n-1)
-w₂(x,y) = 3n*(1+2x+3y)^abs(n-1)
-w₁₁(x,y) = 4n*(n-1)*(1+2x+3y)^abs(n-2)
-w₂₂(x,y) = 9n*(n-1)*(1+2x+3y)^abs(n-2)
-w₁₂(x,y) = 6n*(n-1)*(1+2x+3y)^abs(n-2)
-w₁₁₁(x,y) = 8n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
-w₁₁₂(x,y) = 12n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
-w₁₂₂(x,y) = 18n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
-w₂₂₂(x,y) = 27n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
-w₁₁₁₁(x,y) = 16n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
-w₁₁₂₂(x,y) = 36n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
-w₂₂₂₂(x,y) = 81n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
+# n = 2
+# w(x,y) = (1+2x+3y)^n
+# w₁(x,y) = 2n*(1+2x+3y)^abs(n-1)
+# w₂(x,y) = 3n*(1+2x+3y)^abs(n-1)
+# w₁₁(x,y) = 4n*(n-1)*(1+2x+3y)^abs(n-2)
+# w₂₂(x,y) = 9n*(n-1)*(1+2x+3y)^abs(n-2)
+# w₁₂(x,y) = 6n*(n-1)*(1+2x+3y)^abs(n-2)
+# w₁₁₁(x,y) = 8n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
+# w₁₁₂(x,y) = 12n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
+# w₁₂₂(x,y) = 18n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
+# w₂₂₂(x,y) = 27n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
+# w₁₁₁₁(x,y) = 16n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
+# w₁₁₂₂(x,y) = 36n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
+# w₂₂₂₂(x,y) = 81n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
 
-# w(x,y) = - sin(π*x)*sin(π*y)
-# w₁(x,y) = - π*cos(π*x)*sin(π*y)
-# w₂(x,y) = - π*sin(π*x)*cos(π*y)
-# w₁₁(x,y) = π^2*sin(π*x)*sin(π*y)
-# w₂₂(x,y) = π^2*sin(π*x)*sin(π*y)
-# w₁₂(x,y) = - π^2*cos(π*x)*cos(π*y)
-# w₁₁₁(x,y) = π^3*cos(π*x)*sin(π*y)
-# w₁₁₂(x,y) = π^3*sin(π*x)*cos(π*y)
-# w₁₂₂(x,y) = π^3*cos(π*x)*sin(π*y)
-# w₂₂₂(x,y) = π^3*sin(π*x)*cos(π*y)
-# w₁₁₁₁(x,y) = - π^4*sin(π*x)*sin(π*y)
-# w₁₁₂₂(x,y) = - π^4*sin(π*x)*sin(π*y)
-# w₂₂₂₂(x,y) = - π^4*sin(π*x)*sin(π*y)
+w(x,y) = - sin(π*x)*sin(π*y)
+w₁(x,y) = - π*cos(π*x)*sin(π*y)
+w₂(x,y) = - π*sin(π*x)*cos(π*y)
+w₁₁(x,y) = π^2*sin(π*x)*sin(π*y)
+w₂₂(x,y) = π^2*sin(π*x)*sin(π*y)
+w₁₂(x,y) = - π^2*cos(π*x)*cos(π*y)
+w₁₁₁(x,y) = π^3*cos(π*x)*sin(π*y)
+w₁₁₂(x,y) = π^3*sin(π*x)*cos(π*y)
+w₁₂₂(x,y) = π^3*cos(π*x)*sin(π*y)
+w₂₂₂(x,y) = π^3*sin(π*x)*cos(π*y)
+w₁₁₁₁(x,y) = - π^4*sin(π*x)*sin(π*y)
+w₁₁₂₂(x,y) = - π^4*sin(π*x)*sin(π*y)
+w₂₂₂₂(x,y) = - π^4*sin(π*x)*sin(π*y)
 D = 1.0
 ν = 0.3
 M₁₁(x,y) = - D*(w₁₁(x,y)+ν*w₂₂(x,y))
@@ -237,17 +237,17 @@ prescribe!(elements["Ω"],:∂³u∂y³=>(x,y,z)->w₂₂₂(x,y))
 h3,h2,h1,l2 = ops[9](elements["Ω"])
 show(to)
 
-# index = [10,20,40,80]
-# XLSX.openxlsx("./xlsx/rectangular_"*𝒑*".xlsx", mode="rw") do xf
-#     row = "G"
-#     𝐿₂ = xf[2]
-#     𝐻₁ = xf[3]
-#     𝐻₂ = xf[4]
-#     𝐻₃ = xf[5]
-#     ind = findfirst(n->n==ndiv,index)+1
-#     row = row*string(ind)
-#     𝐿₂[row] = log10(l2)
-#     𝐻₁[row] = log10(h1)
-#     𝐻₂[row] = log10(h2)
-#     𝐻₃[row] = log10(h3)
-# end
+index = [10,20,40,80]
+XLSX.openxlsx("./xlsx/rectangular_"*𝒑*".xlsx", mode="rw") do xf
+    row = "G"
+    𝐿₂ = xf[2]
+    𝐻₁ = xf[3]
+    𝐻₂ = xf[4]
+    𝐻₃ = xf[5]
+    ind = findfirst(n->n==ndiv,index)+1
+    row = row*string(ind)
+    𝐿₂[row] = log10(l2)
+    𝐻₁[row] = log10(h1)
+    𝐻₂[row] = log10(h2)
+    𝐻₃[row] = log10(h3)
+end

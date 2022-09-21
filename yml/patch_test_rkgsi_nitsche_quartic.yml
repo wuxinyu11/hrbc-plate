@@ -1,5 +1,5 @@
 RegularGrid:
-    n: 2
+    n: 3
     γ: 5
 
 Ω:
@@ -16,7 +16,8 @@ RegularGrid:
         tag: Ω
     𝓖:
         type: TriGI6
-        𝝭: [∂²𝝭∂x²,∂²𝝭∂x∂y,∂²𝝭∂y²]
+        𝝭: [𝝭,∂𝝭∂x,∂𝝭∂y,∂²𝝭∂x²,∂²𝝭∂x∂y,∂²𝝭∂y∂x,∂²𝝭∂y²]
+
 
 
 Γ₁:

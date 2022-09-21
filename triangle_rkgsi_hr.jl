@@ -5,10 +5,10 @@ to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
 
-# 𝒑 = "cubic"
-𝒑 = "quartic"
+𝒑 = "cubic"
+# 𝒑 = "quartic"
 config = YAML.load_file("./yml/triangle_rkgsi_hr_"*𝒑*".yml")
-ndiv = 80
+ndiv = 10
 elements, nodes = importmsh("./msh/triangle_"*string(ndiv)*".msh", config)
 end
 
@@ -166,17 +166,17 @@ prescribe!(elements["Ω"],:∂³u∂y³=>(x,y,z)->w₂₂₂(x,y))
 h3,h2,h1,l2 = ops[9](elements["Ω"])
 show(to)
 
-# index = [10,20,40,80]
-# XLSX.openxlsx("./xlsx/triangle_"*𝒑*".xlsx", mode="rw") do xf
-#     row = "G"
-#     𝐿₂ = xf[2]
-#     𝐻₁ = xf[3]
-#     𝐻₂ = xf[4]
-#     𝐻₃ = xf[5]
-#     ind = findfirst(n->n==ndiv,index)+1
-#     row = row*string(ind)
-#     𝐿₂[row] = log10(l2)
-#     𝐻₁[row] = log10(h1)
-#     𝐻₂[row] = log10(h2)
-#     𝐻₃[row] = log10(h3)
-# end
+index = [10,20,40,80]
+XLSX.openxlsx("./xlsx/triangle_"*𝒑*".xlsx", mode="rw") do xf
+    row = "G"
+    𝐿₂ = xf[2]
+    𝐻₁ = xf[3]
+    𝐻₂ = xf[4]
+    𝐻₃ = xf[5]
+    ind = findfirst(n->n==ndiv,index)+1
+    row = row*string(ind)
+    𝐿₂[row] = log10(l2)
+    𝐻₁[row] = log10(h1)
+    𝐻₂[row] = log10(h2)
+    𝐻₃[row] = log10(h3)
+end

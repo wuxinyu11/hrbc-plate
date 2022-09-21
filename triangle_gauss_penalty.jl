@@ -70,7 +70,19 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        # ndiv = 20, α = 3e11
        # ndiv = 40, α = 1e14
        # ndiv = 80, α = 1e17
-       Operator(:∫vgdΓ,coefficient...,:α=>1e17),
+
+ #    quartic-0909
+       # ndiv = 10, α = 1e4
+       # ndiv = 20, α = 1e5
+       # ndiv = 40, α = 1e6
+       # ndiv = 80, α = 1e8
+        #    cubic-0909
+       # ndiv = 10, α = 1e2
+       # ndiv = 20, α = 1e4
+       # ndiv = 40, α = 1e5
+       # ndiv = 80, α = 1e7
+
+       Operator(:∫vgdΓ,coefficient...,:α=>1e8),
        Operator(:∫wVdΓ,coefficient...),
        Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e3),
        Operator(:∫θₙMₙₙdΓ,coefficient...),

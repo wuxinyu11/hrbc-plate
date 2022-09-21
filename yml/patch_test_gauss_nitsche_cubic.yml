@@ -7,7 +7,7 @@ RegularGrid:
     𝓒:
         tag: Ω
     𝓖:
-        type: TriGI3
+        type: TriGI13
         𝝭: [𝝭,∂𝝭∂x,∂𝝭∂y,∂²𝝭∂x²,∂²𝝭∂x∂y,∂²𝝭∂y²]
 
 Γ₁:
@@ -15,7 +15,7 @@ RegularGrid:
     𝓒:
         tag: Γ₁
     𝓖:
-        type: &GB SegGI2
+        type: &GB SegGI3
         𝝭: &𝝭 [𝝭,∂𝝭∂x,∂𝝭∂y,∂²𝝭∂x²,∂²𝝭∂x∂y,∂²𝝭∂y²,∂³𝝭∂x³,∂³𝝭∂x²∂y,∂³𝝭∂x∂y²,∂³𝝭∂y³,∂𝝭∂z]
 
 Γ₂:

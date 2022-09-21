@@ -5,9 +5,9 @@ to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
 
-𝒑 = "cubic"
-# 𝒑 = "quartic"
-ndiv = 8
+# 𝒑 = "cubic"
+𝒑 = "quartic"
+ndiv = 16
 config = YAML.load_file("./yml/hollow_cylinder_gauss_nitsche_"*𝒑*".yml")
 elements,nodes = importmsh("./msh/hollow_cylinder_"*string(ndiv)*".msh", config)
 nₚ = length(nodes)
@@ -20,7 +20,7 @@ for node in nodes
     x = node.x
     y = node.y
     r = (x^2+y^2)^0.5
-    sᵢ = 3.1*r*π/4/ndiv
+    sᵢ = 4.1*r*π/4/ndiv
     node.s₁ = sᵢ
     node.s₂ = sᵢ
     node.s₃ = sᵢ
@@ -89,10 +89,10 @@ prescribe!(elements["Γᴾ"],:g=>(x,y,z)->w(x,y))
        # ndiv = 80, α = 1e3*ndiv^4
     #    quartic
        # ndiv = 8, α = 1e4*ndiv^3
-       # ndiv = 16, α = 1e4*ndiv^3
+       # ndiv = 16, α = 1e6*ndiv^3
        # ndiv = 32, α = 1e4*ndiv^3
        # ndiv = 64, α = 1e4*ndiv^3
-        Operator(:∫VgdΓ,coefficient...,:α=>1e4*ndiv^3),
+        Operator(:∫VgdΓ,coefficient...,:α=>1e6*ndiv^3),
         Operator(:∫wVdΓ,coefficient...),
        # ndiv = 10, α = 1e3*ndiv
        # ndiv = 80, α = 1e2*ndiv

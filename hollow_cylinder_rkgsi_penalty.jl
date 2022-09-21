@@ -5,8 +5,8 @@ to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
 
-𝒑 = "cubic"
-# 𝒑 = "quartic"
+# 𝒑 = "cubic"
+𝒑 = "quartic"
 ndiv = 64
 config = YAML.load_file("./yml/hollow_cylinder_rkgsi_penalty_"*𝒑*".yml")
 elements,nodes = importmsh("./msh/hollow_cylinder_"*string(ndiv)*".msh", config)
@@ -94,9 +94,9 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        # ndiv = 16, α = 1e9, β = 1e4
        # ndiv = 32, α = 1e11, β = 1e6
        # ndiv = 64, α = 1e13, β = 1e5
-       Operator(:∫vgdΓ,coefficient...,:α=>1e9),
+       Operator(:∫vgdΓ,coefficient...,:α=>1e13),
        Operator(:∫wVdΓ,coefficient...),
-       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e4),
+       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e5),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:H₃)]
@@ -138,18 +138,23 @@ prescribe!(elements["Ω"],:∂³u∂y³=>(x,y,z)->w₂₂₂(x,y))
 h3,h2,h1,l2 = ops[8](elements["Ω"])
 show(to)
 
-index = [10,20,40,80]
-index = [8,16,32,64]
-XLSX.openxlsx("./xlsx/hollow_cylinder_"*𝒑*".xlsx", mode="rw") do xf
-    row = "E"
-    𝐿₂ = xf[2]
-    𝐻₁ = xf[3]
-    𝐻₂ = xf[4]
-    𝐻₃ = xf[5]
-    ind = findfirst(n->n==ndiv,index)+1
-    row = row*string(ind)
-    𝐿₂[row] = log10(l2)
-    𝐻₁[row] = log10(h1)
-    𝐻₂[row] = log10(h2)
-    𝐻₃[row] = log10(h3)
-end
+    𝐿₂ = log10(l2)
+    𝐻₁= log10(h1)
+    𝐻₂ = log10(h2)
+    𝐻₃ = log10(h3)
+
+# # index = [10,20,40,80]
+# index = [8,16,32,64]
+# XLSX.openxlsx("./xlsx/hollow_cylinder_"*𝒑*".xlsx", mode="rw") do xf
+#     row = "E"
+#     𝐿₂ = xf[2]
+#     𝐻₁ = xf[3]
+#     𝐻₂ = xf[4]
+#     𝐻₃ = xf[5]
+#     ind = findfirst(n->n==ndiv,index)+1
+#     row = row*string(ind)
+#     𝐿₂[row] = log10(l2)
+#     𝐻₁[row] = log10(h1)
+#     𝐻₂[row] = log10(h2)
+#     𝐻₃[row] = log10(h3)
+# end

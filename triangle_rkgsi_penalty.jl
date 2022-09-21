@@ -5,9 +5,9 @@ to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
 
-# 𝒑 = "cubic"
-𝒑 = "quartic"
-ndiv = 80
+𝒑 = "cubic"
+# 𝒑 = "quartic"
+ndiv = 20
 config = YAML.load_file("./yml/triangle_rkgsi_penalty_"*𝒑*".yml")
 elements,nodes = importmsh("./msh/triangle_"*string(ndiv)*".msh", config)
 end
@@ -77,7 +77,19 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        # ndiv = 20, α = 1e5
        # ndiv = 40, α = 1e7
        # ndiv = 80, α = 5e8
-       Operator(:∫vgdΓ,coefficient...,:α=>1e8),
+
+        #    quartic-0909
+       # ndiv = 10, α = 1e4
+       # ndiv = 20, α = 1e5
+       # ndiv = 40, α = 1e6
+       # ndiv = 80, α = 5e8
+        #    cubic-0909
+       # ndiv = 10, α = 1e2
+       # ndiv = 20, α = 1e3
+       # ndiv = 40, α = 1e4
+       # ndiv = 80, α = 1e5
+       
+       Operator(:∫vgdΓ,coefficient...,:α=>1e3),
        Operator(:∫wVdΓ,coefficient...),
        # ndiv = 10, α = 1e3
        # ndiv = 20, α = 1e3

@@ -5,15 +5,15 @@ to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
 
-𝒑 = "cubic"
-# 𝒑 = "quartic"
-ndiv = 10
+# 𝒑 = "cubic"
+𝒑 = "quartic"
+ndiv = 40
 config = YAML.load_file("./yml/triangle_gauss_nitsche_"*𝒑*".yml")
 elements, nodes = importmsh("./msh/triangle_"*string(ndiv)*".msh",config)
 end
 nₚ = length(nodes)
 
-s = 4*10/ndiv*ones(nₚ)
+s = 5*10/ndiv*ones(nₚ)
 #s = 4.5*10/ndiv*ones(nₚ)
 #push!(nodes,:s₁=>3^(0.5)/2 .*s,:s₂=>s,:s₃=>s)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
@@ -80,7 +80,21 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        # ndiv = 20, α = 1e7
        # ndiv = 40, α = 1e9
        # ndiv = 80, α = 1e11
-       Operator(:∫VgdΓ,coefficient...,:α=>1e4),
+
+
+    #    quartic-0909
+       # ndiv = 10, α = 1e4
+       # ndiv = 20, α = 1e6
+       # ndiv = 40, α = 1e6
+       # ndiv = 80, α = 1e8
+
+       #    cubic-0909
+       # ndiv = 10, α = 1e4
+       # ndiv = 20, α = 1e5
+       # ndiv = 40, α = 1e6
+       # ndiv = 80, α = 1e7
+
+       Operator(:∫VgdΓ,coefficient...,:α=>1e6),
        Operator(:∫wVdΓ,coefficient...),
        Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3*ndiv),
        Operator(:∫θₙMₙₙdΓ,coefficient...),

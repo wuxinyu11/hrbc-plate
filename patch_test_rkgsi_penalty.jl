@@ -1,12 +1,21 @@
 
 using Revise, YAML, ApproxOperator
 
-ndiv = 10
-config = YAML.load_file("./yml/patch_test_rkgsi_nitsche.yml")
-elements,nodes = importmsh("./msh/patchtest_"*string(ndiv)*".msh", config)
-nₚ = getnₚ(elements["Ω"])
+ndiv = 15
+𝒑 = "quartic"
+# 𝒑 = "cubic"
+config = YAML.load_file("./yml/patch_test_rkgsi_penalty_"*𝒑*".yml")
+elements,nodes = importmsh("./msh/patchtest.msh", config)
+# elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh", config)
+nₚ = length(nodes)
 
-s = 3.5/ndiv*ones(nₚ)
+# s = 3.5/ndiv*ones(nₚ)
+s = 4.5/ndiv*ones(nₚ)
+# ndiv = 10
+# config = YAML.load_file("./yml/patch_test_rkgsi_nitsche.yml")
+# elements,nodes = importmsh("./msh/patchtest_"*string(ndiv)*".msh", config)
+# nₚ = getnₚ(elements["Ω"])
+
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
 
@@ -21,7 +30,7 @@ set𝝭!(elements["Γₚ₂"])
 set𝝭!(elements["Γₚ₃"])
 set𝝭!(elements["Γₚ₄"])
 
-n = 3
+n = 4
 w(x,y) = (1+2x+3y)^n
 w₁(x,y) = 2n*(1+2x+3y)^abs(n-1)
 w₂(x,y) = 3n*(1+2x+3y)^abs(n-1)

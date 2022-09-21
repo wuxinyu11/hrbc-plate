@@ -1,14 +1,17 @@
 
 using Revise, YAML, ApproxOperator
 
-ndiv = 10
-# 𝒑 = "quartic"
-𝒑 = "cubic"
+ndiv = 15
+𝒑 = "quartic"
+# 𝒑 = "cubic"
 config = YAML.load_file("./yml/patch_test_rkgsi_nitsche_"*𝒑*".yml")
-# elements,nodes = importmsh("./msh/patchtest.msh", config)
-elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh", config)
+elements,nodes = importmsh("./msh/patchtest.msh", config)
+# elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh", config)
 nₚ = length(nodes)
+
+# s = 3.5/ndiv*ones(nₚ)
 s = 4.5/ndiv*ones(nₚ)
+
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
 
@@ -26,33 +29,33 @@ set∇²₂𝝭!(elements["Γₚ₄"])
 f1 = ApproxOperator.check∇̃²₂𝝭(elements["Ω̃"])
 f2 = check∇³𝝭(elements["Γ₁"])
 
-n = 3
-# w(x,y) = (1+2x+3y)^n
-# w₁(x,y) = 2n*(1+2x+3y)^abs(n-1)
-# w₂(x,y) = 3n*(1+2x+3y)^abs(n-1)
-# w₁₁(x,y) = 4n*(n-1)*(1+2x+3y)^abs(n-2)
-# w₂₂(x,y) = 9n*(n-1)*(1+2x+3y)^abs(n-2)
-# w₁₂(x,y) = 6n*(n-1)*(1+2x+3y)^abs(n-2)
-# w₁₁₁(x,y) = 8n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
-# w₁₁₂(x,y) = 12n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
-# w₁₂₂(x,y) = 18n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
-# w₂₂₂(x,y) = 27n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
-# w₁₁₁₁(x,y) = 16n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
-# w₁₁₂₂(x,y) = 36n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
-# w₂₂₂₂(x,y) = 81n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
-w(x,y) = x^n
-w₁(x,y) = n*x^abs(n-1)
-w₂(x,y) = 0.
-w₁₁(x,y) = n*(n-1)*x^abs(n-2)
-w₂₂(x,y) = 0.
-w₁₂(x,y) = 0.
-w₁₁₁(x,y) = n*(n-1)*(n-2)*x^abs(n-3)
-w₁₁₂(x,y) = 0.
-w₁₂₂(x,y) = 0.
-w₂₂₂(x,y) = 0.
-w₁₁₁₁(x,y) = n*(n-1)*(n-2)*(n-3)*x^abs(n-4)
-w₁₁₂₂(x,y) = 0.
-w₂₂₂₂(x,y) = 0.
+n = 4
+w(x,y) = (1+2x+3y)^n
+w₁(x,y) = 2n*(1+2x+3y)^abs(n-1)
+w₂(x,y) = 3n*(1+2x+3y)^abs(n-1)
+w₁₁(x,y) = 4n*(n-1)*(1+2x+3y)^abs(n-2)
+w₂₂(x,y) = 9n*(n-1)*(1+2x+3y)^abs(n-2)
+w₁₂(x,y) = 6n*(n-1)*(1+2x+3y)^abs(n-2)
+w₁₁₁(x,y) = 8n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
+w₁₁₂(x,y) = 12n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
+w₁₂₂(x,y) = 18n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
+w₂₂₂(x,y) = 27n*(n-1)*(n-2)*(1+2x+3y)^abs(n-3)
+w₁₁₁₁(x,y) = 16n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
+w₁₁₂₂(x,y) = 36n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
+w₂₂₂₂(x,y) = 81n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
+# w(x,y) = x^n
+# w₁(x,y) = n*x^abs(n-1)
+# w₂(x,y) = 0.
+# w₁₁(x,y) = n*(n-1)*x^abs(n-2)
+# w₂₂(x,y) = 0.
+# w₁₂(x,y) = 0.
+# w₁₁₁(x,y) = n*(n-1)*(n-2)*x^abs(n-3)
+# w₁₁₂(x,y) = 0.
+# w₁₂₂(x,y) = 0.
+# w₂₂₂(x,y) = 0.
+# w₁₁₁₁(x,y) = n*(n-1)*(n-2)*(n-3)*x^abs(n-4)
+# w₁₁₂₂(x,y) = 0.
+# w₂₂₂₂(x,y) = 0.
 D = 1.0
 ν = 0.0
 M₁₁(x,y) = - D*(w₁₁(x,y)+ν*w₂₂(x,y))
@@ -144,17 +147,17 @@ f .-= k*d
 # err = d'*k*d-d'*f
 # d = k\f
 
-# push!(nodes,:d=>d)
-# set𝓖!(elements["Ω"],:TriGI16,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
-# set∇̂³𝝭!(elements["Ω"])
-# prescribe!(elements["Ω"],:u=>(x,y,z)->w(x,y))
-# prescribe!(elements["Ω"],:∂u∂x=>(x,y,z)->w₁(x,y))
-# prescribe!(elements["Ω"],:∂u∂y=>(x,y,z)->w₂(x,y))
-# prescribe!(elements["Ω"],:∂²u∂x²=>(x,y,z)->w₁₁(x,y))
-# prescribe!(elements["Ω"],:∂²u∂x∂y=>(x,y,z)->w₁₂(x,y))
-# prescribe!(elements["Ω"],:∂²u∂y²=>(x,y,z)->w₂₂(x,y))
-# prescribe!(elements["Ω"],:∂³u∂x³=>(x,y,z)->w₁₁₁(x,y))
-# prescribe!(elements["Ω"],:∂³u∂x²∂y=>(x,y,z)->w₁₁₂(x,y))
-# prescribe!(elements["Ω"],:∂³u∂x∂y²=>(x,y,z)->w₁₂₂(x,y))
-# prescribe!(elements["Ω"],:∂³u∂y³=>(x,y,z)->w₂₂₂(x,y))
-# h3,h2,h1,l2 = ops[9](elements["Ω"])
+push!(nodes,:d=>d)
+set𝓖!(elements["Ω"],:TriGI16,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
+set∇̂³𝝭!(elements["Ω"])
+prescribe!(elements["Ω"],:u=>(x,y,z)->w(x,y))
+prescribe!(elements["Ω"],:∂u∂x=>(x,y,z)->w₁(x,y))
+prescribe!(elements["Ω"],:∂u∂y=>(x,y,z)->w₂(x,y))
+prescribe!(elements["Ω"],:∂²u∂x²=>(x,y,z)->w₁₁(x,y))
+prescribe!(elements["Ω"],:∂²u∂x∂y=>(x,y,z)->w₁₂(x,y))
+prescribe!(elements["Ω"],:∂²u∂y²=>(x,y,z)->w₂₂(x,y))
+prescribe!(elements["Ω"],:∂³u∂x³=>(x,y,z)->w₁₁₁(x,y))
+prescribe!(elements["Ω"],:∂³u∂x²∂y=>(x,y,z)->w₁₁₂(x,y))
+prescribe!(elements["Ω"],:∂³u∂x∂y²=>(x,y,z)->w₁₂₂(x,y))
+prescribe!(elements["Ω"],:∂³u∂y³=>(x,y,z)->w₂₂₂(x,y))
+h3,h2,h1,l2 = ops[9](elements["Ω"])

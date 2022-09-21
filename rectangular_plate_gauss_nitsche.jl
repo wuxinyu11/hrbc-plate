@@ -3,15 +3,16 @@ using YAML, ApproxOperator, XLSX, TimerOutputs
 to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
-ndiv = 10
-𝒑 = "cubic"
-# 𝒑 = "quartic"
+ndiv = 40
+# 𝒑 = "cubic"
+𝒑 = "quartic"
 config = YAML.load_file("./yml/rectangular_gauss_nitsche_"*𝒑*".yml")
 elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh",config)
 nₚ = length(nodes)
 end
 
-s = 3.5/ndiv*ones(nₚ)
+s = 4.5/ndiv*ones(nₚ)
+# s = 3.5/ndiv*ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 
 @timeit to "shape functions " begin        
@@ -77,11 +78,26 @@ prescribe!(elements["Γₚ₂"],:ΔM=>(x,y,z)->-2*M₁₂(x,y))
 prescribe!(elements["Γₚ₃"],:ΔM=>(x,y,z)->2*M₁₂(x,y))
 prescribe!(elements["Γₚ₄"],:ΔM=>(x,y,z)->-2*M₁₂(x,y))
 
+     #  quartic-wxy
+        # α = 1e7 for ndiv = 10
+        # α = 1e8 for ndiv = 20
+        # α = 1e8 for ndiv = 40
+        # α = 1e9 for ndiv = 80
+            # cubic-wxy
+        # ndiv = 10, α = 1e5
+        # ndiv = 20, α = 1e6
+        # ndiv = 40, α = 1e7
+        # ndiv = 80, α = 1e9
+
+set𝒏!(elements["Γ₁"])
+set𝒏!(elements["Γ₂"])
+set𝒏!(elements["Γ₃"])
+set𝒏!(elements["Γ₄"])
 coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
        # ndiv = 10, α = 1e3*ndiv^3
-       Operator(:∫VgdΓ,coefficient...,:α=>1e5),
+       Operator(:∫VgdΓ,coefficient...,:α=>1e8),
        Operator(:∫wVdΓ,coefficient...),
        Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3*ndiv),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
