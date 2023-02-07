@@ -7,7 +7,7 @@ to = TimerOutput()
 
 # 𝒑 = "cubic"
 𝒑 = "quartic"
-ndiv = 16
+ndiv = 64
 config = YAML.load_file("./yml/hollow_cylinder_gauss_nitsche_"*𝒑*".yml")
 elements,nodes = importmsh("./msh/hollow_cylinder_"*string(ndiv)*".msh", config)
 nₚ = length(nodes)
@@ -28,11 +28,14 @@ end
 
 @timeit to "shape functions " begin      
 set∇²₂𝝭!(elements["Ω"])
-set∇³𝝭!(elements["Γᴹ"])
-set∇³𝝭!(elements["Γⱽ"])
+set∇₂𝝭!(elements["Γᴹ"])
+set𝝭!(elements["Γⱽ"])
+# set∇³𝝭!(elements["Γᴹ"])
+# set∇³𝝭!(elements["Γⱽ"])
 @timeit to "shape functions Γᵍ " begin      
 set∇³𝝭!(elements["Γᵍ"])
-set∇³𝝭!(elements["Γᶿ"])
+set∇²₂𝝭!(elements["Γᶿ"])
+# set∇³𝝭!(elements["Γᶿ"])
 set∇²₂𝝭!(elements["Γᴾ"])
 
 end
@@ -52,13 +55,11 @@ w₁₁₁₁(x,y)=-24/(3*(1-ν))*(x^2+y^2)^(-4)*8*x^4+192*x^2/(3*(1-ν))*(x^2+y
 w₁₁₂₂(x,y)=-24/(3*(1-ν))*(x^2+y^2)^(-4)*8*x^2*y^2+32/(3*(1-ν))*(x^2+y^2)^(-3)*x^2+32/(3*(1-ν))*(x^2+y^2)^(-3)*y^2-8/(3*(1-ν))*(x^2+y^2)^(-2)
 w₂₂₂₂(x,y)=-24/(3*(1-ν))*(x^2+y^2)^(-4)*8*y^4+192*y^2/(3*(1-ν))*(x^2+y^2)^(-3)-24/(3*(1-ν))*(x^2+y^2)^(-2)
 
-D = 1.0
+D =  1.0
 ν = 0.3
 M₁₁(x,y) = - D*(w₁₁(x,y)+ν*w₂₂(x,y))
 M₂₂(x,y) = - D*(ν*w₁₁(x,y)+w₂₂(x,y))
 M₁₂(x,y) = - D*(1-ν)*w₁₂(x,y)
-
-
 function Vₙ(x,y,n₁,n₂)
     s₁ = -n₂
     s₂ = n₁
@@ -68,6 +69,7 @@ function Vₙ(x,y,n₁,n₂)
     D₂₂₂ = -D*(n₂ + n₂*s₂*s₂ + ν*n₁*s₁*s₂)
     return D₁₁₁*w₁₁₁(x,y)+D₁₁₂*w₁₁₂(x,y)+D₁₂₂*w₁₂₂(x,y)+D₂₂₂*w₂₂₂(x,y)
 end
+
 prescribe!(elements["Ω"],:q=>(x,y,z)->w₁₁₁₁(x,y)+2*w₁₁₂₂(x,y)+w₂₂₂₂(x,y))
 set𝒏!(elements["Γᵍ"])
 prescribe!(elements["Γᵍ"],:g=>(x,y,z)->w(x,y))
@@ -92,17 +94,18 @@ prescribe!(elements["Γᴾ"],:g=>(x,y,z)->w(x,y))
        # ndiv = 16, α = 1e6*ndiv^3
        # ndiv = 32, α = 1e4*ndiv^3
        # ndiv = 64, α = 1e4*ndiv^3
-        Operator(:∫VgdΓ,coefficient...,:α=>1e6*ndiv^3),
+        Operator(:∫VgdΓ,coefficient...,:α=>1e8),
         Operator(:∫wVdΓ,coefficient...),
        # ndiv = 10, α = 1e3*ndiv
        # ndiv = 80, α = 1e2*ndiv
-        Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e2*ndiv),
+        Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e6),
         Operator(:∫θₙMₙₙdΓ,coefficient...),
        # ndiv = 10, α = 1e1*ndiv^2
        # ndiv = 80, α = 1e0*ndiv^2
-        Operator(:ΔMₙₛg,coefficient...,:α=>1e1*ndiv^2),
+        Operator(:ΔMₙₛg,coefficient...,:α=>1e5),
         Operator(:wΔMₙₛ,coefficient...),
-        Operator(:H₃)]
+        Operator(:H₃),
+        Operator(:L₂),]
  
  k = zeros(nₚ,nₚ)
  f = zeros(nₚ)
@@ -141,16 +144,25 @@ show(to)
 # index = [10,20,40,80]
 index = [8,16,32,64]
 XLSX.openxlsx("./xlsx/hollow_cylinder_"*𝒑*".xlsx", mode="rw") do xf
-    row = "B"
-    # row = "D"
+    # row = "B"
+    row = "D"
     𝐿₂ = xf[2]
     𝐻₁ = xf[3]
     𝐻₂ = xf[4]
     𝐻₃ = xf[5]
     ind = findfirst(n->n==ndiv,index)+1
     row = row*string(ind)
-    𝐿₂[row] = log10(l2)
     𝐻₁[row] = log10(h1)
     𝐻₂[row] = log10(h2)
     𝐻₃[row] = log10(h3)
+    𝐿₂[row] = log10(l2)
+end
+
+XLSX.openxlsx("./xlsx/hollow_cylinder_contour.xlsx", mode="rw") do xf
+    sheet = xf[1]
+    row = "B"
+    sheet[row*string(1)] = "gauss-nitsche"
+    for (i,node) in enumerate(nodes)
+        sheet[row*string(i+1)] = node.d
+    end
 end

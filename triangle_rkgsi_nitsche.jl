@@ -6,7 +6,7 @@ to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
 
-ndiv = 10
+ndiv = 80
 𝒑 = "cubic"
 # 𝒑 = "quartic"
 config = YAML.load_file("./yml/triangle_rkgsi_nitsche_"*𝒑*".yml")
@@ -14,7 +14,8 @@ elements,nodes = importmsh("./msh/triangle_"*string(ndiv)*".msh", config)
 end
 
 nₚ = length(nodes)
-s = 5*10/ndiv*ones(nₚ)
+s = 3.5*20/3^0.5/ndiv*ones(nₚ)
+# s = 5*10/ndiv*ones(nₚ)
 # s = 4.5*10/ndiv*ones(nₚ)
 #push!(nodes,:s₁=>3^(0.5)/2 .*s,:s₂=>s,:s₃=>s)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
@@ -91,7 +92,7 @@ prescribe!(elements["Γₚ₃"],:Δn₂s₂=>(x,y,z)->-3^(0.5)/4)
 coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫VgdΓ,coefficient...,:α=>1e4),
+       Operator(:∫VgdΓ,coefficient...,:α=>1e7),
        Operator(:∫wVdΓ,coefficient...),
        Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3*ndiv),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
@@ -161,8 +162,17 @@ XLSX.openxlsx("./xlsx/triangle_"*𝒑*".xlsx", mode="rw") do xf
     𝐻₃ = xf[5]
     ind = findfirst(n->n==ndiv,index)+1
     row = row*string(ind)
-    𝐿₂[row] = log10(l2)
     𝐻₁[row] = log10(h1)
     𝐻₂[row] = log10(h2)
     𝐻₃[row] = log10(h3)
+    𝐿₂[row] = log10(l2)
+end
+
+XLSX.openxlsx("./xlsx/triangular_contour.xlsx", mode="rw") do xf
+    sheet = xf[1]
+    row = "D"
+    sheet[row*string(1)] = "rkgsi-nitsche"
+    for (i,node) in enumerate(nodes)
+        sheet[row*string(i+1)] = node.d
+    end
 end

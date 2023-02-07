@@ -8,14 +8,14 @@ RegularGrid:
         tag: Ω
     𝓖:
         type: TriRK6
-        𝝭: [𝝭,∂𝝭∂x,∂𝝭∂y]
+        𝝭: ∇₂𝝭
 Ω̄:
     type: *A1
     𝓒:
         tag: Ω
     𝓖:
         type: TriGI16
-        𝝭: [𝝭]
+        𝝭: 𝝭
 
 Ω̃:
     type: *A1
@@ -23,8 +23,7 @@ RegularGrid:
         tag: Ω
     𝓖:
         type: TriGI3
-        𝝭: [∂²𝝭∂x²,∂²𝝭∂x∂y,∂²𝝭∂y²]
-
+        𝝭: ∇²₂𝝭
 
 Γ₁:
     type: &A2 ReproducingKernel{:Cubic2D,:□,:QuinticSpline,:Seg2}
@@ -32,7 +31,8 @@ RegularGrid:
         tag: Γ₁
     𝓖:
         type: &GB SegRK3
-        𝝭: &𝝭 [𝝭,∂𝝭∂x,∂𝝭∂y]
+        𝝭: &𝝭 ∇₂𝝭
+        normal: true
 
 Γ₂:
     type: *A2
@@ -41,6 +41,7 @@ RegularGrid:
     𝓖:
         type: *GB
         𝝭: *𝝭
+        normal: true
 
 Γ₃:
     type: *A2
@@ -49,6 +50,7 @@ RegularGrid:
     𝓖:
         type: *GB
         𝝭: *𝝭
+        normal: true
 
 
 Γₚ₁:
@@ -57,7 +59,7 @@ RegularGrid:
         tag: Γₚ₁
     𝓖:
         type: &GP PoiGI1
-        𝝭: &𝝭ₚ [𝝭]
+        𝝭: &𝝭ₚ 𝝭
 
 Γₚ₂:
     type: *A3

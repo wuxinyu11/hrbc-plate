@@ -91,15 +91,22 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        # ndiv = 64, α = 1e14, β = 1e6
     #    quartic
        # ndiv = 8, α = 1e7, β = 1e2
-       # ndiv = 16, α = 1e9, β = 1e4
+       # ndiv = 16, α = 1e10, β = 1e8
        # ndiv = 32, α = 1e11, β = 1e6
        # ndiv = 64, α = 1e13, β = 1e5
-       Operator(:∫vgdΓ,coefficient...,:α=>1e13),
+    #    quartic
+       # ndiv = 8, α = 1e10, β = 1e3
+       # ndiv = 16, α = 1e10, β = 1e9
+       # ndiv = 32, α = 1e12, β = 1e5
+       # ndiv = 64, α = 1e13, β = 1e5
+       Operator(:∫vgdΓ,coefficient...,:α=>1e9),
        Operator(:∫wVdΓ,coefficient...),
-       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e5),
+       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e4),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
        Operator(:wΔMₙₛ,coefficient...),
-       Operator(:H₃)]
+       Operator(:H₃),
+       Operator(:∫vgdΓ,coefficient...,:α=>1e8)
+       ]
 
 k = zeros(nₚ,nₚ)
 f = zeros(nₚ)
@@ -113,7 +120,7 @@ ops[6](elements["Γᴹ"],f)
 @timeit to "assembly Γᵍ" begin       
 ops[3](elements["Γᵍ"],k,f)
 ops[5](elements["Γᶿ"],k,f)
-ops[3](elements["Γᴾ"],k,f)
+ops[9](elements["Γᴾ"],k,f)
 
 end
 end
@@ -138,23 +145,27 @@ prescribe!(elements["Ω"],:∂³u∂y³=>(x,y,z)->w₂₂₂(x,y))
 h3,h2,h1,l2 = ops[8](elements["Ω"])
 show(to)
 
-    𝐿₂ = log10(l2)
-    𝐻₁= log10(h1)
-    𝐻₂ = log10(h2)
-    𝐻₃ = log10(h3)
+# index = [10,20,40,80]
+index = [8,16,32,64]
+XLSX.openxlsx("./xlsx/hollow_cylinder_"*𝒑*".xlsx", mode="rw") do xf
+    row = "E"
+    𝐿₂ = xf[2]
+    𝐻₁ = xf[3]
+    𝐻₂ = xf[4]
+    𝐻₃ = xf[5]
+    ind = findfirst(n->n==ndiv,index)+1
+    row = row*string(ind)
+    𝐻₁[row] = log10(h1)
+    𝐻₂[row] = log10(h2)
+    𝐻₃[row] = log10(h3)
+    𝐿₂[row] = log10(l2)
+end
 
-# # index = [10,20,40,80]
-# index = [8,16,32,64]
-# XLSX.openxlsx("./xlsx/hollow_cylinder_"*𝒑*".xlsx", mode="rw") do xf
-#     row = "E"
-#     𝐿₂ = xf[2]
-#     𝐻₁ = xf[3]
-#     𝐻₂ = xf[4]
-#     𝐻₃ = xf[5]
-#     ind = findfirst(n->n==ndiv,index)+1
-#     row = row*string(ind)
-#     𝐿₂[row] = log10(l2)
-#     𝐻₁[row] = log10(h1)
-#     𝐻₂[row] = log10(h2)
-#     𝐻₃[row] = log10(h3)
-# end
+XLSX.openxlsx("./xlsx/hollow_cylinder_contour.xlsx", mode="rw") do xf
+    sheet = xf[1]
+    row = "C"
+    sheet[row*string(1)] = "rkgsi-penalty"
+    for (i,node) in enumerate(nodes)
+        sheet[row*string(i+1)] = node.d
+    end
+end

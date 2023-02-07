@@ -28,9 +28,9 @@ end
 @timeit to "shape functions " begin      
 set∇²₂𝝭!(elements["Ω"])
 set∇₂𝝭!(elements["Γᴹ"])
-set∇₂𝝭!(elements["Γⱽ"])
+set𝝭!(elements["Γⱽ"])
 @timeit to "shape functions Γᵍ " begin      
-set∇₂𝝭!(elements["Γᵍ"])
+set𝝭!(elements["Γᵍ"])
 set∇₂𝝭!(elements["Γᶿ"])
 set𝝭!(elements["Γᴾ"])
 end
@@ -94,12 +94,14 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
     #    ndiv = 16, α = 1e7
     #    ndiv = 32, α = 1e8
     #    ndiv = 64, α = 1e9
-       Operator(:∫vgdΓ,coefficient...,:α=>1e9),
+       Operator(:∫vgdΓ,coefficient...,:α=>1e7),
        Operator(:∫wVdΓ,coefficient...),
-       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e5),
+       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e12),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
        Operator(:wΔMₙₛ,coefficient...),
-       Operator(:H₃)]
+       Operator(:H₃),
+       Operator(:∫vgdΓ,coefficient...,:α=>1e8),
+       ]
 
 k = zeros(nₚ,nₚ)
 f = zeros(nₚ)
@@ -112,7 +114,7 @@ ops[6](elements["Γᴹ"],f)
 @timeit to "assembly Γᵍ" begin       
 ops[3](elements["Γᵍ"],k,f)
 ops[5](elements["Γᶿ"],k,f)
-ops[3](elements["Γᴾ"],k,f)
+ops[9](elements["Γᴾ"],k,f)
 end
 end
 
@@ -139,16 +141,25 @@ show(to)
 # index = [10,20,40,80]
 index = [8,16,32,64]
 XLSX.openxlsx("./xlsx/hollow_cylinder_"*𝒑*".xlsx", mode="rw") do xf
-    row = "A"
-    # row = "C"
+    # row = "A"
+    row = "C"
     𝐿₂ = xf[2]
     𝐻₁ = xf[3]
     𝐻₂ = xf[4]
     𝐻₃ = xf[5]
     ind = findfirst(n->n==ndiv,index)+1
     row = row*string(ind)
-    𝐿₂[row] = log10(l2)
     𝐻₁[row] = log10(h1)
     𝐻₂[row] = log10(h2)
     𝐻₃[row] = log10(h3)
+    𝐿₂[row] = log10(l2)
+end
+
+XLSX.openxlsx("./xlsx/hollow_cylinder_contour.xlsx", mode="rw") do xf
+    sheet = xf[1]
+    row = "A"
+    sheet[row*string(1)] = "gauss-penalty"
+    for (i,node) in enumerate(nodes)
+        sheet[row*string(i+1)] = node.d
+    end
 end

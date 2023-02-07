@@ -11,8 +11,8 @@ using ApproxOperator,Plots
 #   linewidth: 2->1.5, 12->1
 #   markersize: 2->6, 6->5
 
-xlims_ = (-0.05,1.05)
-ylims_ = (-0.05,1.05)
+# xlims_ = (-0.05,1.05)
+# ylims_ = (-0.05,1.05)
 
 # plate_with_hole:
 #   linewidth: 3,6->2, 12->1, 24->0.5
@@ -20,6 +20,8 @@ ylims_ = (-0.05,1.05)
 
 # xlims_ = (-0.1,5.1)
 # ylims_ = (-0.1,5.1)
+xlims_ = (-0.1,5.1)
+ylims_ = (-0.1,5.1)
 
 # cantilever:
 #   linewidth: 4->2, 8->1.5, 16->1, 32->0.5
@@ -28,11 +30,11 @@ ylims_ = (-0.05,1.05)
 # xlims_ = (-0.5,48.5)
 # ylims_ = (-6.5,6.5)
 
-linestyle = (:solid,1.25)
-markstyle = (:circle,5,Plots.stroke(0, :black))
+linestyle = (:solid,0.1)
+markstyle = (:circle,1,Plots.stroke(0, :black))
 
 function plotmesh(as::Vector{T}) where T<:ApproxOperator.AbstractElement
-    p = plot(;framestyle=:none,legend = false,ylims = ylims_,background_color=:transparent,aspect_ratio=:equal)
+    p = plot(;framestyle=:none,legend = false,background_color=:transparent,aspect_ratio=:equal)
     for a in as
         plotmesh(a,p)
     end
@@ -51,13 +53,21 @@ end
 # p = plotmesh(elements["Ω"])
 # p;savefig(p,"./figure/bar_mesh.svg")
 
-elements, nodes = importmsh("./msh/patchtest.msh,config")
-p = plotmesh(elements["Ω"])
-savefig(p,"./figure/patchtest.svg")
-
-# elements, nodes = importmsh("./msh/cantilever_32.msh")
+# elements, nodes = ApproxOperator.importmsh("./msh/patchtest.msh",config)
 # p = plotmesh(elements["Ω"])
-# savefig(p,"./figure/cantilever_32.svg")
+# savefig(p,"./figure/patchtest.svg")
+
+elements, nodes = ApproxOperator.importmsh("./msh/triangle_80.msh")
+p = plotmesh(elements["Ω"])
+lw = 1.5
+plot!([-10/3,20/3,-10/3,-10/3],[-10/3^0.5,0,10/3^0.5,-10/3^0.5],color=:black,line=(:solid,lw))
+# plot!([0,0],[1,2],color=:black,line=(:solid,lw))
+# plot!([1,2],[0,0],color=:black,line=(:solid,lw))
+# curves!([0,0.552284749831,1,1],[1,1,0.552284749831,0],color=:black,line=(:solid,lw))
+# curves!([0,2*0.552284749831,2,2],[2,2,2*0.552284749831,0],color=:black,line=(:solid,lw))
+# plot!([nodes[i].x for i in (1,2,3,4,1)],[nodes[i].y for i in (1,2,3,4,1)],color=:black,line=(:solid,2.0))
+# savefig(p,"./figure/patch_test.svg")
+savefig(p,"./figure/triangle_80.svg")
 
 # elements, nodes = importmsh("./msh/plate_with_hole_24.msh")
 # p = plotmesh(elements["Ω"])

@@ -3,7 +3,7 @@ using YAML, ApproxOperator, XLSX, TimerOutputs
 to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
-ndiv = 40
+ndiv = 10
 # 𝒑 = "cubic"
 𝒑 = "quartic"
 config = YAML.load_file("./yml/rectangular_rkgsi_penalty_"*𝒑*".yml")
@@ -104,7 +104,7 @@ coefficient = (:D=>D,:ν=>ν)
 
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫vgdΓ,coefficient...,:α=>1e12),
+       Operator(:∫vgdΓ,coefficient...,:α=>1e7),
        Operator(:∫wVdΓ,coefficient...),
        Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e7),
        Operator(:∫θₙMₙₙdΓ,coefficient...),

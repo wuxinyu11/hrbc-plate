@@ -1,15 +1,16 @@
 
 using YAML, ApproxOperator, XLSX 
 
-# 𝒑 = "cubic"
-𝒑 = "quartic"
-ndiv = 80
+𝒑 = "cubic"
+# 𝒑 = "quartic"
+ndiv = 10
 config = YAML.load_file("./yml/triangle_rkgsi_penalty_alpha_"*𝒑*".yml")
-elements,nodes = importmsh("./msh/triangle_"*string(ndiv)*".msh", config)
+elements,nodes = ApproxOperator.importmsh("./msh/triangle_"*string(ndiv)*".msh", config)
 
 nₚ = getnₚ(elements["Ω"])
 
-s = 5*10/ndiv*ones(nₚ)
+s = 3.5*20/3^0.5/ndiv*ones(nₚ)
+# s = 3.5*10/ndiv*ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
 
@@ -58,8 +59,8 @@ prescribe!(elements["Γₚ₃"],:Δn₂s₂=>(x,y,z)->-3^(0.5)/4)
 prescribe!(elements["Ω̄"],:u=>(x,y,z)->w(x,y))
 
 coefficient = (:D=>D,:ν=>ν)
-ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
-       Operator(:∫wqdΩ,coefficient...),
+ops = [Operator{:∫κᵢⱼMᵢⱼdΩ}(coefficient...),
+       Operator{:∫wqdΩ}(coefficient...),
     #    cubic
        # ndiv = 10, α = 1e3
        # ndiv = 20, α = 1e5
@@ -75,16 +76,16 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        # ndiv = 20, α = 1e5
        # ndiv = 40, α = 1e6
        # ndiv = 80, α = 5e8
-       Operator(:∫vgdΓ,coefficient...,:α=>5e8),
-       Operator(:∫wVdΓ,coefficient...),
+       Operator{:∫vgdΓ}(coefficient...,:α=>1e7),
+       Operator{:∫wVdΓ}(coefficient...),
        # ndiv = 10, α = 1e3
        # ndiv = 20, α = 1e3
        # ndiv = 40, α = 1e3
        # ndiv = 80, α = 1e3
-       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e3),
-       Operator(:∫θₙMₙₙdΓ,coefficient...),
-       Operator(:wΔMₙₛ,coefficient...),
-       Operator(:L₂)]
+       Operator{:∫∇𝑛vθdΓ}(coefficient...,:α=>1e3),
+       Operator{:∫θₙMₙₙdΓ}(coefficient...),
+       Operator{:wΔMₙₛ}(coefficient...),
+       Operator{:L₂}()]
 
 k = zeros(nₚ,nₚ)
 f = zeros(nₚ)
@@ -101,7 +102,7 @@ for (i,α) in enumerate(αs)
     ops[1](elements["Ω̃"],k)
     ops[2](elements["Ω"],f)
 
-    opv = Operator(:∫vgdΓ,coefficient...,:α=>α)
+    opv = Operator{:∫vgdΓ}(coefficient...,:α=>α)
     opv(elements["Γ₁"],k,f)
     opv(elements["Γ₂"],k,f)
     opv(elements["Γ₃"],k,f)
@@ -121,3 +122,4 @@ for (i,α) in enumerate(αs)
         xf_[𝐿₂_row] = log10(l2)
     end
 end
+

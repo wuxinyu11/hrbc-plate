@@ -2,15 +2,15 @@ using YAML, ApproxOperator, XLSX, TimerOutputs
 to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
-ndiv = 10
-𝒑 = "cubic"
-# 𝒑 = "quartic"
+ndiv = 80
+# 𝒑 = "cubic"
+𝒑 = "quartic"
 config = YAML.load_file("./yml/rectangular_gauss_penalty_"*𝒑*".yml")
 elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh",config)
 nₚ = length(nodes)
 end
-s = 3.5/ndiv*ones(nₚ)
-# s = 4.5/ndiv*ones(nₚ)
+# s = 3.5/ndiv*ones(nₚ)
+s = 4.5/ndiv*ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 
 # @CPUtime begin
@@ -99,7 +99,7 @@ prescribe!(elements["Γₚ₄"],:ΔM=>(x,y,z)->-2*M₁₂(x,y))
 coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫vgdΓ,coefficient...,:α=>1e6),
+       Operator(:∫vgdΓ,coefficient...,:α=>1e12),
        Operator(:∫wVdΓ,coefficient...),
        Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e7),
        Operator(:∫θₙMₙₙdΓ,coefficient...),

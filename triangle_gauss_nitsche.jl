@@ -5,15 +5,16 @@ to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
 
-# 𝒑 = "cubic"
-𝒑 = "quartic"
-ndiv = 40
+𝒑 = "cubic"
+# 𝒑 = "quartic"
+ndiv = 80
 config = YAML.load_file("./yml/triangle_gauss_nitsche_"*𝒑*".yml")
 elements, nodes = importmsh("./msh/triangle_"*string(ndiv)*".msh",config)
 end
 nₚ = length(nodes)
 
-s = 5*10/ndiv*ones(nₚ)
+s = 3.5*20/3^0.5/ndiv*ones(nₚ)
+# s = 5*10/ndiv*ones(nₚ)
 #s = 4.5*10/ndiv*ones(nₚ)
 #push!(nodes,:s₁=>3^(0.5)/2 .*s,:s₂=>s,:s₃=>s)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
@@ -94,7 +95,7 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        # ndiv = 40, α = 1e6
        # ndiv = 80, α = 1e7
 
-       Operator(:∫VgdΓ,coefficient...,:α=>1e6),
+       Operator(:∫VgdΓ,coefficient...,:α=>1e7),
        Operator(:∫wVdΓ,coefficient...),
        Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3*ndiv),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
@@ -138,6 +139,7 @@ end
 
 push!(nodes,:d=>d)
 set𝓖!(elements["Ω"],:TriGI16,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
+# set∇³𝝭!(elements["Ω"])
 set∇̂³𝝭!(elements["Ω"])
 prescribe!(elements["Ω"],:u=>(x,y,z)->w(x,y))
 prescribe!(elements["Ω"],:∂u∂x=>(x,y,z)->w₁(x,y))
@@ -166,4 +168,13 @@ XLSX.openxlsx("./xlsx/triangle_"*𝒑*".xlsx", mode="rw") do xf
     𝐻₁[row] = log10(h1)
     𝐻₂[row] = log10(h2)
     𝐻₃[row] = log10(h3)
+end
+
+XLSX.openxlsx("./xlsx/triangular_contour.xlsx", mode="rw") do xf
+    sheet = xf[1]
+    row = "B"
+    sheet[row*string(1)] = "gauss-nitsche"
+    for (i,node) in enumerate(nodes)
+        sheet[row*string(i+1)] = node.d
+    end
 end

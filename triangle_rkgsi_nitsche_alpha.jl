@@ -3,15 +3,16 @@
 using YAML, ApproxOperator, XLSX
 
 ndiv = 80
-# 𝒑 = "cubic"
-𝒑 = "quartic"
+𝒑 = "cubic"
+# 𝒑 = "quartic"
 config = YAML.load_file("./yml/triangle_rkgsi_nitsche_alpha_"*𝒑*".yml")
-elements,nodes = importmsh("./msh/triangle_"*string(ndiv)*".msh", config)
+elements,nodes = ApproxOperator.importmsh("./msh/triangle_"*string(ndiv)*".msh", config)
 
 nₚ = getnₚ(elements["Ω"])
 
-s = 5*10/ndiv*ones(nₚ)
-#s = 4.5*10/ndiv*ones(nₚ)
+# s = 5*10/ndiv*ones(nₚ)
+# s = 4.5*10/ndiv*ones(nₚ)
+s = 3.5*20/3^0.5/ndiv*ones(nₚ)
 #push!(nodes,:s₁=>3^(0.5)/2 .*s,:s₂=>s,:s₃=>s)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 
@@ -70,15 +71,15 @@ prescribe!(elements["Ω̄"],:u=>(x,y,z)->w(x,y))
 # ndiv = 10, 20, 40, 80, α = 1e3*ndiv^2
 # ndiv = 80, α = 1e2*ndiv^3
 coefficient = (:D=>D,:ν=>ν)
-ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
-       Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫VgdΓ,coefficient...,:α=>1e3*ndiv^2),
-       Operator(:∫wVdΓ,coefficient...),
-       Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3*ndiv),
-       Operator(:∫θₙMₙₙdΓ,coefficient...),
-       Operator(:ΔMₙₛg,coefficient...,:α=>1e3),
-       Operator(:wΔMₙₛ,coefficient...),
-       Operator(:L₂)]
+ops = [Operator{:∫κᵢⱼMᵢⱼdΩ}(coefficient...),
+       Operator{:∫wqdΩ}(coefficient...),
+       Operator{:∫VgdΓ}(coefficient...,:α=>1e3*ndiv^2),
+       Operator{:∫wVdΓ}(coefficient...),
+       Operator{:∫MₙₙθdΓ}(coefficient...,:α=>1e3*ndiv),
+       Operator{:∫θₙMₙₙdΓ}(coefficient...),
+       Operator{:ΔMₙₛg}(coefficient...,:α=>1e3),
+       Operator{:wΔMₙₛ}(coefficient...),
+       Operator{:L₂}()]
 
 k = zeros(nₚ,nₚ)
 f = zeros(nₚ)
@@ -94,7 +95,7 @@ for (i,α) in enumerate(αs)
     ops[1](elements["Ω̃"],k)
     ops[2](elements["Ω"],f)
 
-    opv = Operator(:∫VgdΓ,coefficient...,:α=>α)
+    opv = Operator{:∫VgdΓ}(coefficient...,:α=>α)
     opv(elements["Γ₁"],k,f)
     opv(elements["Γ₂"],k,f)
     opv(elements["Γ₃"],k,f)

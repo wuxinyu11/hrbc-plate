@@ -5,15 +5,16 @@ to = TimerOutput()
 @timeit to "Total Time" begin
 @timeit to "searching" begin
 
-# 𝒑 = "cubic"
-𝒑 = "quartic"
+𝒑 = "cubic"
+# 𝒑 = "quartic"
 ndiv = 80
 config = YAML.load_file("./yml/triangle_gauss_penalty_"*𝒑*".yml")
 elements, nodes = importmsh("./msh/triangle_"*string(ndiv)*".msh",config)
 end
 nₚ = length(nodes)
 
-s = 5*10/ndiv*ones(nₚ)
+# s = 5*10/ndiv*ones(nₚ)
+s = 3.5*20/3^0.5/ndiv*ones(nₚ)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 
 @timeit to "shape functions " begin      
@@ -82,7 +83,7 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        # ndiv = 40, α = 1e5
        # ndiv = 80, α = 1e7
 
-       Operator(:∫vgdΓ,coefficient...,:α=>1e8),
+       Operator(:∫vgdΓ,coefficient...,:α=>1e7),
        Operator(:∫wVdΓ,coefficient...),
        Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e3),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
@@ -101,9 +102,12 @@ ops[3](elements["Γ₁"],k,f)
 ops[3](elements["Γ₂"],k,f)
 ops[3](elements["Γ₃"],k,f)
 
-ops[7](elements["Γₚ₁"],f)
-ops[7](elements["Γₚ₂"],f)
-ops[7](elements["Γₚ₃"],f)
+ops[3](elements["Γₚ₁"],k,f)
+ops[3](elements["Γₚ₂"],k,f)
+ops[3](elements["Γₚ₃"],k,f)
+# ops[7](elements["Γₚ₁"],f)
+# ops[7](elements["Γₚ₂"],f)
+# ops[7](elements["Γₚ₃"],f)
 end
 end
 
@@ -141,4 +145,13 @@ XLSX.openxlsx("./xlsx/triangle_"*𝒑*".xlsx", mode="rw") do xf
     𝐻₁[row] = log10(h1)
     𝐻₂[row] = log10(h2)
     𝐻₃[row] = log10(h3)
+end
+
+XLSX.openxlsx("./xlsx/triangular_contour.xlsx", mode="rw") do xf
+    sheet = xf[1]
+    row = "A"
+    sheet[row*string(1)] = "gauss-penalty"
+    for (i,node) in enumerate(nodes)
+        sheet[row*string(i+1)] = node.d
+    end
 end

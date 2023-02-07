@@ -8,13 +8,14 @@ to = TimerOutput()
 𝒑 = "cubic"
 # 𝒑 = "quartic"
 config = YAML.load_file("./yml/triangle_rkgsi_hr_"*𝒑*".yml")
-ndiv = 10
+ndiv = 80
 elements, nodes = importmsh("./msh/triangle_"*string(ndiv)*".msh", config)
 end
 
 nₚ = length(nodes)
 nₑ = length(elements["Ω"])
-s = 5*10/ndiv*ones(nₚ)
+s = 3.5*20/3^0.5/ndiv*ones(nₚ)
+# s = 5*10/ndiv*ones(nₚ)
 #s = 4.5*10/ndiv*ones(nₚ)
 #push!(nodes,:s₁=>3^(0.5)/2 .*s,:s₂=>s,:s₃=>s)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
@@ -179,4 +180,13 @@ XLSX.openxlsx("./xlsx/triangle_"*𝒑*".xlsx", mode="rw") do xf
     𝐻₁[row] = log10(h1)
     𝐻₂[row] = log10(h2)
     𝐻₃[row] = log10(h3)
+end
+
+XLSX.openxlsx("./xlsx/triangular_contour.xlsx", mode="rw") do xf
+    sheet = xf[1]
+    row = "E"
+    sheet[row*string(1)] = "rkgsi-hr"
+    for (i,node) in enumerate(nodes)
+        sheet[row*string(i+1)] = node.d
+    end
 end

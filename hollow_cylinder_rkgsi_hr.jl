@@ -10,7 +10,7 @@ to = TimerOutput()
 𝒑 = "quartic"
 config = YAML.load_file("./yml/hollow_cylinder_rkgsi_hr_"*𝒑*".yml")
 
-ndiv = 32
+ndiv = 64
 elements, nodes = importmsh("./msh/hollow_cylinder_"*string(ndiv)*".msh", config)
 # elements, nodes = importmsh("./msh/hollow_cylinder_regular_"*string(ndiv)*".msh", config)
 end
@@ -25,8 +25,11 @@ for node in nodes
     x = node.x
     y = node.y
     r = (x^2+y^2)^0.5
+    # quartic, ndiv = 8, s = 4.1
+    # quartic, ndiv = 16, s = 4.1
     # quartic, ndiv = 32, s = 4.05
-    sᵢ = 4.05*r*π/4/ndiv
+    # quartic, ndiv = 64, s = 4.1
+    sᵢ = 4.1*r*π/4/ndiv
     node.s₁ = sᵢ
     node.s₂ = sᵢ
     node.s₃ = sᵢ
@@ -79,20 +82,22 @@ end
 # w₁₁₂₂(x,y) = 36n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
 # w₂₂₂₂(x,y) = 81n*(n-1)*(n-2)*(n-3)*(1+2x+3y)^abs(n-4)
 
-
-w(x,y)=4/(3*(1-ν))*log((x^2+y^2)^(1/2)/2)-1/(3*(1+ν))*(x^2+y^2-4)
-w₁(x,y)=4/(3*(1-ν))*(x^2+y^2)^(-1)*x-2*x/(3*(1+ν))
-w₂(x,y)=4/(3*(1-ν))*(x^2+y^2)^(-1)*y-2*y/(3*(1+ν))
-w₁₁(x,y)=-4/(3*(1-ν))*(x^2+y^2)^(-2)*2*x^2+4/(3*(1-ν))*(x^2+y^2)^(-1)-1/(3*(1+ν))*2
-w₁₂(x,y)=-4/(3*(1-ν))*(x^2+y^2)^(-2)*2*y*x
-w₂₂(x,y)=-4/(3*(1-ν))*(x^2+y^2)^(-2)*2*y^2+4/(3*(1-ν))*(x^2+y^2)^(-1)-1/(3*(1+ν))*2
-w₁₁₁(x,y)=8/(3*(1-ν))*(x^2+y^2)^(-3)*4*x^3-24*x/(3*(1-ν))*(x^2+y^2)^(-2)
-w₁₁₂(x,y)=8/(3*(1-ν))*(x^2+y^2)^(-3)*4*y*x^2-4/(3*(1-ν))*(x^2+y^2)^(-2)*2*y
-w₁₂₂(x,y)=8/(3*(1-ν))*(x^2+y^2)^(-3)*4*x*y^2-4/(3*(1-ν))*(x^2+y^2)^(-2)*2*x
-w₂₂₂(x,y)=8/(3*(1-ν))*(x^2+y^2)^(-3)*4*y^3-24*y/(3*(1-ν))*(x^2+y^2)^(-2)
-w₁₁₁₁(x,y)=-24/(3*(1-ν))*(x^2+y^2)^(-4)*8*x^4+192*x^2/(3*(1-ν))*(x^2+y^2)^(-3)-24/(3*(1-ν))*(x^2+y^2)^(-2)
-w₁₁₂₂(x,y)=-24/(3*(1-ν))*(x^2+y^2)^(-4)*8*x^2*y^2+32/(3*(1-ν))*(x^2+y^2)^(-3)*x^2+32/(3*(1-ν))*(x^2+y^2)^(-3)*y^2-8/(3*(1-ν))*(x^2+y^2)^(-2)
-w₂₂₂₂(x,y)=-24/(3*(1-ν))*(x^2+y^2)^(-4)*8*y^4+192*y^2/(3*(1-ν))*(x^2+y^2)^(-3)-24/(3*(1-ν))*(x^2+y^2)^(-2)
+c1 = 4/D/(1-ν)/3
+c2 = -2/D/(1+ν)/3
+r²(x,y) = x^2+y^2
+w(x,y)=c1*log(r²(x,y)^0.5/2)+c2/2*(x^2+y^2-4)
+w₁(x,y)=c1*x/r²(x,y)+c2*x
+w₂(x,y)=c1*y/r²(x,y)+c2*y
+w₁₁(x,y)=c1*(-2*x^2/r²(x,y)^2+1/r²(x,y))+c2
+w₁₂(x,y)=c1*(-2*x*y/r²(x,y)^2)
+w₂₂(x,y)=c1*(-2*y^2/r²(x,y)^2+1/r²(x,y))+c2
+w₁₁₁(x,y)=c1*(8*x^3/r²(x,y)^3-6*x/r²(x,y)^2)
+w₁₁₂(x,y)=c1*(8*x^2*y/r²(x,y)^3-2*y/r²(x,y)^2)
+w₁₂₂(x,y)=c1*(8*x*y^2/r²(x,y)^3-2*x/r²(x,y)^2)
+w₂₂₂(x,y)=c1*(8*y^3/r²(x,y)^3-6*y/r²(x,y)^2)
+w₁₁₁₁(x,y)=c1*(-48*x^4/r²(x,y)^4+48*x^2/r²(x,y)^3-6/r²(x,y)^2)
+w₁₁₂₂(x,y)=c1*(-48*x^2*y^2/r²(x,y)^4+8*x^2/r²(x,y)^3+8*y^2/r²(x,y)^3-2/r²(x,y)^2)
+w₂₂₂₂(x,y)=c1*(-48*y^4/r²(x,y)^4+48*y^2/r²(x,y)^3-6/r²(x,y)^2)
 
 D = 1.0
 ν = 0.3
@@ -158,8 +163,6 @@ end
 push!(nodes,:d=>d)
 set𝓖!(elements["Ω"],:TriGI16,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
 set∇̂³𝝭!(elements["Ω"])
-# set_memory_𝗠!(elements["Ω"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
-# set∇³𝝭!(elements["Ω"])
 prescribe!(elements["Ω"],:u=>(x,y,z)->w(x,y))
 prescribe!(elements["Ω"],:∂u∂x=>(x,y,z)->w₁(x,y))
 prescribe!(elements["Ω"],:∂u∂y=>(x,y,z)->w₂(x,y))
@@ -188,3 +191,64 @@ XLSX.openxlsx("./xlsx/hollow_cylinder_"*𝒑*".xlsx", mode="rw") do xf
     𝐻₂[row] = log10(h2)
     𝐻₃[row] = log10(h3)
 end
+XLSX.openxlsx("./xlsx/hollow_cylinder_contour.xlsx", mode="rw") do xf
+    sheet = xf[1]
+    row = "E"
+    sheet[row*string(1)] = "rkgsi-hr"
+    for (i,node) in enumerate(nodes)
+        sheet[row*string(i+1)] = node.d
+    end
+end
+
+# log10(l2)
+
+# set𝓖!(elements["Ω"],:TriRK6,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
+# using GLMakie, CairoMakie
+# f = Figure()
+# ax = Axis(f[1, 1])
+# ax.aspect = 1
+# hidespines!(ax)
+# hidedecorations!(ax)
+# vertices = zeros(nₚ,2)
+# colors = zeros(nₚ)
+# faces = zeros(Int,nₑ,3)
+
+# set∇²₂𝝭!(elements["Ω"])
+# for (c,elm) in enumerate(elements["Ω"])
+#     𝓒 = elm.𝓒
+#     𝓖 = elm.𝓖
+#     faces[c,1] = 𝓒[1].𝐼
+#     faces[c,2] = 𝓒[2].𝐼
+#     faces[c,3] = 𝓒[3].𝐼
+#     for (j,ξ) in enumerate(𝓖[1:3])
+#         r = (ξ.x^2+ξ.y^2)^0.5
+#         n₁ = ξ.x/r
+#         n₂ = ξ.y/r
+#         B₁₁ = ξ[:∂²𝝭∂x²]
+#         B₁₂ = ξ[:∂²𝝭∂x∂y]
+#         B₂₂ = ξ[:∂²𝝭∂y²]
+#         M₁₁ = 0.0
+#         M₁₂ = 0.0
+#         M₂₂ = 0.0
+#         for (i,xᵢ) in enumerate(𝓒)
+#             M₁₁ -= D*(B₁₁[i]+ν*B₂₂[i])*xᵢ.d
+#             M₂₂ -= D*(ν*B₁₁[i]+B₂₂[i])*xᵢ.d
+#             M₁₂ -= D*(1-ν)*B₁₂[i]*xᵢ.d
+#         end
+#         vertices[𝓒[j].𝐼,1] = ξ.x
+#         vertices[𝓒[j].𝐼,2] = ξ.y
+#         colors[𝓒[j].𝐼] = M₁₁*n₁*n₁+2*M₁₂*n₁*n₂+M₂₂*n₂*n₂ 
+#     end
+# end
+# mesh!(
+#     vertices,
+#     faces,
+#     color = colors,
+#     colormap = :balance,
+#     shading = false
+#     )
+# contour!(vertices[:,1],vertices[:,2],colors,levels=1:0.1:2,color=:black)
+# contour!()
+
+# f
+# save("./figure/rkgsi_hr.png",f)

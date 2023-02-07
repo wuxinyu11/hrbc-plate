@@ -1,6 +1,6 @@
 // Gmsh project created on Fri Jul 15 15:31:17 2022
 a = 10;
-lc = a/3^0.5/50;
+lc = a/3^0.5/40;
 
 Point(1) = {2*a/3,           0, 0, lc};
 Point(2) = {- a/3,  a/3^0.5, 0, lc};
@@ -27,8 +27,8 @@ Physical Point("Γₚ₃") = {3};
 Physical Surface("Ω") = {1};
 
 
-//Mesh.Algorithm = 6;
-Mesh.Algorithm = 8;
+Mesh.Algorithm = 6;
+// Mesh.Algorithm = 8;
 Mesh.MshFileVersion = 2;
 Mesh 2;
 //RefineMesh;
