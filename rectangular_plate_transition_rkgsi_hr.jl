@@ -6,6 +6,15 @@ ndiv = 10
 # 𝒑 = "quartic"
 config = YAML.load_file("./yml/rectangular_rkgsi_hr_"*𝒑*".yml")
 elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh", config)
+
+# naturall bc
+sp = ApproxOperator.RegularGrid(nodes,n=2,γ=5)
+data = Dict([:x=>(2,[5.0]),:y=>(2,[5.0],:z=>(2,[0.0],:𝑤=>(2,[1.0])))])
+ξ = SNode((1,1,1,0),data)
+𝓒 = [nodes[i] for i in sp(ξ)]
+elements["Γᵗ"] = [ApproxOperator.ReproducingKernel{:Quadratic2D,:□,:QuinticSpline,:Tri3}(𝓒,[ξ])]
+set_memory_𝗠!(elements["Γᵗ"],:𝝭)
+set_memory_𝝭!(elements["Γᵗ"],:𝝭)
  
 nₚ = length(nodes)
 nₑ = length(elements["Ω"])
@@ -14,6 +23,8 @@ s = 3.5 / ndiv * ones(nₚ)
 push!(nodes, :s₁ => s, :s₂ => s, :s₃ => s)
        
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
+set_memory_𝗠!(elements["Ω̃"],:∇̃²)
+set_memory_𝝭!(elements["Γᵗ"],:𝝭)
 
 set_memory_𝗠!(elements["Γ₁"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
 set_memory_𝗠!(elements["Γ₂"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
@@ -69,54 +80,32 @@ set∇̄²𝝭!(elements["Γₚ"],Γᵍ=elements["Γ∩Γₚ"],Γᴾ=elements["�
 
 
 
-w(x,y) = - sin(π*x)*sin(π*y)
-w₁(x,y) = - π*cos(π*x)*sin(π*y)
-w₂(x,y) = - π*sin(π*x)*cos(π*y)
-w₁₁(x,y) = π^2*sin(π*x)*sin(π*y)
-w₂₂(x,y) = π^2*sin(π*x)*sin(π*y)
-w₁₂(x,y) = - π^2*cos(π*x)*cos(π*y)
-w₁₁₁(x,y) = π^3*cos(π*x)*sin(π*y)
-w₁₁₂(x,y) = π^3*sin(π*x)*cos(π*y)
-w₁₂₂(x,y) = π^3*cos(π*x)*sin(π*y)
-w₂₂₂(x,y) = π^3*sin(π*x)*cos(π*y)
-w₁₁₁₁(x,y) = - π^4*sin(π*x)*sin(π*y)
-w₁₁₂₂(x,y) = - π^4*sin(π*x)*sin(π*y)
-w₂₂₂₂(x,y) = - π^4*sin(π*x)*sin(π*y)
-D = 1.0
-ν = 0.3
+function w(x,y)
+    w_ = 0.0
+    max_iter = 5
+    for m in 1:max_iter
+        for n in 1:max_iter
+            w_ += W(x,y,m,n)*η(t,m,n)
+        end
+    end
+    return w_
+end
+W(x,y,m,n) = 2/a/(ρh)^0.5*sin(m*π*x/a)*sin(n*π*y/a)
+η(t,m,n) = 2*F₀/(ω(m,n)^2-Θ^2)/a/(ρh)^0.5*sin(m*π/a)*sin(n*π/a)*(sin(Θ*t)-Θ/ω(m,n)*sin(ω(m,n)*t))
 
-M₁₁(x,y) = - D*(w₁₁(x,y)+ν*w₂₂(x,y))
-M₂₂(x,y) = - D*(ν*w₁₁(x,y)+w₂₂(x,y))
-M₁₂(x,y) = - D*(1-ν)*w₁₂(x,y)
-prescribe!(elements["Γ₁"],:g=>(x,y,z)->w(x,y))
-prescribe!(elements["Γ₂"],:g=>(x,y,z)->w(x,y))
-prescribe!(elements["Γ₃"],:g=>(x,y,z)->w(x,y))
-prescribe!(elements["Γ₄"],:g=>(x,y,z)->w(x,y))
-prescribe!(elements["Γ₁"],:V=>(x,y,z)-> - D*(-(2-ν)*w₁₁₂(x,y)-w₂₂₂(x,y)))
-prescribe!(elements["Γ₂"],:V=>(x,y,z)-> - D*(w₁₁₁(x,y)+(2-ν)*w₁₂₂(x,y)))
-prescribe!(elements["Γ₃"],:V=>(x,y,z)-> - D*((2-ν)*w₁₁₂(x,y)+w₂₂₂(x,y)))
-prescribe!(elements["Γ₄"],:V=>(x,y,z)-> - D*(-w₁₁₁(x,y)-(2-ν)*w₁₂₂(x,y)))
-prescribe!(elements["Γ₁"],:θ=>(x,y,z)->-w₂(x,y))
-prescribe!(elements["Γ₂"],:θ=>(x,y,z)-> w₁(x,y))
-prescribe!(elements["Γ₃"],:θ=>(x,y,z)-> w₂(x,y))
-prescribe!(elements["Γ₄"],:θ=>(x,y,z)->-w₁(x,y))
-prescribe!(elements["Γ₁"],:M=>(x,y,z)->M₂₂(x,y))
-prescribe!(elements["Γ₂"],:M=>(x,y,z)->M₁₁(x,y))
-prescribe!(elements["Γ₃"],:M=>(x,y,z)->M₂₂(x,y))
-prescribe!(elements["Γ₄"],:M=>(x,y,z)->M₁₁(x,y))
-prescribe!(elements["Γₚ₁"],:g=>(x,y,z)->w(x,y))
-prescribe!(elements["Γₚ₂"],:g=>(x,y,z)->w(x,y))
-prescribe!(elements["Γₚ₃"],:g=>(x,y,z)->w(x,y))
-prescribe!(elements["Γₚ₄"],:g=>(x,y,z)->w(x,y))
-prescribe!(elements["Γₚ₁"],:ΔM=>(x,y,z)->2*M₁₂(x,y))
-prescribe!(elements["Γₚ₂"],:ΔM=>(x,y,z)->-2*M₁₂(x,y))
-prescribe!(elements["Γₚ₃"],:ΔM=>(x,y,z)->2*M₁₂(x,y))
-prescribe!(elements["Γₚ₄"],:ΔM=>(x,y,z)->-2*M₁₂(x,y))
+prescribe!(elements["Γ₁"],:g=>(x,y,z)->0.0)
+prescribe!(elements["Γ₂"],:g=>(x,y,z)->0.0)
+prescribe!(elements["Γ₃"],:g=>(x,y,z)->0.0)
+prescribe!(elements["Γ₄"],:g=>(x,y,z)->0.0)
+prescribe!(elements["Γₚ₁"],:g=>(x,y,z)->0.0)
+prescribe!(elements["Γₚ₂"],:g=>(x,y,z)->0.0)
+prescribe!(elements["Γₚ₃"],:g=>(x,y,z)->0.0)
+prescribe!(elements["Γₚ₄"],:g=>(x,y,z)->0.0)
 
 
 coefficient = (:D=>1.0,:ν=>0.3,:ρ=>8000.0,:h=>0.05)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
-       Operator(:∫ρᵢⱼhᵢⱼdΩ,coefficient...),
+       Operator(:∫ρhvwdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
        Operator(:∫ṼgdΓ,coefficient...),
        Operator(:∫wVdΓ,coefficient...),
@@ -152,28 +141,37 @@ A=eigvals(m,k)
 Δt = 0.1
 total_time = 1.0
 times = 0.0:Δt:total_time
-d = zeros(nₚ,length(times))
+d = zeros(nₚ)
+deflection = zeros(length(times))
                 #  ---时间从d=0到第n步
 v = zeros(nₚ)
 aₙ = zeros(nₚ)
 for (n,t) in enumerate(times)
                             # --第几个t
-    prescribe!(elements["Γ"],:V=>(x,y,z)->sin(Θ*t))   
+    prescribe!(elements["Γᵗ"],:V=>(x,y,z)->sin(Θ*t))   
                         #    ----把这个点上的集中力设到这个单元上
     f = zeros(nₚ)
-    ops[8](elements["Γ"],f)
+    ops[5](elements["Γᵗ"],f)
 
-    a = (m + β*Δt^2*k)\(f-k*d[:,n])
+    a = (m + β*Δt^2*k)\(f-k*d)
                      #       ----这个m是前面的m(kₚ,kₚ)的结果
     # predictor phase
-    d[:,n+1] .= d[:,n] + Δt*v + Δt^2/2.0*(1.0-2.0*β)*aₙ
+    d .+= Δt*v + Δt^2/2.0*(1.0-2.0*β)*aₙ
     v .+= Δt*(1.0-γ)*aₙ
 
     # Corrector phase
-    d[:,n+1] .+= β*Δt^2*a
+    d .+= β*Δt^2*a
     v .+= γ*Δt*a
 
+    # cal deflection
+    ξ = elements["Γᵗ"].𝓖[1]
+    N = ξ[:𝝭]
+    for (i,xᵢ) in enumerate(elements["Γᵗ"].𝓒)
+        I = xᵢ.𝐼
+        deflection[n] += N[i]*d[I]
+    end
 end
+
 
 # push!(nodes,:d=>d)
 # set𝓖!(elements["Ω"],:TriGI16,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
