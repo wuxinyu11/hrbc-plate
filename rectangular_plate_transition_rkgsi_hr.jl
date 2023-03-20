@@ -4,17 +4,18 @@ ndiv = 10
 𝒑 = "cubic"
 # 𝒑 = "quartic"
 config = YAML.load_file("./yml/rectangular_rkgsi_hr_"*𝒑*".yml")
-elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh")
+elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh",config)
 
 # naturall bc
 # sp = ApproxOperator.RegularGrid(nodes,n=2,γ=5)
 
-data = Dict([:x=>(2,[5.0]),:y=>(2,[5.0],:z=>(2,[0.0],:𝑤=>(2,[1.0])))])
-sp = ApproxOperator.RegularGrid(nodes[:x],nodes[:y],nodes[:z];n=2,γ=5)
-# data = Dict([:x=>(2,[5.0]),:y=>(2,[5.0],:z=>(2,[0.0],:𝑤=>(2,[1.0])))])
-ξ = ApproxOperator.SNode((1,1,1,0),data)
+data = getfield(nodes[1],:data)
+sp = ApproxOperator.RegularGrid(data[:x][2],data[:y][2],data[:z][2];n=2,γ=5)
+data = Dict([:x=>(2,[5.0]),:y=>(2,[5.0]),:z=>(2,[0.0]),:𝑤=>(2,[1.0])])
+ξ = ApproxOperator.SNode((1,1,0),data)
 𝓒 = [nodes[i] for i in sp(ξ)]
-elements["Γᵗ"] = [ApproxOperator.ReproducingKernel{:Quadratic2D,:□,:QuinticSpline,:Tri3}(𝓒,[ξ])]
+𝗠 = Dict{Symbol,ApproxOperator.SymMat}()
+elements["Γᵗ"] = [ApproxOperator.ReproducingKernel{:Quadratic2D,:□,:QuinticSpline,:Tri3}(𝓒,[ξ],𝗠)]
 set_memory_𝗠!(elements["Γᵗ"],:𝝭)
 set_memory_𝝭!(elements["Γᵗ"],:𝝭)
  
