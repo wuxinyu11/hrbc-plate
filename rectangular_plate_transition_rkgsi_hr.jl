@@ -1,16 +1,18 @@
-
-using YAML, ApproxOperator, XLSX,LinearAlgebra
+using YAML, ApproxOperator, XLSX,LinearAlgebra,Revise
 
 ndiv = 10
 𝒑 = "cubic"
 # 𝒑 = "quartic"
 config = YAML.load_file("./yml/rectangular_rkgsi_hr_"*𝒑*".yml")
-elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh", config)
+elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh")
 
 # naturall bc
-sp = ApproxOperator.RegularGrid(nodes,n=2,γ=5)
+# sp = ApproxOperator.RegularGrid(nodes,n=2,γ=5)
+
 data = Dict([:x=>(2,[5.0]),:y=>(2,[5.0],:z=>(2,[0.0],:𝑤=>(2,[1.0])))])
-ξ = SNode((1,1,1,0),data)
+sp = ApproxOperator.RegularGrid(nodes[:x],nodes[:y],nodes[:z];n=2,γ=5)
+# data = Dict([:x=>(2,[5.0]),:y=>(2,[5.0],:z=>(2,[0.0],:𝑤=>(2,[1.0])))])
+ξ = ApproxOperator.SNode((1,1,1,0),data)
 𝓒 = [nodes[i] for i in sp(ξ)]
 elements["Γᵗ"] = [ApproxOperator.ReproducingKernel{:Quadratic2D,:□,:QuinticSpline,:Tri3}(𝓒,[ξ])]
 set_memory_𝗠!(elements["Γᵗ"],:𝝭)
