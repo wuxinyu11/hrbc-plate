@@ -21,12 +21,12 @@ set_memory_𝝭!(elements["Γᵗ"],:𝝭)
  
 nₚ = length(nodes)
 nₑ = length(elements["Ω"])
-s = 3.5 / ndiv * ones(nₚ)
+s = 3.5*10 / ndiv * ones(nₚ)
 # s = 4.5 / ndiv * ones(nₚ)
 push!(nodes, :s₁ => s, :s₂ => s, :s₃ => s)
        
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
-set_memory_𝗠!(elements["Ω̃"],:∇̃²)
+set_memory_𝗠!(elements["Ω̃"],:∇̃²,:𝝭)
 set_memory_𝝭!(elements["Γᵗ"],:𝝭)
 
 set_memory_𝗠!(elements["Γ₁"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂∇̃²∂ξ,:∂∇̃²∂η)
@@ -72,6 +72,7 @@ set𝝭!(elements["Γₚ₁"])
 set𝝭!(elements["Γₚ₂"])
 set𝝭!(elements["Γₚ₃"])
 set𝝭!(elements["Γₚ₄"])
+set𝝭!(elements["Γᵗ"])
 
 
 
@@ -116,7 +117,6 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
        Operator(:ΔM̃ₙₛg,coefficient...),
        Operator(:wΔMₙₛ,coefficient...),
-                                   # ----施加边界：集中力
        Operator(:H₃)]
 
 k = zeros(nₚ,nₚ)
@@ -133,10 +133,10 @@ ops[7](elements["Γ₁"],f)
 ops[7](elements["Γ₂"],f)
 ops[7](elements["Γ₃"],f)
 ops[7](elements["Γ₄"],f)
-# ops[9](elements["Γₚ"],k,f)
+ops[8](elements["Γₚ"],k,f)
 
 
-A=eigvals(m,k)
+# A=eigvals(m,k)
 
 Θ = π
 β = 0.0
@@ -146,18 +146,18 @@ total_time = 1.0
 times = 0.0:Δt:total_time
 d = zeros(nₚ)
 deflection = zeros(length(times))
-                #  ---时间从d=0到第n步
+
 v = zeros(nₚ)
 aₙ = zeros(nₚ)
 for (n,t) in enumerate(times)
-                            # --第几个t
+                           
     prescribe!(elements["Γᵗ"],:V=>(x,y,z)->sin(Θ*t))   
-                        #    ----把这个点上的集中力设到这个单元上
+                       
     f = zeros(nₚ)
     ops[5](elements["Γᵗ"],f)
 
     a = (m + β*Δt^2*k)\(f-k*d)
-                     #       ----这个m是前面的m(kₚ,kₚ)的结果
+                    
     # predictor phase
     d .+= Δt*v + Δt^2/2.0*(1.0-2.0*β)*aₙ
     v .+= Δt*(1.0-γ)*aₙ
@@ -167,14 +167,14 @@ for (n,t) in enumerate(times)
     v .+= γ*Δt*a
 
     # cal deflection
-    ξ = elements["Γᵗ"].𝓖[1]
+    ξ = elements["Γᵗ"][1].𝓖[1]
     N = ξ[:𝝭]
-    for (i,xᵢ) in enumerate(elements["Γᵗ"].𝓒)
+    for (i,xᵢ) in enumerate(elements["Γᵗ"][1].𝓒)
         I = xᵢ.𝐼
         deflection[n] += N[i]*d[I]
     end
 end
-
+deflection
 
 # push!(nodes,:d=>d)
 # set𝓖!(elements["Ω"],:TriGI16,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²,:∂³𝝭∂x³,:∂³𝝭∂x²∂y,:∂³𝝭∂x∂y²,:∂³𝝭∂y³)
@@ -206,4 +206,5 @@ end
 #     𝐻₂[row] = log10(h2)
 #     𝐻₃[row] = log10(h3)
 # end
+
 
