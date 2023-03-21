@@ -15,7 +15,7 @@ data = Dict([:x=>(2,[5.0]),:y=>(2,[5.0]),:z=>(2,[0.0]),:𝑤=>(2,[1.0])])
 ξ = ApproxOperator.SNode((1,1,0),data)
 𝓒 = [nodes[i] for i in sp(ξ)]
 𝗠 = Dict{Symbol,ApproxOperator.SymMat}()
-elements["Γᵗ"] = [ApproxOperator.ReproducingKernel{:Quadratic2D,:□,:QuinticSpline,:Tri3}(𝓒,[ξ],𝗠)]
+elements["Γᵗ"] = [ApproxOperator.ReproducingKernel{:Cubic2D,:□,:QuinticSpline,:Tri3}(𝓒,[ξ],𝗠)]
 set_memory_𝗠!(elements["Γᵗ"],:𝝭)
 set_memory_𝝭!(elements["Γᵗ"],:𝝭)
  
@@ -120,29 +120,32 @@ ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:H₃)]
 
 k = zeros(nₚ,nₚ)
+kw = zeros(nₚ,nₚ)
 m = zeros(nₚ,nₚ)
 f = zeros(nₚ)
 ops[1](elements["Ω̃"],k)
 ops[2](elements["Ω"],m)
 
-ops[4](elements["Γ₁"],k,f)
-ops[4](elements["Γ₂"],k,f)
-ops[4](elements["Γ₃"],k,f)
-ops[4](elements["Γ₄"],k,f)
+ops[4](elements["Γ₁"],kw,f)
+ops[4](elements["Γ₂"],kw,f)
+ops[4](elements["Γ₃"],kw,f)
+ops[4](elements["Γ₄"],kw,f)
 ops[7](elements["Γ₁"],f)
 ops[7](elements["Γ₂"],f)
 ops[7](elements["Γ₃"],f)
 ops[7](elements["Γ₄"],f)
-ops[8](elements["Γₚ"],k,f)
+ops[8](elements["Γₚ"],kw,f)
 
 
 # A=eigvals(m,k)
 
 Θ = π
+# β = 0.25
+# γ = 0.5
 β = 0.0
 γ = 0.5
-Δt = 0.1
-total_time = 1.0
+Δt = 0.01
+total_time = 5.0
 times = 0.0:Δt:total_time
 d = zeros(nₚ)
 deflection = zeros(length(times))
@@ -151,20 +154,26 @@ v = zeros(nₚ)
 aₙ = zeros(nₚ)
 for (n,t) in enumerate(times)
                            
-    prescribe!(elements["Γᵗ"],:V=>(x,y,z)->sin(Θ*t))   
+    prescribe!(elements["Γᵗ"],:V=>(x,y,z)->100.0*sin(Θ*t))   
                        
-    f = zeros(nₚ)
-    ops[5](elements["Γᵗ"],f)
+    fₙ = zeros(nₚ)
+    ops[5](elements["Γᵗ"],fₙ)
 
-    a = (m + β*Δt^2*k)\(f-k*d)
-                    
     # predictor phase
     d .+= Δt*v + Δt^2/2.0*(1.0-2.0*β)*aₙ
     v .+= Δt*(1.0-γ)*aₙ
 
+    if n == 1
+        a = (m + β*Δt^2*(k+kw))\((fₙ+f)-k*d)
+    else
+        a = (m + β*Δt^2*k)\(fₙ-k*d)
+    end
+        
+
     # Corrector phase
     d .+= β*Δt^2*a
     v .+= γ*Δt*a
+    aₙ .= a
 
     # cal deflection
     ξ = elements["Γᵗ"][1].𝓖[1]
