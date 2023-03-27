@@ -2,19 +2,20 @@ using Revise, ApproxOperator, YAML
 
 ndiv = 10
 𝒑 = "cubic"
-config = YAML.load_file("./yml/beam_rkgsi_hr_"*𝒑*".yml")
+config = YAML.load_file("./yml/beam_rkgsi_penalty_"*𝒑*".yml")
 elements, nodes = importmsh("./msh/beam_"*string(ndiv)*".msh",config)
 
 data = getfield(nodes[1],:data)
-sp = ApproxOperator.RegularGrid(data[:x][2],data[:y][2],data[:z][2];n=2,γ=5)
+sp = ApproxOperator.RegularGrid(data[:x][2],data[:y][2],data[:z][2];n=4,γ=6)
 data = Dict([:x=>(2,[5.0]),:y=>(2,[0.0]),:z=>(2,[0.0]),:𝑤=>(2,[1.0])])
 ξ = ApproxOperator.SNode((1,1,0),data)
 𝓒 = [nodes[i] for i in sp(ξ)]
 𝗠 = Dict{Symbol,ApproxOperator.SymMat}()
-elements["Γᵗ"] = [ApproxOperator.ReproducingKernel{:Cubic2D,:□,:QuinticSpline,:Tri3}(𝓒,[ξ],𝗠)]
+elements["Γᵗ"] = [ApproxOperator.ReproducingKernel{:Cubic1D,:□,:QuinticSpline,:Poi1}(𝓒,[ξ],𝗠)]
 set_memory_𝗠!(elements["Γᵗ"],:𝝭)
 set_memory_𝝭!(elements["Γᵗ"],:𝝭)
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
+set_memory_𝝭!(elements["Ω̃"],:∂²𝝭∂x²)
 
 nₚ = length(nodes)
 nₑ = length(elements["Ω"])
@@ -28,12 +29,19 @@ set𝝭!(elements["Ω"])
 set𝝭!(elements["Γᵗ"])
 set𝝭!(elements["Γ"])
 
-coefficient = (:EI=>1.0)
-ops = [Operator(:∫κMdx,:EI=>1.0),
-       Operator(:∫ρhvwdΩ,:ρ=>1.0,:h=>1.0),
-       Operator(:∫wVdΓ),
-       Operator(:∫vgdΓ,:α=>1e8),
-    ]
+ops = [
+    Operator(:∫κMdx,:EI=>1.0/6.0*1e6),
+    Operator(:∫ρhvwdΩ,:ρ=>2500.0,:h=>1.0),
+    Operator(:∫wVdΓ),
+    Operator(:∫vgdΓ,:α=>1e8),
+]
+k = zeros(nₚ,nₚ)
+m = zeros(nₚ,nₚ)
+kα = zeros(nₚ,nₚ)
+fα = zeros(nₚ)
+ops[1](elements["Ω̃"],k)
+ops[2](elements["Ω"],m)
+ops[4](elements["Γ"],kα,fα)
 
 Θ = π
 # β = 0.25
@@ -50,16 +58,16 @@ v = zeros(nₚ)
 aₙ = zeros(nₚ)
 for (n,t) in enumerate(times)
                            
-    prescribe!(elements["Γᵗ"],:V=>(x,y,z)->100.0*sin(Θ*t))   
+    prescribe!(elements["Γᵗ"],:V=>(x,y,z)->10.0*sin(Θ*t))   
                        
     fₙ = zeros(nₚ)
-    ops[5](elements["Γᵗ"],fₙ)
+    ops[3](elements["Γᵗ"],fₙ)
 
     # predictor phase
     d .+= Δt*v + Δt^2/2.0*(1.0-2.0*β)*aₙ
     v .+= Δt*(1.0-γ)*aₙ
 
-    a = (m + β*Δt^2*(k+kw))\((fₙ+f)-k*d)
+    a = (m + β*Δt^2*(k+kα))\((fₙ+fα)-k*d)
         
 
     # Corrector phase
