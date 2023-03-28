@@ -29,6 +29,24 @@ set𝝭!(elements["Ω"])
 set𝝭!(elements["Γᵗ"])
 set𝝭!(elements["Γ"])
 
+e0 = 0.0
+e1 = 0.0
+e2 = 0.0
+for ap in elements["Ω̃"]
+    𝓒 = ap.𝓒
+    𝓖 = ap.𝓖
+    for ξ in 𝓖
+        𝑤 = ξ.𝑤
+        B = ξ[:∂²𝝭∂x²]
+        for (i,xᵢ) in enumerate(𝓒)
+            global e0 += B[i]*𝑤
+            global e1 += B[i]*xᵢ.x*𝑤
+            global e2 += B[i]*xᵢ.x^2*𝑤
+        end
+        global e2 -= 2.0*𝑤
+    end
+end
+
 F₀ = 10
 ρ = 2500
 t = 1.0
