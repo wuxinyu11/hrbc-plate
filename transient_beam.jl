@@ -1,4 +1,4 @@
-using Revise, ApproxOperator, YAML
+using Revise, ApproxOperator, YAML,XLSX
 
 ndiv = 10
 𝒑 = "cubic"
@@ -29,6 +29,28 @@ set𝝭!(elements["Ω"])
 set𝝭!(elements["Γᵗ"])
 set𝝭!(elements["Γ"])
 
+F₀ = 10
+ρ = 2500
+t = 1.0
+A = 1.0
+L = 10
+ω = π
+E = 2*10e6
+I = 1/12
+EI = 1.0/6.0*1e6
+# function w(x,t)
+#     w_ = 0.0
+#     max_iter = 5
+#     for i in 1:max_iter
+#         ωᵢ = (i*i*π*π)/(L*L)*((E*I)/(ρ*A))^abs(1/2)    
+#         # w_ += W(x,t)
+#         w_ += 2*F₀/(ρ*A*L)*(sin((i*π)/2)*sin(i*π*x/L)/(ωᵢ²-ω²))*(sin(ω*t)-(ω/ωᵢ)*sin(ωᵢ*t))
+#         # ωᵢ = (i*i*π*π)/L*L*((E*I)/(ρ*A))^abs(1/2)    
+#     end
+#     return w_    
+# end
+# W(x,t)= 2*F₀/(ρ*A*L)*(sin((i*π)/2)*sin(i*π*x/L)/(ωᵢ²-ω²))*(sin(ω*t)-(ω/ωᵢ)*sin(ωᵢ*t))
+
 ops = [
     Operator(:∫κMdx,:EI=>1.0/6.0*1e6),
     Operator(:∫ρhvwdΩ,:ρ=>2500.0,:h=>1.0),
@@ -46,18 +68,19 @@ ops[4](elements["Γ"],kα,fα)
 Θ = π
 # β = 0.25
 # γ = 0.5
-β = 0.0
+β = 0.25
 γ = 0.5
 Δt = 0.01
 total_time = 5.0
 times = 0.0:Δt:total_time
 d = zeros(nₚ)
+x = zeros(length(times))
 deflection = zeros(length(times))
-
 v = zeros(nₚ)
 aₙ = zeros(nₚ)
 for (n,t) in enumerate(times)
-                           
+    ωₜ = (t*t*π*π)/(L*L)*((E*I)/(ρ*A))^abs(1/2)    
+    w(x,t)= 2*F₀/(ρ*A*L)*(sin((t*π)/2)*sin(t*π*x/L)/(ωₜ*ωₜ-ω*ω))*(sin(ω)-(ω/ωₜ)*sin(ωₜ))                      
     prescribe!(elements["Γᵗ"],:V=>(x,y,z)->10.0*sin(Θ*t))   
                        
     fₙ = zeros(nₚ)
@@ -66,10 +89,7 @@ for (n,t) in enumerate(times)
     # predictor phase
     d .+= Δt*v + Δt^2/2.0*(1.0-2.0*β)*aₙ
     v .+= Δt*(1.0-γ)*aₙ
-
-    a = (m + β*Δt^2*(k+kα))\((fₙ+fα)-k*d)
-        
-
+    a = (m + β*Δt^2*(k+kα))\(fₙ+fα-(k+kα)*d)
     # Corrector phase
     d .+= β*Δt^2*a
     v .+= γ*Δt*a
@@ -81,6 +101,33 @@ for (n,t) in enumerate(times)
     for (i,xᵢ) in enumerate(elements["Γᵗ"][1].𝓒)
         I = xᵢ.𝐼
         deflection[n] += N[i]*d[I]
+    end 
+    ξ = elements["Γᵗ"][1].𝓖[1]
+    N = ξ[:𝝭]
+    for (i,xᵢ) in enumerate(elements["Γᵗ"][1].𝓒)
+        I = xᵢ.𝐼
+        x[n] += N[i]*d[I]
     end
 end
-deflection
+
+x
+  
+
+
+
+
+
+
+# index = [10,20,40,80]
+# XLSX.openxlsx("./xlsx/transient_"*𝒑*".xlsx", mode="rw") do xf
+#     row = "A"
+# #     row = "C"
+#     D = xf[1]
+#     # T = xf[3]
+
+#     ind = findfirst(n->n==ndiv,index)+1
+#     row = row*string(ind)
+#     D[row] = deflection
+#     # T[row] = times
+
+# end
