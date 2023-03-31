@@ -1,12 +1,12 @@
 using Revise, ApproxOperator, YAML, LinearAlgebra, CairoMakie, XLSX
 
-ndiv = 10
+ndiv = 40
 𝒑 = "cubic"
 config = YAML.load_file("./yml/beam_rkgsi_hr_"*𝒑*".yml")
 elements, nodes = importmsh("./msh/beam_"*string(ndiv)*".msh",config)
 
-set_memory_𝗠!(elements["Ω̃"],:∇̃²)
-set_memory_𝝭!(elements["Ω̃"],:∂²𝝭∂x²)
+set_memory_𝗠!(elements["Ω̃"],:∇̃²,:𝝭)
+set_memory_𝝭!(elements["Ω̃"],:𝝭,:∂²𝝭∂x²)
 set_memory_𝗠!(elements["Γ"],:𝝭,:∂𝝭∂x,:∇̃²,:∂∇̃²∂ξ)
 
 nₚ = length(nodes)
@@ -18,6 +18,7 @@ push!(nodes, :s₁ => s, :s₂ => s, :s₃ => s)
 set∇₁𝝭!(elements["Ω"])
 set∇̃²𝝭!(elements["Ω̃"],elements["Ω"])
 set𝝭!(elements["Ω"])
+set𝝭!(elements["Ω̃"])
 set∇₁𝝭!(elements["Γ"])
 set∇∇̃²𝝭!(elements["Γ"],elements["Ω"][[1,nₑ]])
 set∇∇̄²𝝭!(elements["Γ"])
@@ -51,7 +52,8 @@ m = zeros(nₚ,nₚ)
 kα = zeros(nₚ,nₚ)
 fα = zeros(nₚ)
 ops[1](elements["Ω̃"],k)
-ops[2](elements["Ω"],m)
+# ops[2](elements["Ω"],m)
+ops[2](elements["Ω̃"],m)
 ops[4](elements["Γ"],kα,fα)
 
 vals, vecs = LinearAlgebra.eigen(k+kα,m)  
@@ -78,3 +80,14 @@ XLSX.openxlsx("./xlsx/beam_eigen_"*𝒑*".xlsx", mode="rw") do xf
     ω₃[row] = log10(abs(err3))
     ω₄[row] = log10(abs(err4))
 end
+
+cpn = zeros(nₚ)
+kΔx = zeros(nₚ)
+for n in 1:nₚ
+    cpn[n] = vals[n]^0.5/ω(n)
+    kΔx[n] = (n-1)/(nₚ-1)
+end
+f = Figure()
+ax = Axis(f[1,1])
+lines!(kΔx,cpn)
+f
