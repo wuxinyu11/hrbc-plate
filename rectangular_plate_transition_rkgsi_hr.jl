@@ -10,7 +10,7 @@ elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh",config)
 # sp = ApproxOperator.RegularGrid(nodes,n=2,γ=5)
 
 data = getfield(nodes[1],:data)
-sp = ApproxOperator.RegularGrid(data[:x][2],data[:y][2],data[:z][2];n=2,γ=5)
+sp = ApproxOperator.RegularGrid(data[:x][2],data[:y][2],data[:z][2];n=3,γ=5)
 data = Dict([:x=>(2,[5.0]),:y=>(2,[5.0]),:z=>(2,[0.0]),:𝑤=>(2,[1.0])])
 ξ = ApproxOperator.SNode((1,1,0),data)
 𝓒 = [nodes[i] for i in sp(ξ)]
@@ -73,7 +73,6 @@ set∇̃²𝝭!(elements["Γₚ₂"],elements["Ω∩Γₚ₂"])
 set∇̃²𝝭!(elements["Γₚ₃"],elements["Ω∩Γₚ₃"])
 set∇̃²𝝭!(elements["Γₚ₄"],elements["Ω∩Γₚ₄"])
 
-
 set∇₂𝝭!(elements["Γ₁"])
 set∇₂𝝭!(elements["Γ₂"])
 set∇₂𝝭!(elements["Γ₃"])
@@ -84,39 +83,34 @@ set𝝭!(elements["Γₚ₃"])
 set𝝭!(elements["Γₚ₄"])
 set𝝭!(elements["Γᵗ"])
 
+set∇∇̄²𝝭!(elements["Γ₁"],Γᵍ=elements["Γ₁"],Γᴾ=elements["Γₚ"])
+set∇∇̄²𝝭!(elements["Γ₂"],Γᵍ=elements["Γ₂"],Γᴾ=elements["Γₚ"])
+set∇∇̄²𝝭!(elements["Γ₃"],Γᵍ=elements["Γ₃"],Γᴾ=elements["Γₚ"])
+set∇∇̄²𝝭!(elements["Γ₄"],Γᵍ=elements["Γ₄"],Γᴾ=elements["Γₚ"])
+set∇̄²𝝭!(elements["Γₚ"],Γᵍ=elements["Γ∩Γₚ"],Γᴾ=elements["Γₚ"])
 
-
-# set∇∇̄²𝝭!(elements["Γ₁"],Γᵍ=elements["Γ₁"],Γᴾ=elements["Γₚ"])
-# set∇∇̄²𝝭!(elements["Γ₂"],Γᵍ=elements["Γ₂"],Γᴾ=elements["Γₚ"])
-# set∇∇̄²𝝭!(elements["Γ₃"],Γᵍ=elements["Γ₃"],Γᴾ=elements["Γₚ"])
-# set∇∇̄²𝝭!(elements["Γ₄"],Γᵍ=elements["Γ₄"],Γᴾ=elements["Γₚ"])
-# set∇̄²𝝭!(elements["Γₚ"],Γᵍ=elements["Γ∩Γₚ"],Γᴾ=elements["Γₚ"])
-
-
-a =10
-ρ = 8000
+𝑎 = 10
+ρ = 8000.0
 h = 0.05
-F₀ = 100
+F₀ = 100.0
 Θ = π
-E = 2*10e11
+E = 2e11
 ν = 0.3
-D =1.0
-# ω(m,n) = π^2*(D/ρ/h)^0.5*((m/a)^2+(n/b)^2)
+D = E*h^3/12/(1-ν^2)
+ω(m,n) = π^2*(D/ρ/h)^0.5*((m/𝑎)^2+(n/𝑎)^2)
+W(x,y,m,n) = 2/𝑎/(ρ*h)^0.5*sin(m*π*x/𝑎)*sin(n*π*y/𝑎)
+# η(t,m,n) = 2*F₀/(ω(m,n)^2-Θ^2)/𝑎/(ρ*h)^0.5*sin(m*π*5/𝑎)*sin(n*π*5/𝑎)*(ω(m,n)*sin(Θ*t)-Θ*sin(ω(m,n)*t))
+η(t,m,n) = 2*F₀/(ω(m,n)^2-Θ^2)/𝑎/(ρ*h)^0.5*sin(m*π*5/𝑎)*sin(n*π*5/𝑎)*(sin(Θ*t)-Θ/ω(m,n)*sin(ω(m,n)*t))
 function w(x,y,t)
     w_ = 0.0
-    max_iter = 5
+    max_iter = 100
     for m in 1:max_iter
         for n in 1:max_iter
-            ω(m,n) = π^2*(D/ρ/h)^0.5*((m/a)^2+(n/a)^2)
-            W(x,y,m,n) = 2/a/(ρ*h)^0.5*sin(m*π*x/a)*sin(n*π*y/a)
-            η(t,m,n) = 2*F₀/(ω(m,n)^2-Θ^2)/a/(ρ*h)^0.5*sin(m*π/2)*sin(n*π/2)*(sin(Θ*t)-Θ/ω(m,n)*sin(ω(m,n)*t))
             w_ += W(x,y,m,n)*η(t,m,n)
         end
     end
     return w_
 end
-# W(x,y,m,n) = 2/a/(ρ*h)^0.5*sin(m*π*x/a)*sin(n*π*y/a)
-# η(t,m,n) = 2*F₀/(ω(m,n)^2-Θ^2)/a/(ρ*h)^0.5*sin(m*π/2)*sin(n*π/2)*(sin(Θ*t)-Θ/ω(m,n)*sin(ω(m,n)*t))
 
 prescribe!(elements["Γ₁"],:g=>(x,y,z)->0.0)
 prescribe!(elements["Γ₂"],:g=>(x,y,z)->0.0)
@@ -128,7 +122,7 @@ prescribe!(elements["Γₚ₃"],:g=>(x,y,z)->0.0)
 prescribe!(elements["Γₚ₄"],:g=>(x,y,z)->0.0)
 
 
-coefficient = (:D=>1.0,:ν=>0.3,:ρ=>8000.0,:h=>0.05)
+coefficient = (:D=>D,:ν=>ν,:ρ=>ρ,:h=>h)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫ρhvwdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
@@ -147,21 +141,16 @@ fα = zeros(nₚ)
 ops[1](elements["Ω̃"],k)
 ops[2](elements["Ω"],m)
 
-# ops[4](elements["Γ₁"],kα,fα)
-# ops[4](elements["Γ₂"],kα,fα)
-# ops[4](elements["Γ₃"],kα,fα)
-# ops[4](elements["Γ₄"],kα,fα)
-# ops[7](elements["Γ₁"],fα)
-# ops[7](elements["Γ₂"],fα)
-# ops[7](elements["Γ₃"],fα)
-# ops[7](elements["Γ₄"],fα)
-# ops[8](elements["Γₚ"],kα,fα)
+ops[4](elements["Γ₁"],kα,fα)
+ops[4](elements["Γ₂"],kα,fα)
+ops[4](elements["Γ₃"],kα,fα)
+ops[4](elements["Γ₄"],kα,fα)
+ops[8](elements["Γₚ"],kα,fα)
 
-Θ = π
-# β = 0.25
-# γ = 0.5
 β = 0.25
 γ = 0.5
+# β = 0.0
+# γ = 0.5
 Δt = 0.01
 total_time = 5.0
 times = 0.0:Δt:total_time
@@ -173,7 +162,7 @@ v = zeros(nₚ)
 aₙ = zeros(nₚ)
 for (n,t) in enumerate(times)
                            
-    prescribe!(elements["Γᵗ"],:V=>(x,y,z)->100.0*sin(Θ*t))   
+    prescribe!(elements["Γᵗ"],:V=>(x,y,z)->F₀*sin(Θ*t))   
                        
     fₙ = zeros(nₚ)
     ops[5](elements["Γᵗ"],fₙ)

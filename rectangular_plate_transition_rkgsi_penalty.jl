@@ -55,7 +55,8 @@ function w(x,y,t)
         for n in 1:max_iter
             ω(m,n) = π^2*(D/ρ/h)^0.5*((m/a)^2+(n/a)^2)
             W(x,y,m,n) = 2/a/(ρ*h)^0.5*sin(m*π*x/a)*sin(n*π*y/a)
-            η(t,m,n) = 2*F₀/(ω(m,n)^2-Θ^2)/a/(ρ*h)^0.5*sin(m*π/2)*sin(n*π/2)*(sin(Θ*t)-Θ/ω(m,n)*sin(ω(m,n)*t))
+            # η(t,m,n) = 2*F₀/(ω(m,n)^2-Θ^2)/a/(ρ*h)^0.5*sin(m*π/2)*sin(n*π/2)*(sin(Θ*t)-Θ/ω(m,n)*sin(ω(m,n)*t))
+            η(t,m,n) = 2*F₀/(ω(m,n)^2-Θ^2)/a/(ρ*h)^0.5*sin(m*π/2)*sin(n*π/2)*(ω(m,n)*sin(Θ*t)-Θ*sin(ω(m,n)*t))
             w_ += W(x,y,m,n)*η(t,m,n)
         end
     end

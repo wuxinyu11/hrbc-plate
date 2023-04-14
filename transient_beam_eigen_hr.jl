@@ -56,7 +56,8 @@ ops[1](elements["Ω̃"],k)
 ops[2](elements["Ω̃"],m)
 ops[4](elements["Γ"],kα,fα)
 
-vals, vecs = LinearAlgebra.eigen(k+kα,m)  
+# vals, vecs = LinearAlgebra.eigen(k+kα,m)  
+vals, vecs = LinearAlgebra.eigen(k,m)  
 
 ω(n) = (n*π)^2*(EI/ρ/A/L^4)^0.5
 err1 = vals[1]^0.5/ω(1) - 1.0
@@ -87,6 +88,10 @@ for n in 1:nₚ
     cpn[n] = vals[n]^0.5/ω(n)
     kΔx[n] = (n-1)/(nₚ-1)
 end
+# for n in 2:nₚ
+#     cpn[n] = vals[n]^0.5/ω(n-1)
+#     kΔx[n] = (n-1)/(nₚ-1)
+# end
 f = Figure()
 ax = Axis(f[1,1])
 lines!(kΔx,cpn)
