@@ -1,0 +1,19 @@
+RegularGrid:
+    n: 4
+    γ: 6
+
+Ω:
+    type: ReproducingKernel{:Quartic1D,:□,:QuinticSpline,:Seg2}
+    𝓒:
+        tag: Ω
+    𝓖:
+        type: SegGI2
+        𝝭: [𝝭,∂𝝭∂x,∂²𝝭∂x²]
+
+Γ:
+    type: ReproducingKernel{:Quartic1D,:□,:QuinticSpline,:Poi1}
+    𝓒:
+        tag: Γ
+    𝓖:
+        type: PoiGI1
+        𝝭: [𝝭,∂𝝭∂x,∂²𝝭∂x²,∂³𝝭∂x³]
