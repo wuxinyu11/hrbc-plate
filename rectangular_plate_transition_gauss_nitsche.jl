@@ -3,7 +3,7 @@ using YAML, ApproxOperator,LinearAlgebra,CairoMakie
 ndiv = 10
 𝒑 = "cubic"
 # 𝒑 = "quartic"
-config = YAML.load_file("./yml/rectangular_gauss_nitsche_"*𝒑*"_GI13.yml")
+config = YAML.load_file("./yml/rectangular_gauss_nitsche_"*𝒑*"_GI3.yml")
 elements, nodes = importmsh("./msh/rectangular_"*string(ndiv)*".msh",config)
 nₚ = length(nodes)
 nₑ = length(elements["Ω"])
@@ -78,11 +78,11 @@ coefficient = (:D=>D,:ν=>ν,:ρ=>ρ,:h=>h)
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫ρhvwdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫VgdΓ,coefficient...,:α=>1e8),   
+       Operator(:∫VgdΓ,coefficient...,:α=>1e3*D),   
        Operator(:∫wVdΓ,coefficient...),
        Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3*ndiv),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
-       Operator(:ΔMₙₛg,coefficient...,:α=>1e1),      
+       Operator(:ΔMₙₛg,coefficient...,:α=>1e1*D),      
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:H₃)]
 
@@ -151,12 +151,12 @@ xlims!(ax, 1,5)
 ax.xlabel = "time"
 ax.ylabel = "deflection"
 
-# scatter!(times[1:10:500],deflection[1:10:500],markersize = 15,color = "#C00E0E",
-#    label = "gauss_nitsche")
-# lines!(times[1:10:500],dexact[1:10:500],linewidth = 4,color = :black,
-#     label = "exact")
-lines!(times[1:10:500],error[1:10:500],linewidth = 4,color = "#C00E0E",
-label = "rkgsi_hr")
+scatter!(times[1:1:500],deflection[1:1:500],markersize = 15,color = "#C00E0E",
+   label = "gauss_nitsche")
+lines!(times[1:1:500],dexact[1:1:500],linewidth = 4,color = :black,
+    label = "exact")
+# lines!(times[1:10:500],error[1:10:500],linewidth = 4,color = "#C00E0E",
+# label = "rkgsi_hr")
 
 
     axislegend(position = :lb)

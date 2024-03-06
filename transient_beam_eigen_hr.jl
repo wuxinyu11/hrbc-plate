@@ -56,8 +56,8 @@ ops[1](elements["Ω̃"],k)
 ops[2](elements["Ω̃"],m)
 ops[4](elements["Γ"],kα,fα)
 
-# vals, vecs = LinearAlgebra.eigen(k+kα,m)  
-vals, vecs = LinearAlgebra.eigen(k,m)  
+vals, vecs = LinearAlgebra.eigen(k+kα,m)  
+# vals, vecs = LinearAlgebra.eigen(k,m)  
 
 ω(n) = (n*π)^2*(EI/ρ/A/L^4)^0.5
 err1 = vals[1]^0.5/ω(1) - 1.0

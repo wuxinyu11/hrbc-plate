@@ -1,6 +1,6 @@
 using YAML, ApproxOperator,LinearAlgebra,CairoMakie
 
-ndiv = 10
+ndiv = 40
 𝒑 = "cubic"
 # 𝒑 = "quartic"
 config = YAML.load_file("./yml/rectangular_rkgsi_hr_"*𝒑*".yml")
