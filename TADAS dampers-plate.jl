@@ -1,7 +1,7 @@
 
-using Revise, YAML, ApproxOperator
+using Revise, YAML, ApproxOperator, CairoMakie
 
-ndiv = 16
+ndiv = 12
 
 config = YAML.load_file("./yml/TADAS dampers-cubic.yml")
 elements, nodes = importmsh("./msh/TADAS dampers.msh", config)
@@ -29,8 +29,8 @@ set_memory_𝗠!(elements["Γᵗ"],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∇̃²,:∂
 # set_memory_𝗠!(elements["Γₚ₃"],:𝝭,:∇̃²)
 # set_memory_𝗠!(elements["Γₚ₄"],:𝝭,:∇̃²)
 # set_memory_𝗠!(elements["Γₚ₅"],:𝝭,:∇̃²)
-# set_memory_𝗠!(elements["Γₚ₆"],:𝝭,:∇̃²)
-# set_memory_𝗠!(elements["Γₚ₇"],:𝝭,:∇̃²)
+set_memory_𝗠!(elements["Γₚ₆"],:𝝭,:∇̃²)
+set_memory_𝗠!(elements["Γₚ₇"],:𝝭,:∇̃²)
 # set_memory_𝗠!(elements["Γₚ₈"],:𝝭,:∇̃²)
 # set_memory_𝗠!(elements["Γₚ₉"],:𝝭,:∇̃²)
 # set_memory_𝗠!(elements["Γₚ₁₀"],:𝝭,:∇̃²)
@@ -51,8 +51,8 @@ elements["Ω∩Γ10"] = elements["Ω"]∩elements["Γ10"]
 # elements["Ω∩Γₚ₃"] = elements["Ω"]∩elements["Γₚ₃"]
 # elements["Ω∩Γₚ₄"] = elements["Ω"]∩elements["Γₚ₄"]
 # elements["Ω∩Γₚ₅"] = elements["Ω"]∩elements["Γₚ₅"]
-# elements["Ω∩Γₚ₆"] = elements["Ω"]∩elements["Γₚ₆"]
-# elements["Ω∩Γₚ₇"] = elements["Ω"]∩elements["Γₚ₇"]
+elements["Ω∩Γₚ₆"] = elements["Ω"]∩elements["Γₚ₆"]
+elements["Ω∩Γₚ₇"] = elements["Ω"]∩elements["Γₚ₇"]
 # elements["Ω∩Γₚ₈"] = elements["Ω"]∩elements["Γₚ₈"]
 # elements["Ω∩Γₚ₉"] = elements["Ω"]∩elements["Γₚ₉"]
 # elements["Ω∩Γₚ₁₀"] = elements["Ω"]∩elements["Γₚ₁₀"]
@@ -60,6 +60,8 @@ elements["Ω∩Γ10"] = elements["Ω"]∩elements["Γ10"]
 
 
 # elements["Γₚ"] = elements["Γₚ₁"]∪elements["Γₚ₂"]∪elements["Γₚ₃"]∪elements["Γₚ₄"]∪elements["Γₚ₅"]∪elements["Γₚ₆"]∪elements["Γₚ₇"]∪elements["Γₚ₈"]∪elements["Γₚ₉"]∪elements["Γₚ₁₀"]
+elements["Γₚ"] = elements["Γₚ₆"]∪elements["Γₚ₇"]
+
 elements["Γ"] = elements["Γᵍ"]∪elements["Γᵗ"]∪elements["Γ2"]∪elements["Γ3"]∪elements["Γ4"]∪elements["Γ5"]∪elements["Γ7"]∪elements["Γ8"]∪elements["Γ9"]∪elements["Γ10"]
 # elements["Γ∩Γₚ"] = elements["Γ"]∩elements["Γₚ"]
 
@@ -84,8 +86,8 @@ set∇∇̃²𝝭!(elements["Γ10"],elements["Ω∩Γ10"])
 # set∇̃²𝝭!(elements["Γₚ₃"],elements["Ω∩Γₚ₃"])
 # set∇̃²𝝭!(elements["Γₚ₄"],elements["Ω∩Γₚ₄"])
 # set∇̃²𝝭!(elements["Γₚ₅"],elements["Ω∩Γₚ₅"])
-# set∇̃²𝝭!(elements["Γₚ₆"],elements["Ω∩Γₚ₆"])
-# set∇̃²𝝭!(elements["Γₚ₇"],elements["Ω∩Γₚ₇"])
+set∇̃²𝝭!(elements["Γₚ₆"],elements["Ω∩Γₚ₆"])
+set∇̃²𝝭!(elements["Γₚ₇"],elements["Ω∩Γₚ₇"])
 # set∇̃²𝝭!(elements["Γₚ₈"],elements["Ω∩Γₚ₈"])
 # set∇̃²𝝭!(elements["Γₚ₉"],elements["Ω∩Γₚ₉"])
 # set∇̃²𝝭!(elements["Γₚ₁₀"],elements["Ω∩Γₚ₁₀"])
@@ -104,31 +106,34 @@ set∇₂𝝭!(elements["Γ10"])
 
 
 
-# set𝝭!(elements["Γₚ₁"])
-# set𝝭!(elements["Γₚ₂"])
-# set𝝭!(elements["Γₚ₃"])
-# set𝝭!(elements["Γₚ₄"])
+
+set𝝭!(elements["Γₚ₆"])
+set𝝭!(elements["Γₚ₇"])
 # set∇∇̄²𝝭!(elements["Γ₃"],Γᵍ=elements["Γ₃"],Γᶿ=elements["Γ₃"],Γᴾ=elements["Γₚ"])
 # set∇∇̄²𝝭!(elements["Γ₄"],Γᵍ=elements["Γ₄"],Γᶿ=elements["Γ₄"],Γᴾ=elements["Γₚ"])
 # set∇̄²𝝭!(elements["Γₚ"],Γᵍ=elements["Γ∩Γₚ"],Γᶿ=elements["Γ∩Γₚ"],Γᴾ=elements["Γₚ"])
 
 
-set∇∇̄²𝝭!(elements["Γᵍ"],Γᵍ=elements["Γᵍ"],Γᶿ=elements["Γᵍ"])
-set∇∇̄²𝝭!(elements["Γᵗ"],Γᵍ=elements["Γᵗ"],Γᶿ=elements["Γᵗ"])
+set∇∇̄²𝝭!(elements["Γᵍ"],Γᵍ=elements["Γᵍ"],Γᶿ=elements["Γᵍ"],Γᴾ=elements["Γₚ"])
+set∇∇̄²𝝭!(elements["Γᵗ"],Γᵍ=elements["Γᵗ"],Γᶿ=elements["Γᵗ"],Γᴾ=elements["Γₚ"])
 
 
 E = 2E11;
+h = 3.0;
 ν = 0.3;
+D = E*h^3/(12*(1-ν^2));
 P = 100.0;
 w(x,y) = 0.0
 prescribe!(elements["Γᵍ"],:g=>(x,y,z)->w(x,y))
-
 prescribe!(elements["Γᵗ"],:V=>(x,y,z)->-P)
+prescribe!(elements["Γₚ₆"],:g=>(x,y,z)->w(x,y))
+prescribe!(elements["Γₚ₇"],:g=>(x,y,z)->w(x,y))
 
 
 
 
-coefficient = (:D=>1.0,:ν=>0.3)
+
+coefficient = (:D=>D,:ν=>0.3)
 
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
@@ -149,19 +154,13 @@ ops[1](elements["Ω̃"],k)
 
 ops[3](elements["Γᵍ"],k,f)
 
-# ops[4](elements["Γ₁"],f)
-# ops[4](elements["Γ₂"],f)
-# ops[4](elements["Γ₃"],f)
-# ops[4](elements["Γ₄"],f)
-
 ops[4](elements["Γᵗ"],f)
 
-# ops[6](elements["Γ₁"],f)
-# ops[6](elements["Γ₂"],f)
-# ops[6](elements["Γ₃"],f)
-# ops[6](elements["Γ₄"],f)
-
-# d = k\f
+ops[7](elements["Γₚ"],k,f)
 
 
+d = k\f
+
+
+push!(nodes,:d=>d)
 
