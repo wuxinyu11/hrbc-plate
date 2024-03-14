@@ -40,9 +40,9 @@ coefficient = (:D=>D,:ν=>0.3)
 
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫vgdΓ,coefficient...,:α=>1e3),
+       Operator(:∫vgdΓ,coefficient...,:α=>1e23*E),
        Operator(:∫wVdΓ,coefficient...),
-       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e3),
+       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e23*E),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:H₃)]
@@ -60,5 +60,5 @@ ops[4](elements["Γᵗ"],f)
 d = k\f
 
 
-# push!(nodes,:d=>d)
-# @save compress=true "png/TADAS_penalty_"*string(ndiv)*".jld" d
+push!(nodes,:d=>d)
+@save compress=true "png/TADAS_penalty_"*string(ndiv)*".jld" d

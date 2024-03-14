@@ -26,7 +26,6 @@ RegularGrid:
     𝓖:
         type: &GB SegRK3
         𝝭: &𝝭 [𝝭,∂𝝭∂x,∂𝝭∂y]
-
 Γᵗ:
     type: *A2
     𝓒:
