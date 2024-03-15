@@ -1,14 +1,13 @@
 using Revise, YAML, ApproxOperator, CairoMakie, JLD
 
-ndiv = 12
+ndiv = 8
 
 config = YAML.load_file("./yml/TADAS dampers-rkgsi-nitsche-cubic.yml")
-elements, nodes = importmsh("./msh/TADAS dampers.msh", config)
-
+elements, nodes = importmsh("./msh/ADAS damper.msh", config)
 nₚ = length(nodes)
 nₑ = length(elements["Ω"])
 
-s = 3.5*120/ ndiv * ones(nₚ)
+s = 3.5*320/ ndiv * ones(nₚ)
 push!(nodes, :s₁ => s, :s₂ => s, :s₃ => s)
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
 
@@ -40,9 +39,9 @@ coefficient = (:D=>D,:ν=>0.3)
 coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κ̃ᵢⱼM̃ᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫VgdΓ,coefficient...,:α=>1e3),
+       Operator(:∫VgdΓ,coefficient...,:α=>1e3*E),
        Operator(:∫wVdΓ,coefficient...),
-       Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3),
+       Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3*E),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
        Operator(:ΔMₙₛg,coefficient...,:α=>1e1),
        Operator(:wΔMₙₛ,coefficient...),
@@ -62,5 +61,5 @@ ops[4](elements["Γᵗ"],f)
 d = k\f
 
 
-push!(nodes,:d=>d)
-@save compress=true "png/TADAS_nitsche_"*string(ndiv)*".jld" d
+# push!(nodes,:d=>d)
+# @save compress=true "png/ADAS_nitsche.jld" d

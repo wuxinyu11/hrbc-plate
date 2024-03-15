@@ -49,6 +49,11 @@ Line(18) = {18, 1};
 Curve Loop(1) = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18};
 Plane Surface(1) = {1};
 
+Physical Curve("Γᵍ") = {10};
+Physical Curve("Γᵗ") = {1};
+Physical Surface("Ω") = {1};
+
+
 Mesh.Algorithm = 8;
 Mesh.MshFileVersion = 2;
 Mesh 2;

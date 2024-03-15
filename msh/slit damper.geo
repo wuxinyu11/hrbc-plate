@@ -68,6 +68,10 @@ Curve Loop(3) = {-31,32,-33,34};
 Plane Surface(1) = {1,2,3};
 
 
+Physical Curve("Γᵍ") = {7};
+Physical Curve("Γᵗ") = {1};
+Physical Surface("Ω") = {1};
+
 Mesh.Algorithm = 8;
 Mesh.MshFileVersion = 2;
 Mesh 2;
