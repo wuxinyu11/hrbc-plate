@@ -61,4 +61,4 @@ d = k\f
 
 
 push!(nodes,:d=>d)
-@save compress=true "png/TADAS_penalty_"*string(ndiv)*".jld" d
+@save compress=true "png/TADAS_penalty.jld" d

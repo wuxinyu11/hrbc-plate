@@ -64,5 +64,5 @@ ops[4](elements["Γᵗ"],f)
 d = k\f
 
 
-# push!(nodes,:d=>d)
-# @save compress=true "png/TADAS_hr_"*string(ndiv)*".jld" d
+push!(nodes,:d=>d)
+@save compress=true "png/TADAS_hr.jld" d

@@ -62,5 +62,5 @@ ops[4](elements["Γᵗ"],f)
 d = k\f
 
 
-# push!(nodes,:d=>d)
-# @save compress=true "png/ADAS_penalty.jld" d
+push!(nodes,:d=>d)
+@save compress=true "png/ADAS_penalty.jld" d
