@@ -67,7 +67,7 @@ Line(34) = {34,31};
 Curve Loop(3) = {-31,32,-33,34};
 Plane Surface(1) = {1,2,3};
 
-Transfinite Curve{1,7} = 15;
+Transfinite Curve{1,7} = 20;
 Transfinite Curve{10,22,24,32,34,4} = 10;
 //Transfinite Curve{9,5,11,3} = 2;
 //Transfinite Curve{23,33,21,31} = 8;
