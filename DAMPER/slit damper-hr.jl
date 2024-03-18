@@ -65,4 +65,4 @@ d = k\f
 
 
 push!(nodes,:d=>d)
-@save compress=true "png/slit_hr.jld" d
+@save compress=true "jld/slit_hr.jld" d

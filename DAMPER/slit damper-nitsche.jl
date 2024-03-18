@@ -63,4 +63,4 @@ d = k\f
 
 
 push!(nodes,:d=>d)
-@save compress=true "png/slit_nitsche.jld" d
+@save compress=true "jld/slit_nitsche.jld" d

@@ -42,9 +42,9 @@ coefficient = (:D=>D,:ν=>0.3)
 
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫vgdΓ,coefficient...,:α=>1e23*E),
+       Operator(:∫vgdΓ,coefficient...,:α=>1e15*E),
        Operator(:∫wVdΓ,coefficient...),
-       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e23*E),
+       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e10*E),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:H₃)]
@@ -63,4 +63,4 @@ d = k\f
 
 
 push!(nodes,:d=>d)
-@save compress=true "png/ADAS_penalty.jld" d
+@save compress=true "jld/ADAS_penalty.jld" d

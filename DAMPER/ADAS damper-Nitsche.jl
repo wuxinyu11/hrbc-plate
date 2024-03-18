@@ -39,9 +39,9 @@ coefficient = (:D=>D,:ν=>0.3)
 coefficient = (:D=>D,:ν=>ν)
 ops = [Operator(:∫κ̃ᵢⱼM̃ᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫VgdΓ,coefficient...,:α=>1e3*E),
+       Operator(:∫VgdΓ,coefficient...,:α=>1e5*E),
        Operator(:∫wVdΓ,coefficient...),
-       Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e3*E),
+       Operator(:∫MₙₙθdΓ,coefficient...,:α=>1e5*E),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
        Operator(:ΔMₙₛg,coefficient...,:α=>1e1),
        Operator(:wΔMₙₛ,coefficient...),
@@ -62,4 +62,4 @@ d = k\f
 
 
 push!(nodes,:d=>d)
-@save compress=true "png/ADAS_nitsche.jld" d
+@save compress=true "jld/ADAS_nitsche.jld" d

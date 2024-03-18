@@ -1,7 +1,7 @@
 
 using Revise, YAML, ApproxOperator, CairoMakie, JLD
 
-ndiv = 8
+ndiv = 6
 
 config = YAML.load_file("./yml/TADAS dampers-cubic.yml")
 elements, nodes = importmsh("./msh/ADAS damper.msh", config)
@@ -65,4 +65,4 @@ d = k\f
 
 
 push!(nodes,:d=>d)
-@save compress=true "png/ADAS_hr.jld" d
+@save compress=true "jld/ADAS_hr.jld" d

@@ -33,7 +33,7 @@ h = 10;
 ν = 0.3;
 D = E*h^3/(12*(1-ν^2));
 P = 1E5;
-w(x,y) = 0.0
+w(x,y) = 0.0;
 prescribe!(elements["Γᵍ"],:g=>(x,y,z)->w(x,y))
 prescribe!(elements["Γᵗ"],:V=>(x,y,z)->-P)
 
@@ -41,9 +41,9 @@ coefficient = (:D=>D,:ν=>0.3)
 
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫vgdΓ,coefficient...,:α=>1e23*E),
+       Operator(:∫vgdΓ,coefficient...,:α=>1e15*E),
        Operator(:∫wVdΓ,coefficient...),
-       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e23*E),
+       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e15*E),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:H₃)]
@@ -62,4 +62,4 @@ d = k\f
 
 
 push!(nodes,:d=>d)
-@save compress=true "png/slit_penalty.jld" d
+@save compress=true "jld/slit_penalty.jld" d
