@@ -67,12 +67,17 @@ Line(34) = {34,31};
 Curve Loop(3) = {-31,32,-33,34};
 Plane Surface(1) = {1,2,3};
 
+Transfinite Curve{1,7} = 15;
+Transfinite Curve{10,22,24,32,34,4} = 10;
+//Transfinite Curve{9,5,11,3} = 2;
+//Transfinite Curve{23,33,21,31} = 8;
+
 
 Physical Curve("Γᵍ") = {7};
 Physical Curve("Γᵗ") = {1};
 Physical Surface("Ω") = {1};
 
-Mesh.Algorithm = 8;
+Mesh.Algorithm = 2;
 Mesh.MshFileVersion = 2;
 Mesh 2;
 //RecombineMesh;

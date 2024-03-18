@@ -31,13 +31,15 @@ Line(14) = {14, 1};
 
 Curve Loop(1) = {1,2,3,4,5,6,7,8,9,10,11,12,13,14};
 Plane Surface(1) = {1};
+Transfinite Curve{1,8,11,5,12,4} = 10;
+Transfinite Curve{10,6,13,3} = 4;
 
 Physical Curve("Γᵍ") = {8};
 Physical Curve("Γᵗ") = {1};
 Physical Surface("Ω") = {1};
 
 
-Mesh.Algorithm = 8;
+Mesh.Algorithm = 2;
 Mesh.MshFileVersion = 2;
 Mesh 2;
 //RecombineMesh;
