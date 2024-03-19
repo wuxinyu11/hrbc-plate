@@ -3,14 +3,14 @@ using Revise, YAML, ApproxOperator, CairoMakie, JLD
 
 ndiv = 12
 
-config = YAML.load_file("./yml/TADAS dampers-rkgsi-penalty-cubic.yml")
+config = YAML.load_file("./yml/TADAS damper-rkgsi-penalty-quartic.yml")
 elements, nodes = importmsh("./msh/TADAS dampers.msh", config)
 
 # nₚ = length(nodes)
 # nₑ = length(elements["Ω"])
 nₚ = getnₚ(elements["Ω"])
 
-s = 3.5*120/ ndiv * ones(nₚ)
+s = 4.5*120/ ndiv * ones(nₚ)
 push!(nodes, :s₁ => s, :s₂ => s, :s₃ => s)
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
 
@@ -28,7 +28,7 @@ set∇₂𝝭!(elements["Γᵗ"])
 
 
 E = 2E11;
-h = 10;
+h = 5;
 ν = 0.3;
 D = E*h^3/(12*(1-ν^2));
 P = 1E5;
@@ -40,9 +40,9 @@ coefficient = (:D=>D,:ν=>0.3)
 
 ops = [Operator(:∫κᵢⱼMᵢⱼdΩ,coefficient...),
        Operator(:∫wqdΩ,coefficient...),
-       Operator(:∫vgdΓ,coefficient...,:α=>1e23*E),
+       Operator(:∫vgdΓ,coefficient...,:α=>1e15*E),
        Operator(:∫wVdΓ,coefficient...),
-       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e23*E),
+       Operator(:∫∇𝑛vθdΓ,coefficient...,:α=>1e10*E),
        Operator(:∫θₙMₙₙdΓ,coefficient...),
        Operator(:wΔMₙₛ,coefficient...),
        Operator(:H₃)]

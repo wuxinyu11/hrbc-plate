@@ -1,13 +1,13 @@
 using Revise, YAML, ApproxOperator, CairoMakie, JLD
 
-ndiv = 8
+ndiv = 9
 
-config = YAML.load_file("./yml/TADAS dampers-rkgsi-nitsche-cubic.yml")
+config = YAML.load_file("./yml/ADAS dampers-rkgsi-nitsche-cubic.yml")
 elements, nodes = importmsh("./msh/ADAS damper.msh", config)
 nₚ = length(nodes)
 nₑ = length(elements["Ω"])
 
-s = 3.5*320/ ndiv * ones(nₚ)
+s = 3.5*240/ ndiv * ones(nₚ)
 push!(nodes, :s₁ => s, :s₂ => s, :s₃ => s)
 set_memory_𝗠!(elements["Ω̃"],:∇̃²)
 
@@ -23,7 +23,7 @@ set∇³𝝭!(elements["Γᵗ"])
 
 
 E = 2E11;
-h = 10;
+h = 5;
 ν = 0.3;
 D = E*h^3/(12*(1-ν^2));
 P = 1E5;
