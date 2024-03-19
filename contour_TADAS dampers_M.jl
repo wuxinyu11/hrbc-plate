@@ -4,7 +4,7 @@ import Gmsh: gmsh
 import BenchmarkExample: BenchmarkExample
 
 ndiv = 12
-α = 5e2
+α = 5e1
 gmsh.initialize()
 gmsh.open("msh/TADAS dampers.msh")
 nodes = get𝑿ᵢ()
@@ -29,10 +29,9 @@ E = 2e11
 ν = 0.3
 Dᵢᵢᵢᵢ = E*h^3/(12*(1-ν^2))
 Dᵢⱼᵢⱼ = E*h^3/(24*(1+ν))
-# ds = Dict(load("jld/TADAS_hr_12.jld"))
-# ds = Dict(load("jld/TADAS_penalty_12.jld"))
-ds = Dict(load("jld/TADAS_nitsche_12.jld"))
-# ds = Dict(load("jld/TADAS_gauss_nitsche_12.jld"))
+# ds = Dict(load("jld/TADAS_hr.jld"))
+ds = Dict(load("jld/TADAS_penalty.jld"))
+# ds = Dict(load("jld/TADAS_nitsche.jld"))
 push!(nodes,:d=>ds["d"])
 
 ind = 21
@@ -435,17 +434,10 @@ ax = Axis3(fig[1, 1], aspect = :data, azimuth = -0.25*pi, elevation = 0.10*pi)
 
 hidespines!(ax)
 hidedecorations!(ax)
-# M₁₂ colorrange = (-300000,300000) M₁₁ colorrange = (-1530000,260000)
-# s = surface!(ax,zs1,xs1,ys1, color=M₁₁, colormap=:haline)
-s = surface!(ax,zs1,xs1,ys1, color=M₂₂, colormap=:haline, colorrange = (-110000,4730000))
-# s = surface!(ax,xs1s,ys1s,zs1s, color=cs1, colormap=:redsblues, colorrange = (-0.11,0))
-# s = surface!(ax,xs1x,ys1x,zs1x, color=cs1, colormap=:redsblues, colorrange = (-0.11,0))
-s = surface!(ax,zs2,xs2,ys2, color=M2₂₂, colormap=:haline, colorrange = (-110000,4730000))
-# # s = surface!(ax,xs2s,ys2s,zs2s, color=cs2, colormap=:redsblues, colorrange = (-0.11,0))
-# # s = surface!(ax,xs2x,ys2x,zs2x, color=cs2, colormap=:redsblues, colorrange = (-0.11,0))
-s = surface!(ax,zs3,xs3,ys3, color=M3₂₂, colormap=:haline, colorrange = (-110000,4730000))
-# # s = surface!(ax,xs3s,ys3s,zs3s, color=cs3, colormap=:redsblues, colorrange = (-0.11,0))
-# # s = surface!(ax,xs3x,ys3x,zs3x, color=cs3, colormap=:redsblues, colorrange = (-0.11,0))
+# M₁₂ colorrange = (-300000,300000) M₁₁ colorrange = (-12000000,3000000)
+s = surface!(ax,zs1,xs1,ys1,  color=M₁₁, colormap=:haline, colorrange = (-12000000,3000000))
+s = surface!(ax,zs2,xs2,ys2, color=M2₁₁, colormap=:haline, colorrange = (-12000000,3000000))
+s = surface!(ax,zs3,xs3,ys3, color=M3₁₁, colormap=:haline, colorrange = (-12000000,3000000))
 lines!(ax,zl,xl₁,yl₁,color=:black,linestyle = :dash)
 lines!(ax,zl,xl₂,yl₂,color=:black,linestyle = :dash)
 lines!(ax,zl,xl₃,yl₃,color=:black,linestyle = :dash)
@@ -489,8 +481,7 @@ lines!(ax,zld10,xld10,yld10,color=:gray)
 
 
 # Colorbar(fig[1, 2],s)
-# # save("./png/TADAS_gauss_nitsche_22.png",fig)
-save("./png/TADAS_nitsche_12_M22.png",fig)
-# save("./png/TADAS_hr_12_M22.png",fig)
-# save("./png/TADAS_penalty_12_M22.png",fig)
+# save("./png/TADAS_nitsche_M11.png",fig)
+# save("./png/TADAS_hr_M11.png",fig)
+save("./png/TADAS_penalty_M11.png",fig)
 fig

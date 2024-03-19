@@ -489,7 +489,7 @@ ax = Axis3(fig[1, 1], aspect = :data, azimuth =-0.5*pi, elevation = 0.5*pi)
 
 hidespines!(ax)
 hidedecorations!(ax)
-# M₁₂ colorrange = (-100000,100000) M₁₁ colorrange = (-800000,200000) M₂₂ colorrange = (-100000,3800000)
+# M₁₂ colorrange = (-200000,200000) M₁₁ colorrange = (-200000,200000) M₂₂ colorrange = (-200000,200000)
 s = surface!(ax,xs1,ys1,  color=M₂₂, colormap=:haline,colorrange = (-200000,200000))
 s = surface!(ax,xs2,ys2, color=M2₂₂, colormap=:haline,colorrange = (-200000,200000))
 s = surface!(ax,xs3,ys3, color=M3₂₂, colormap=:haline,colorrange = (-200000,200000))
