@@ -3,7 +3,7 @@ using ApproxOperator, JLD, GLMakie
 import Gmsh: gmsh
 import BenchmarkExample: BenchmarkExample
 
-ndiv = 9
+ndiv = 19
 α = 4e3
 gmsh.initialize()
 gmsh.open("msh/honeycomb_damper.msh")
@@ -161,10 +161,10 @@ for (I,ξ¹) in enumerate(LinRange(0.0,560, ind))
         M₂₂[I,J] = Dᵢᵢᵢᵢ*κ₂₂
         xs1[I,J] = ξ¹+α*u₁
         ys1[I,J] = ξ²+α*u₂
-           xl₂[J] = 0
-           yl₂[J] = ξ²
-           xl₃[J] = 560
-           yl₃[J] = ξ²
+        xl₂[J] = 0
+        yl₂[J] = ξ²
+        xl₃[J] = 560
+        yl₃[J] = ξ²
     end
     xl₁[I] = ξ¹
     yl₁[I] = 0
@@ -490,14 +490,14 @@ ax = Axis3(fig[1, 1], aspect = :data, azimuth =-0.5*pi, elevation = 0.5*pi)
 hidespines!(ax)
 hidedecorations!(ax)
 # M₁₂ colorrange = (-100000,100000) M₁₁ colorrange = (-800000,200000) M₂₂ colorrange = (-100000,3800000)
-s = surface!(ax,xs1,ys1,  color=M₁₂, colormap=:haline,colorrange = (-200000,200000))
-s = surface!(ax,xs2,ys2, color=M2₁₂, colormap=:haline,colorrange = (-200000,200000))
-s = surface!(ax,xs3,ys3, color=M3₁₂, colormap=:haline,colorrange = (-200000,200000))
-s = surface!(ax,xs4,ys4, color=M4₁₂, colormap=:haline,colorrange = (-200000,200000))
-s = surface!(ax,xs5,ys5, color=M5₁₂, colormap=:haline,colorrange = (-200000,200000))
-s = surface!(ax,xs6,ys6, color=M6₁₂, colormap=:haline,colorrange = (-200000,200000))
-s = surface!(ax,xs7,ys7, color=M7₁₂, colormap=:haline,colorrange = (-200000,200000))
-s = surface!(ax,xs8,ys8, color=M8₁₂, colormap=:haline,colorrange = (-200000,200000))
+s = surface!(ax,xs1,ys1,  color=M₂₂, colormap=:haline,colorrange = (-200000,200000))
+s = surface!(ax,xs2,ys2, color=M2₂₂, colormap=:haline,colorrange = (-200000,200000))
+s = surface!(ax,xs3,ys3, color=M3₂₂, colormap=:haline,colorrange = (-200000,200000))
+s = surface!(ax,xs4,ys4, color=M4₂₂, colormap=:haline,colorrange = (-200000,200000))
+s = surface!(ax,xs5,ys5, color=M5₂₂, colormap=:haline,colorrange = (-200000,200000))
+s = surface!(ax,xs6,ys6, color=M6₂₂, colormap=:haline,colorrange = (-200000,200000))
+s = surface!(ax,xs7,ys7, color=M7₂₂, colormap=:haline,colorrange = (-200000,200000))
+s = surface!(ax,xs8,ys8, color=M8₂₂, colormap=:haline,colorrange = (-200000,200000))
 
 lines!(ax,xl₁,yl₁,color=:black,linestyle = :dash)
 lines!(ax,xl₂,yl₂,color=:black,linestyle = :dash)
@@ -526,8 +526,8 @@ lines!(ax,xl₂₄,yl₂₄,color=:black,linestyle = :dash)
 lines!(ax,xl₂₅,yl₂₅,color=:black,linestyle = :dash)
 lines!(ax,xl₂₆,yl₂₆,color=:black,linestyle = :dash)
 
-Colorbar(fig[1, 2],s)
+# Colorbar(fig[1, 2],s)
 # save("./png/honeycomb_damper_penalty_M22.png",fig)
 # save("./png/honeycomb_damper_hr_M22.png",fig)
-save("./png/honeycomb_damper_nitsche_M12.png",fig)
+# save("./png/honeycomb_damper_nitsche_M22.png",fig)
 fig
