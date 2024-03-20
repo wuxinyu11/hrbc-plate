@@ -37,8 +37,8 @@ ds = Dict(load("jld/slit damper_penalty.jld"))
 push!(nodes,:d₁=>ds["d₁"],:d₂=>ds["d₂"])
 
 ind = 21
-xs1 = zeros(3*ind,ind)
-ys1 = zeros(3*ind,ind)
+xs1 = zeros(ind,ind)
+ys1 = zeros(ind,ind)
 xs2 = zeros(ind,ind)
 ys2 = zeros(ind,ind)
 xs3 = zeros(ind,ind)
@@ -57,11 +57,11 @@ xs9 = zeros(ind,ind)
 ys9 = zeros(ind,ind)
 xs10 = zeros(ind,ind)
 ys10 = zeros(ind,ind)
-xs11 = zeros(3*ind,ind)
-ys11 = zeros(3*ind,ind)
+xs11 = zeros(ind,ind)
+ys11 = zeros(ind,ind)
 
-xl₁ = zeros(3*ind)
-yl₁ = zeros(3*ind)
+xl₁ = zeros(ind)
+yl₁ = zeros(ind)
 xl₂ = zeros(ind)
 yl₂ = zeros(ind)
 xl₃ = zeros(ind)
@@ -106,11 +106,11 @@ xl₂₂ = zeros(ind)
 yl₂₂ = zeros(ind)
 xl₂₃ = zeros(ind)
 yl₂₃ = zeros(ind)
-xl₂₄ = zeros(3*ind)
-yl₂₄ = zeros(3*ind)
-σ₁₂ = zeros(3*ind,ind)
-σ₁₁ = zeros(3*ind,ind)
-σ₂₂ = zeros(3*ind,ind)
+xl₂₄ = zeros(ind)
+yl₂₄ = zeros(ind)
+σ₁₂ = zeros(ind,ind)
+σ₁₁ = zeros(ind,ind)
+σ₂₂ = zeros(ind,ind)
 σ2₁₂ = zeros(ind,ind)
 σ2₁₁ = zeros(ind,ind)
 σ2₂₂ = zeros(ind,ind)
@@ -138,10 +138,10 @@ yl₂₄ = zeros(3*ind)
 σ10₁₂ = zeros(ind,ind)
 σ10₁₁ = zeros(ind,ind)
 σ10₂₂ = zeros(ind,ind)
-σ11₁₂ = zeros(3*ind,ind)
-σ11₁₁ = zeros(3*ind,ind)
-σ11₂₂ = zeros(3*ind,ind)
-for (I,ξ¹) in enumerate(LinRange(0.0,240, 3*ind))
+σ11₁₂ = zeros(ind,ind)
+σ11₁₁ = zeros(ind,ind)
+σ11₂₂ = zeros(ind,ind)
+for (I,ξ¹) in enumerate(LinRange(0.0,240, ind))
     for (J,ξ²) in enumerate(LinRange(0.0, 20, ind))
         indices = sp(ξ¹,ξ²,0.0)
         N = zeros(length(indices))
@@ -163,9 +163,9 @@ for (I,ξ¹) in enumerate(LinRange(0.0,240, 3*ind))
         for (i,xᵢ) in enumerate(𝓒)
             u₁ += N[i]*xᵢ.d₁
             u₂ += N[i]*xᵢ.d₂
-            ε₁₁ += B₁[i]*xᵢ.d₁ 
-            ε₁₂ += (B₂[i]*xᵢ.d₁+B₁[i]*xᵢ.d₂)/2
-            ε₂₂ += B₂[i]*xᵢ.d₂
+            ε₁₁ += B₁[i]*xᵢ.d₂
+            ε₁₂ += (B₂[i]*xᵢ.d₂+B₁[i]*xᵢ.d₁)/2
+            ε₂₂ += B₂[i]*xᵢ.d₁
         end
         σ₁₁[I,J] = Cᵢᵢᵢᵢ*ε₁₁+Cᵢᵢⱼⱼ*ε₂₂
         σ₁₂[I,J] = Cᵢⱼᵢⱼ*ε₁₂
@@ -207,9 +207,9 @@ for i in 1:ind
         for (i,xᵢ) in enumerate(𝓒)
             u₁ += N[i]*xᵢ.d₁
             u₂ += N[i]*xᵢ.d₂
-            ε₁₁ += B₁[i]*xᵢ.d₁ 
-            ε₁₂ += (B₂[i]*xᵢ.d₁+B₁[i]*xᵢ.d₂)/2
-            ε₂₂ += B₂[i]*xᵢ.d₂
+            ε₁₁ += B₁[i]*xᵢ.d₂
+            ε₁₂ += (B₂[i]*xᵢ.d₂+B₁[i]*xᵢ.d₁)/2
+            ε₂₂ += B₂[i]*xᵢ.d₁
         end
         σ2₁₁[i,j] =Cᵢᵢᵢᵢ*ε₁₁+Cᵢᵢⱼⱼ*ε₂₂
         σ2₁₂[i,j] =Cᵢⱼᵢⱼ*ε₁₂
@@ -248,9 +248,9 @@ for i in 1:ind
         for (i,xᵢ) in enumerate(𝓒)
             u₁ += N[i]*xᵢ.d₁
             u₂ += N[i]*xᵢ.d₂
-            ε₁₁ += B₁[i]*xᵢ.d₁ 
-            ε₁₂ += (B₂[i]*xᵢ.d₁+B₁[i]*xᵢ.d₂)/2
-            ε₂₂ += B₂[i]*xᵢ.d₂
+            ε₁₁ += B₁[i]*xᵢ.d₂
+            ε₁₂ += (B₂[i]*xᵢ.d₂+B₁[i]*xᵢ.d₁)/2
+            ε₂₂ += B₂[i]*xᵢ.d₁
         end
         σ3₁₁[i,j] = Cᵢᵢᵢᵢ*ε₁₁+Cᵢᵢⱼⱼ*ε₂₂
         σ3₁₂[i,j] = Cᵢⱼᵢⱼ*ε₁₂
@@ -290,9 +290,9 @@ for i in 1:ind
         for (i,xᵢ) in enumerate(𝓒)
             u₁ += N[i]*xᵢ.d₁
             u₂ += N[i]*xᵢ.d₂
-            ε₁₁ += B₁[i]*xᵢ.d₁ 
-            ε₁₂ += (B₂[i]*xᵢ.d₁+B₁[i]*xᵢ.d₂)/2
-            ε₂₂ += B₂[i]*xᵢ.d₂
+            ε₁₁ += B₁[i]*xᵢ.d₂
+            ε₁₂ += (B₂[i]*xᵢ.d₂+B₁[i]*xᵢ.d₁)/2
+            ε₂₂ += B₂[i]*xᵢ.d₁
         end
         σ4₁₁[i,j] = Cᵢᵢᵢᵢ*ε₁₁+Cᵢᵢⱼⱼ*ε₂₂
         σ4₁₂[i,j] = Cᵢⱼᵢⱼ*ε₁₂
@@ -328,9 +328,9 @@ for (I,ξ¹) in enumerate(LinRange(20,60, ind))
         for (i,xᵢ) in enumerate(𝓒)
             u₁ += N[i]*xᵢ.d₁
             u₂ += N[i]*xᵢ.d₂
-            ε₁₁ += B₁[i]*xᵢ.d₁ 
-            ε₁₂ += (B₂[i]*xᵢ.d₁+B₁[i]*xᵢ.d₂)/2
-            ε₂₂ += B₂[i]*xᵢ.d₂
+            ε₁₁ += B₁[i]*xᵢ.d₂
+            ε₁₂ += (B₂[i]*xᵢ.d₂+B₁[i]*xᵢ.d₁)/2
+            ε₂₂ += B₂[i]*xᵢ.d₁
         end
         σ5₁₁[I,J] = Cᵢᵢᵢᵢ*ε₁₁+Cᵢᵢⱼⱼ*ε₂₂
         σ5₁₂[I,J] = Cᵢⱼᵢⱼ*ε₁₂
@@ -366,9 +366,9 @@ for (I,ξ¹) in enumerate(LinRange(100,140, ind))
         for (i,xᵢ) in enumerate(𝓒)
             u₁ += N[i]*xᵢ.d₁
             u₂ += N[i]*xᵢ.d₂
-            ε₁₁ += B₁[i]*xᵢ.d₁ 
-            ε₁₂ += (B₂[i]*xᵢ.d₁+B₁[i]*xᵢ.d₂)/2
-            ε₂₂ += B₂[i]*xᵢ.d₂
+            ε₁₁ += B₁[i]*xᵢ.d₂
+            ε₁₂ += (B₂[i]*xᵢ.d₂+B₁[i]*xᵢ.d₁)/2
+            ε₂₂ += B₂[i]*xᵢ.d₁
         end
         σ6₁₁[I,J] = Cᵢᵢᵢᵢ*ε₁₁+Cᵢᵢⱼⱼ*ε₂₂
         σ6₁₂[I,J] = Cᵢⱼᵢⱼ*ε₁₂
@@ -404,9 +404,9 @@ for (I,ξ¹) in enumerate(LinRange(180,220, ind))
         for (i,xᵢ) in enumerate(𝓒)
             u₁ += N[i]*xᵢ.d₁
             u₂ += N[i]*xᵢ.d₂
-            ε₁₁ += B₁[i]*xᵢ.d₁ 
-            ε₁₂ += (B₂[i]*xᵢ.d₁+B₁[i]*xᵢ.d₂)/2
-            ε₂₂ += B₂[i]*xᵢ.d₂
+            ε₁₁ += B₁[i]*xᵢ.d₂
+            ε₁₂ += (B₂[i]*xᵢ.d₂+B₁[i]*xᵢ.d₁)/2
+            ε₂₂ += B₂[i]*xᵢ.d₁
         end
         σ7₁₁[I,J] = Cᵢᵢᵢᵢ*ε₁₁+Cᵢᵢⱼⱼ*ε₂₂
         σ7₁₂[I,J] = Cᵢⱼᵢⱼ*ε₁₂
@@ -446,9 +446,9 @@ for i in 1:ind
         for (i,xᵢ) in enumerate(𝓒)
             u₁ += N[i]*xᵢ.d₁
             u₂ += N[i]*xᵢ.d₂
-            ε₁₁ += B₁[i]*xᵢ.d₁ 
-            ε₁₂ += (B₂[i]*xᵢ.d₁+B₁[i]*xᵢ.d₂)/2
-            ε₂₂ += B₂[i]*xᵢ.d₂
+            ε₁₁ += B₁[i]*xᵢ.d₂
+            ε₁₂ += (B₂[i]*xᵢ.d₂+B₁[i]*xᵢ.d₁)/2
+            ε₂₂ += B₂[i]*xᵢ.d₁
         end
         σ8₁₁[i,j] = Cᵢᵢᵢᵢ*ε₁₁+Cᵢᵢⱼⱼ*ε₂₂
         σ8₁₂[i,j] = Cᵢⱼᵢⱼ*ε₁₂
@@ -488,9 +488,9 @@ for i in 1:ind
         for (i,xᵢ) in enumerate(𝓒)
             u₁ += N[i]*xᵢ.d₁
             u₂ += N[i]*xᵢ.d₂
-            ε₁₁ += B₁[i]*xᵢ.d₁ 
-            ε₁₂ += (B₂[i]*xᵢ.d₁+B₁[i]*xᵢ.d₂)/2
-            ε₂₂ += B₂[i]*xᵢ.d₂
+            ε₁₁ += B₁[i]*xᵢ.d₂
+            ε₁₂ += (B₂[i]*xᵢ.d₂+B₁[i]*xᵢ.d₁)/2
+            ε₂₂ += B₂[i]*xᵢ.d₁
         end
         σ9₁₁[i,j] = Cᵢᵢᵢᵢ*ε₁₁+Cᵢᵢⱼⱼ*ε₂₂
         σ9₁₂[i,j] = Cᵢⱼᵢⱼ*ε₁₂
@@ -530,9 +530,9 @@ for i in 1:ind
         for (i,xᵢ) in enumerate(𝓒)
             u₁ += N[i]*xᵢ.d₁
             u₂ += N[i]*xᵢ.d₂
-            ε₁₁ += B₁[i]*xᵢ.d₁ 
-            ε₁₂ += (B₂[i]*xᵢ.d₁+B₁[i]*xᵢ.d₂)/2
-            ε₂₂ += B₂[i]*xᵢ.d₂
+            ε₁₁ += B₁[i]*xᵢ.d₂
+            ε₁₂ += (B₂[i]*xᵢ.d₂+B₁[i]*xᵢ.d₁)/2
+            ε₂₂ += B₂[i]*xᵢ.d₁
         end
         σ10₁₁[i,j] = Cᵢᵢᵢᵢ*ε₁₁+Cᵢᵢⱼⱼ*ε₂₂
         σ10₁₂[i,j] = Cᵢⱼᵢⱼ*ε₁₂
@@ -546,7 +546,7 @@ for i in 1:ind
     end
 end
 
-for (I,ξ¹) in enumerate(LinRange(0.0,240, 3*ind))
+for (I,ξ¹) in enumerate(LinRange(0.0,240, ind))
     for (J,ξ²) in enumerate(LinRange(160, 180, ind))
         indices = sp(ξ¹,ξ²,0.0)
         N = zeros(length(indices))
@@ -568,9 +568,9 @@ for (I,ξ¹) in enumerate(LinRange(0.0,240, 3*ind))
         for (i,xᵢ) in enumerate(𝓒)
             u₁ += N[i]*xᵢ.d₁
             u₂ += N[i]*xᵢ.d₂
-            ε₁₁ += B₁[i]*xᵢ.d₁ 
-            ε₁₂ += (B₂[i]*xᵢ.d₁+B₁[i]*xᵢ.d₂)/2
-            ε₂₂ += B₂[i]*xᵢ.d₂
+            ε₁₁ += B₁[i]*xᵢ.d₂ 
+            ε₁₂ += (B₂[i]*xᵢ.d₂+B₁[i]*xᵢ.d₁)/2
+            ε₂₂ += B₂[i]*xᵢ.d₁
         end
         σ11₁₁[I,J] = Cᵢᵢᵢᵢ*ε₁₁+Cᵢᵢⱼⱼ*ε₂₂
         σ11₁₂[I,J] = Cᵢⱼᵢⱼ*ε₁₂
@@ -591,18 +591,18 @@ ax = Axis3(fig[1, 1], aspect = :data, azimuth = -0.5*pi, elevation = 0.5*pi)
 
 hidespines!(ax)
 hidedecorations!(ax)
-# M₁₂ colorrange = (-400000,400000) M₁₁ colorrange = (-400000,400000) M₂₂ colorrange = (-400000,400000)
-s = surface!(ax,xs1,ys1,   color=  σ₂₂, colormap=:haline,colorrange = (-100000,300000))
-s = surface!(ax,xs2,ys2,   color= σ2₂₂, colormap=:haline,colorrange = (-100000,300000))
-s = surface!(ax,xs3,ys3,   color= σ3₂₂, colormap=:haline,colorrange = (-100000,300000))
-s = surface!(ax,xs4,ys4,   color= σ4₂₂, colormap=:haline,colorrange = (-100000,300000))
-s = surface!(ax,xs5,ys5,   color= σ5₂₂, colormap=:haline,colorrange = (-100000,300000))
-s = surface!(ax,xs6,ys6,   color= σ6₂₂, colormap=:haline,colorrange = (-100000,300000))
-s = surface!(ax,xs7,ys7,   color= σ7₂₂, colormap=:haline,colorrange = (-100000,300000))
-s = surface!(ax,xs8,ys8,   color= σ8₂₂, colormap=:haline,colorrange = (-100000,300000))
-s = surface!(ax,xs9,ys9,   color= σ9₂₂, colormap=:haline,colorrange = (-100000,300000))
-s = surface!(ax,xs10,ys10, color=σ10₂₂, colormap=:haline,colorrange = (-100000,300000))
-s = surface!(ax,xs11,ys11, color=σ11₂₂, colormap=:haline,colorrange = (-100000,300000))
+# M₁₂ colorrange = (-100000,100000) M₁₁ colorrange = (-4000000,1000000) M₂₂ colorrange = (-100000,4000000)
+s = surface!(ax,xs1,ys1,   color=  σ₁₁, colormap=:haline,colorrange = (-4000000,1000000))
+s = surface!(ax,xs2,ys2,   color= σ2₁₁, colormap=:haline,colorrange = (-4000000,1000000))
+s = surface!(ax,xs3,ys3,   color= σ3₁₁, colormap=:haline,colorrange = (-4000000,1000000))
+s = surface!(ax,xs4,ys4,   color= σ4₁₁, colormap=:haline,colorrange = (-4000000,1000000))
+s = surface!(ax,xs5,ys5,   color= σ5₁₁, colormap=:haline,colorrange = (-4000000,1000000))
+s = surface!(ax,xs6,ys6,   color= σ6₁₁, colormap=:haline,colorrange = (-4000000,1000000))
+s = surface!(ax,xs7,ys7,   color= σ7₁₁, colormap=:haline,colorrange = (-4000000,1000000))
+s = surface!(ax,xs8,ys8,   color= σ8₁₁, colormap=:haline,colorrange = (-4000000,1000000))
+s = surface!(ax,xs9,ys9,   color= σ9₁₁, colormap=:haline,colorrange = (-4000000,1000000))
+s = surface!(ax,xs10,ys10, color=σ10₁₁, colormap=:haline,colorrange = (-4000000,1000000))
+s = surface!(ax,xs11,ys11, color=σ11₁₁, colormap=:haline,colorrange = (-4000000,1000000))
 lines!(ax,xl₁,yl₁,color=:black,linestyle = :dash)
 lines!(ax,xl₂,yl₂,color=:black,linestyle = :dash)
 lines!(ax,xl₃,yl₃,color=:black,linestyle = :dash)

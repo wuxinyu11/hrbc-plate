@@ -4,10 +4,10 @@ using ApproxOperator, GLMakie
 import Gmsh: gmsh
 
 gmsh.initialize()
-# gmsh.open("./msh/ADAS damper.msh")
+gmsh.open("./msh/ADAS damper.msh")
 # gmsh.open("./msh/TADAS dampers.msh")
 # gmsh.open("./msh/slit damper.msh")
-gmsh.open("./msh/honeycomb_damper.msh")
+# gmsh.open("./msh/honeycomb_damper.msh")
 entities = getPhysicalGroups()
 nodes = get𝑿ᵢ()
 
@@ -23,7 +23,7 @@ f = Figure()
 # axis
 ax = Axis3(f[1, 1], perspectiveness = 0.8, aspect = :data, azimuth = -0.5*pi, elevation = 0.5*pi, xlabel = " ", ylabel = " ", zlabel = " ", xticksvisible = false,xticklabelsvisible=false, yticksvisible = false, yticklabelsvisible=false, zticksvisible = false, zticklabelsvisible=false, protrusions = (0.,0.,0.,0.))
 hidespines!(ax)
-# hidedecorations!(ax)
+hidedecorations!(ax)
 
 x =  nodes.x
 y = nodes.y
@@ -51,8 +51,8 @@ for elm in elements["∂Ω"]
     y =  [x.y for x in elm.𝓒]
     lines!(x,y,linewidth = 1.5, color = :black)
 end
-# save("./png/ADAS damper_msh.png",f)
+save("./png/ADAS damper_msh.png",f)
 # save("./png/TADAS dampers_msh.png",f)
 # save("./png/slit damper_msh.png",f)
-save("./png/honeycomb_damper_msh.png",f)
+# save("./png/honeycomb_damper_msh.png",f)
 f
