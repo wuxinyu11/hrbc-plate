@@ -29,8 +29,8 @@ E = 2e11
 ν = 0.3
 Dᵢᵢᵢᵢ = E*h^3/(12*(1-ν^2))
 Dᵢⱼᵢⱼ = E*h^3/(24*(1+ν))
-# ds = Dict(load("jld/ADAS_hr.jld"))
-ds = Dict(load("jld/ADAS_penalty.jld"))
+ds = Dict(load("jld/ADAS_hr.jld"))
+# ds = Dict(load("jld/ADAS_penalty.jld"))
 # ds = Dict(load("jld/ADAS_nitsche.jld"))
 
 push!(nodes,:d=>ds["d"])
@@ -466,11 +466,11 @@ ax = Axis3(fig[1, 1], aspect = :data, azimuth = -0.25*pi, elevation = 0.10*pi)
 
 hidespines!(ax)
 hidedecorations!(ax)
-# M₁₂ colorrange = (-3000000,3000000) M₁₁ colorrange = (-20000000,10000000) M₂₂ colorrange = (-800000,8000000)
-s = surface!(ax,zs1,xs1,ys1,  color=M₂₂, colormap=:haline,colorrange = (-20000000,100000000))
-s = surface!(ax,zs3,xs3,ys3, color=M3₂₂, colormap=:haline,colorrange = (-20000000,100000000))
-s = surface!(ax,zs4,xs4,ys4, color=M4₂₂, colormap=:haline,colorrange = (-20000000,100000000))
-s = surface!(ax,zs6,xs6,ys6, color=M6₂₂, colormap=:haline,colorrange = (-20000000,100000000))
+# M₁₂ colorrange = (-4e6,4e6) M₁₁ colorrange = (-20000000,10000000) M₂₂ colorrange = (-2e7,1e8)
+s = surface!(ax,zs1,xs1,ys1,  color=M₁₁, colormap=:haline,colorrange = (-2e7,1e7))
+s = surface!(ax,zs3,xs3,ys3, color=M3₁₁, colormap=:haline,colorrange = (-2e7,1e7))
+s = surface!(ax,zs4,xs4,ys4, color=M4₁₁, colormap=:haline,colorrange = (-2e7,1e7))
+s = surface!(ax,zs6,xs6,ys6, color=M6₁₁, colormap=:haline,colorrange = (-2e7,1e7))
 lines!(ax,zl,xl₁,yl₁,color=:black,linestyle = :dash)
 lines!(ax,zl,xl₂,yl₂,color=:black,linestyle = :dash)
 lines!(ax,zl,xl₃,yl₃,color=:black,linestyle = :dash)
@@ -527,8 +527,8 @@ lines!(ax,zl18ₛ,xl₁₈,yl18ₛ,color=:gray)
 lines!(ax,zl18ₓ,xl₁₈,yl18ₓ,color=:gray)
 
 
-# Colorbar(fig[1, 2],s)
+Colorbar(fig[1, 2],s,ticklabelsize = 25)
 # save("./png/ADAS_nitsche_M22.png",fig)
-# save("./png/ADAS_hr_M22.png",fig)
+save("./png/ADAS_hr_M11.png",fig)
 # save("./png/ADAS_penalty_M22.png",fig)
 fig

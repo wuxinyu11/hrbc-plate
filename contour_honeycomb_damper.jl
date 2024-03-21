@@ -27,11 +27,12 @@ type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
 h = 5
 E = 2e11
 ν = 0.3
-Dᵢᵢᵢᵢ = E*h^3/(12*(1-ν^2))
-Dᵢⱼᵢⱼ = E*h^3/(24*(1+ν))
-# ds = Dict(load("jld/honeycomb_damper_hr.jld"))
+Cᵢᵢᵢᵢ = E/(1-ν^2)
+Cᵢᵢⱼⱼ = E*ν/(1-ν^2)
+Cᵢⱼᵢⱼ = E/2/(1+ν)
+ds = Dict(load("jld/honeycomb_damper_hr.jld"))
 # ds = Dict(load("jld/honeycomb_damper_nitsche.jld"))
-ds = Dict(load("jld/honeycomb_damper_penalty.jld"))
+# ds = Dict(load("jld/honeycomb_damper_penalty.jld"))
 
 push!(nodes,:d₁=>ds["d₁"],:d₂=>ds["d₂"])
 
@@ -489,15 +490,15 @@ ax = Axis3(fig[1, 1], aspect = :data, azimuth =-0.5*pi, elevation = 0.5*pi)
 
 hidespines!(ax)
 hidedecorations!(ax)
-# M₁₂ colorrange = (-200000,200000) M₁₁ colorrange = (-200000,200000) M₂₂ colorrange = (-200000,200000)
-s = surface!(ax,xs1,ys1,  color=σ₂₂, colormap=:haline,colorrange = (-100000,6000000))
-s = surface!(ax,xs2,ys2, color=σ2₂₂, colormap=:haline,colorrange = (-100000,6000000))
-s = surface!(ax,xs3,ys3, color=σ3₂₂, colormap=:haline,colorrange = (-100000,6000000))
-s = surface!(ax,xs4,ys4, color=σ4₂₂, colormap=:haline,colorrange = (-100000,6000000))
-s = surface!(ax,xs5,ys5, color=σ5₂₂, colormap=:haline,colorrange = (-100000,6000000))
-s = surface!(ax,xs6,ys6, color=σ6₂₂, colormap=:haline,colorrange = (-100000,6000000))
-s = surface!(ax,xs7,ys7, color=σ7₂₂, colormap=:haline,colorrange = (-100000,6000000))
-s = surface!(ax,xs8,ys8, color=σ8₂₂, colormap=:haline,colorrange = (-100000,6000000))
+# M₁₂ colorrange = (-200000,200000) M₁₁ colorrange = (-3000000,1000000) M₂₂ colorrange = (-100000,6000000)
+s = surface!(ax,xs1,ys1,  color=σ₁₁, colormap=:haline,colorrange = (-3000000,1000000))
+s = surface!(ax,xs2,ys2, color=σ2₁₁, colormap=:haline,colorrange = (-3000000,1000000))
+s = surface!(ax,xs3,ys3, color=σ3₁₁, colormap=:haline,colorrange = (-3000000,1000000))
+s = surface!(ax,xs4,ys4, color=σ4₁₁, colormap=:haline,colorrange = (-3000000,1000000))
+s = surface!(ax,xs5,ys5, color=σ5₁₁, colormap=:haline,colorrange = (-3000000,1000000))
+s = surface!(ax,xs6,ys6, color=σ6₁₁, colormap=:haline,colorrange = (-3000000,1000000))
+s = surface!(ax,xs7,ys7, color=σ7₁₁, colormap=:haline,colorrange = (-3000000,1000000))
+s = surface!(ax,xs8,ys8, color=σ8₁₁, colormap=:haline,colorrange = (-3000000,1000000))
 
 lines!(ax,xl₁,yl₁,color=:black,linestyle = :dash)
 lines!(ax,xl₂,yl₂,color=:black,linestyle = :dash)
@@ -526,8 +527,8 @@ lines!(ax,xl₂₄,yl₂₄,color=:black,linestyle = :dash)
 lines!(ax,xl₂₅,yl₂₅,color=:black,linestyle = :dash)
 lines!(ax,xl₂₆,yl₂₆,color=:black,linestyle = :dash)
 
-# Colorbar(fig[1, 2],s)
+Colorbar(fig[1, 2],s,ticklabelsize = 25)
 # save("./png/honeycomb_damper_penalty_M22.png",fig)
-# save("./png/honeycomb_damper_hr_M22.png",fig)
+save("./png/honeycomb_damper_hr_M11.png",fig)
 # save("./png/honeycomb_damper_nitsche_M22.png",fig)
 fig
