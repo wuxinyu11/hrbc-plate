@@ -7,8 +7,8 @@ ndiv = 60
 gmsh.initialize()
 # gmsh.open("./msh/ADAS damper.msh")
 # gmsh.open("./msh/TADAS dampers.msh")
-gmsh.open("./msh/slit damper_"*string(ndiv)*".msh")
-# gmsh.open("./msh/honeycomb_damper.msh")
+# gmsh.open("./msh/slit damper_"*string(ndiv)*".msh")
+gmsh.open("./msh/honeycomb_damper_"*string(ndiv)*".msh")
 entities = getPhysicalGroups()
 nodes = get𝑿ᵢ()
 
@@ -55,5 +55,5 @@ end
 # save("./png/ADAS damper_msh.png",f)
 # save("./png/TADAS dampers_msh.png",f)
 # save("./png/slit damper_"*string(ndiv)*"_msh.png",f)
-# save("./png/honeycomb_damper_msh.png",f)
+save("./png/honeycomb_damper_"*string(ndiv)*"_msh.png",f)
 f
