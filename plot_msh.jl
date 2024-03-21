@@ -3,10 +3,11 @@ using ApproxOperator, GLMakie
 
 import Gmsh: gmsh
 
+ndiv = 60
 gmsh.initialize()
-gmsh.open("./msh/ADAS damper.msh")
+# gmsh.open("./msh/ADAS damper.msh")
 # gmsh.open("./msh/TADAS dampers.msh")
-# gmsh.open("./msh/slit damper.msh")
+gmsh.open("./msh/slit damper_"*string(ndiv)*".msh")
 # gmsh.open("./msh/honeycomb_damper.msh")
 entities = getPhysicalGroups()
 nodes = get𝑿ᵢ()
@@ -51,8 +52,8 @@ for elm in elements["∂Ω"]
     y =  [x.y for x in elm.𝓒]
     lines!(x,y,linewidth = 1.5, color = :black)
 end
-save("./png/ADAS damper_msh.png",f)
+# save("./png/ADAS damper_msh.png",f)
 # save("./png/TADAS dampers_msh.png",f)
-# save("./png/slit damper_msh.png",f)
+# save("./png/slit damper_"*string(ndiv)*"_msh.png",f)
 # save("./png/honeycomb_damper_msh.png",f)
 f
