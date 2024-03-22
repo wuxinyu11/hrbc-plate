@@ -60,9 +60,9 @@ Curve Loop(2) = {15,16,17,18,19,20};
 Curve Loop(3) = {21,22,23,24,25,26};
 Plane Surface(1) = {1,2,3};
 
-Transfinite Curve{1,8} = 100;
-Transfinite Curve{13,26,20,3,2,14,10,17,23,6,7,9} =15;
-Transfinite Curve{12,15,19,21,25,4,5,24,22,18,16,11} = 75;
+Transfinite Curve{1,8} = 250;
+Transfinite Curve{13,26,20,3,2,14,10,17,23,6,7,9} =18;
+Transfinite Curve{12,15,19,21,25,4,5,24,22,18,16,11} = 62;
 
 
 Physical Curve("Γᵍ") = {8};

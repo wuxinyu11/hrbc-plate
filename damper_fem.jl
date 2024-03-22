@@ -3,7 +3,7 @@ using ApproxOperator, JLD
 import BenchmarkExample: BenchmarkExample
 
 include("impor_damper.jl")
-ndiv = 100
+ndiv = 200
 # elements, nodes = import_damper_fem("msh/honeycomb_damper_"*string(ndiv)*".msh");
 elements, nodes = import_damper_fem("msh/slit damper_"*string(ndiv)*".msh");
 
